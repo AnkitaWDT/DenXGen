@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     },
     dropdownList: {
         //marginTop: 10, // Adjust this value based on your UI
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#fff',
         borderColor: '#121212',
         borderWidth: 0.5,
         borderRadius: 8,

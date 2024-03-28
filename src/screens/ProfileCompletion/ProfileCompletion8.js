@@ -497,7 +497,7 @@ const ProfileCompletion8 = ({ navigation }) => {
                                               <Text style={[commonStyles.headerText2BL, { marginBottom: height * 0.005 }]}>
                                                   Instagram
                                               </Text>
-                                              <View style={[styles.inputContainerM]}>
+                                              <View style={[styles.inputContainer1]}>
                                                   <TextInput
                                                       style={styles.inputs}
                                                       placeholder="Instagram"
@@ -533,7 +533,7 @@ const ProfileCompletion8 = ({ navigation }) => {
                                               <Text style={[commonStyles.headerText2BL, { marginBottom: height * 0.005 }]}>
                                                   LinkedIn
                                               </Text>
-                                              <View style={[styles.inputContainerM]}>
+                                              <View style={[styles.inputContainer1]}>
                                                   <TextInput
                                                       style={styles.inputs}
                                                       placeholder="LinkedIn"
@@ -550,7 +550,7 @@ const ProfileCompletion8 = ({ navigation }) => {
                                               <Text style={[commonStyles.headerText2BL, { marginBottom: height * 0.005 }]}>
                                                   Facebook 
                                               </Text>
-                                              <View style={[styles.inputContainerM]}>
+                                              <View style={[styles.inputContainer1]}>
                                                   <TextInput
                                                       style={[styles.inputs, { width: '100%' }]}
                                                       placeholder="Facebook"
@@ -566,7 +566,7 @@ const ProfileCompletion8 = ({ navigation }) => {
                                               <Text style={[commonStyles.headerText2BL, { marginBottom: height * 0.005 }]}>
                                                   Other Links
                                               </Text>
-                                              <View style={[styles.inputContainerM]}>
+                                              <View style={[styles.inputContainer1]}>
                                                   <TextInput
                                                       style={[styles.inputs, { width: '100%' }]}
                                                       placeholder="Other"
@@ -630,6 +630,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignSelf: 'center',
         backgroundColor: '#979797',
+        borderRadius: 10
     },
     modalContainer: {
         flex: 1,

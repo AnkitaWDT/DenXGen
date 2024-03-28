@@ -358,7 +358,12 @@ marginRight: 12
         color: '#121212',
         lineHeight: 26
     },
-
+    headerText0BL: {
+        fontSize: 20,
+        fontFamily: 'DMSans-Bold',
+        color: '#121212',
+        lineHeight: 26
+    },
     headerText3BL: {
         fontSize: 15,
         color: '#121212',

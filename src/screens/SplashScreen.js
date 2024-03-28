@@ -17,13 +17,132 @@ const SplashScreen = ({ navigation }) => {
                     showOnboardingScreen();
                 } else {
                     // App launched before
-                    showHomeScreen();
+                    checkUserLoggedInStatus();
+                    // showHomeScreen();
                 }
             } catch (error) {
                 // Handle AsyncStorage errors
                 console.log(error);
                 showOnboardingScreen();
             }
+        };
+
+        const checkUserLoggedInStatus = async () => {
+            try {
+                const userLoggedIn = await AsyncStorage.getItem('userLoggedIn');
+                const adminLoggedIn = await AsyncStorage.getItem('adminLoggedIn');
+                const userid = await AsyncStorage.getItem('userid');
+                
+                //console.log(adminLoggedIn);
+                console.log(userLoggedIn);
+
+                if (userLoggedIn === null || userLoggedIn === 'false') {
+                    // User not logged in
+                    showLoginScreen();
+                } else {
+                    // User logged in
+
+                    const userData = {
+                        status: await AsyncStorage.getItem('status'),
+                        isregistered: await AsyncStorage.getItem('isregistered'),
+                    };
+
+                    // Fetch the updated API response
+                    const phoneNumber = await AsyncStorage.getItem('phoneno');
+                    const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/requserlogin-ax.php?phno=${phoneNumber}`);
+                    const apiData = await response.json();
+
+                    // Update the userData object with new values
+                    userData.status = apiData.data.status;
+                    userData.isregistered = apiData.data.isregistered.toString(); // Convert to string
+
+                    // Save the updated userData object back to AsyncStorage
+                    await AsyncStorage.setItem('status', userData.status);
+                    await AsyncStorage.setItem('isregistered', userData.isregistered);
+
+                    console.log("Status:", userData.status);
+                    console.log("IsRegistered:", userData.isregistered);
+
+                    // Compare the current and new userData.status values
+                   if (parseInt(userData.status) === 1 && parseInt(userData.isregistered) === 1) {
+
+                        console.log('HomeScreen');
+                        showHomeScreen();
+                    }
+                    else if (parseInt(userData.status) === 0 && parseInt(userData.isregistered) === 0) {
+                        console.log('SelectCategory');
+                       showHomeScreen();
+                        //showSelectCategoryScreen();
+                    }
+                   else if (parseInt(userData.status) === 0 && parseInt(userData.isregistered) === 1) {
+                       console.log('Profile');
+                       showProfileScreen();
+                   }
+                    else {
+                        console.log('WaitingScreen2');
+                        null;
+                    }
+                }
+            } catch (error) {
+                // Handle AsyncStorage errors
+                console.log(error);
+                console.log('NoInternetScreenError');
+                //showNoInternetScreen();
+            }
+        };
+
+        const showProfileScreen = () => {
+            const fadeIn = Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 700, // Adjust the duration as per your preference
+                useNativeDriver: true,
+            });
+            const fadeOut = Animated.timing(fadeAnim, {
+                toValue: 0,
+                duration: 700, // Adjust the duration as per your preference
+                useNativeDriver: true,
+            });
+
+            Animated.sequence([fadeIn, Animated.delay(700), fadeOut]).start(() => {
+                console.log('ProfileCompletion1');
+                navigation.replace('ProfileCompletion1');
+            });
+        };
+
+        const showSelectCategoryScreen = () => {
+            const fadeIn = Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 700, // Adjust the duration as per your preference
+                useNativeDriver: true,
+            });
+            const fadeOut = Animated.timing(fadeAnim, {
+                toValue: 0,
+                duration: 700, // Adjust the duration as per your preference
+                useNativeDriver: true,
+            });
+
+            Animated.sequence([fadeIn, Animated.delay(700), fadeOut]).start(() => {
+                console.log('SelectCategory');
+                navigation.replace('SelectCategory');
+            });
+        };
+
+        const showLoginScreen = () => {
+            const fadeIn = Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 700, // Adjust the duration as per your preference
+                useNativeDriver: true,
+            });
+            const fadeOut = Animated.timing(fadeAnim, {
+                toValue: 0,
+                duration: 700, // Adjust the duration as per your preference
+                useNativeDriver: true,
+            });
+
+            Animated.sequence([fadeIn, Animated.delay(700), fadeOut]).start(() => {
+                console.log('LoginScreen');
+                navigation.replace('LoginScreen');
+            });
         };
 
         const showHomeScreen = () => {

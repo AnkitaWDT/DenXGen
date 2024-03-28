@@ -111,15 +111,24 @@ const ProfileCompletion6 = ({ navigation }) => {
     }
   };
 
-
   const handleEducationModalSubmit = () => {
-    if (EducationInputs.length < 5) {
-      const newInputs = [...EducationInputs, newInputValue];
+    if (EducationInputs.length < 5 && newInputValue1 && newInputValue && selectedFromYear && selectedFromMonth && selectedToYear && selectedToMonth) {
+      const newInputs = [
+        ...EducationInputs,
+        {
+          Degree: newInputValue1,
+          InstituteName: newInputValue,
+          StartDate: { year: selectedFromYear, month: selectedFromMonth },
+          EndDate: { year: selectedToYear, month: selectedToMonth }
+        }
+      ];
       setEducationInputs(newInputs);
     }
     setEducationModalVisible(false);
     setNewInputValue('');
+    setNewInputValue1('');
   };
+
 
   const handleExpModalSubmit = () => {
     if (ExpInputs.length < 5) {
@@ -130,13 +139,13 @@ const ProfileCompletion6 = ({ navigation }) => {
     setNewInputValue('');
   };
 
-  const handleEduModalSubmit = (e) => {
+  const handleEduModalSubmit = () => {
     if (EduInputs.length < 5) {
-      const newInputs = [...EduInputs, newInputValue]; // <-- Changed newInputValue to newInputValue1
+      const newInputs = [...EduInputs, newInputValue1];
       setEduInputs(newInputs);
     }
-    setEduModalVisible(false);
-    setNewInputValue1(''); // <-- Reset newInputValue1
+    setEduModalVisible(false); // Close the modal
+    setNewInputValue1(''); // Reset newInputValue1
   };
 
 
@@ -222,6 +231,26 @@ const ProfileCompletion6 = ({ navigation }) => {
     setCurrentlyWorking(!currentlyWorking);
   };
 
+
+  const handleNext = async () => {
+    const userData = {
+      EducationalQualifications: EducationInputs.map((value, index) => {
+        return {
+          InstituteName: value.InstituteName, // Assuming 'InstituteName' is the property for institute name in EducationInputs
+          Degree: value.Degree, // Assuming 'Degree' is the property for degree in EducationInputs
+          StartDate: value.StartDate, // Assuming 'StartDate' is the property for start date in EducationInputs
+          EndDate: value.EndDate // Assuming 'EndDate' is the property for end date in EducationInputs
+        };
+      })
+    };
+
+    console.log('User Data:', userData);
+    //navigation.navigate('ProfileCompletion6');
+  };
+
+
+
+
   const currentStep = 6; // For example, current step is 4
   const totalSteps = 9; // Total number of steps
 
@@ -261,13 +290,14 @@ const ProfileCompletion6 = ({ navigation }) => {
                     Educational Qualification <Text style={styles.requiredIndicator}>*</Text>
                   </Text>
                   {EducationInputs.map((value, index) => (
-                    <View key={index} style={styles.educationInputContainer}>
+                    <View key={index} style={styles.inputContainer1}>
                       <TextInput
                         style={styles.inputs}
                         placeholder="Educational Qualification"
                         placeholderTextColor="#979797"
-                        value={value}
+                        value={value.Institute}
                         underlineColorAndroid="transparent"
+                        editable={false}
                       />
                       <TouchableOpacity onPress={() => handleRemoveEducationInput(index)} style={styles.closeContainer} activeOpacity={0.8}>
                         <Image
@@ -313,6 +343,7 @@ const ProfileCompletion6 = ({ navigation }) => {
                             placeholderTextColor="#979797"
                             value={newInputValue1}
                             onChangeText={setNewInputValue1}
+                           
                           />
                         </View>
                         <View style={styles.dropdownContainer}>
@@ -320,12 +351,12 @@ const ProfileCompletion6 = ({ navigation }) => {
                           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
 
                             <View style={{ flexDirection: 'row' }}>
-                              <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Year:</Text>
+                              <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Year  :</Text>
                               <TouchableOpacity
                                 onPress={() => toggleFromYearPicker()}
                                 style={styles.yearDropdown}
                               >
-                                <Text style={{ color: '#000', alignSelf: 'center' }}>{selectedFromYear ? selectedFromYear.toString() : 'Year'}</Text>
+                                    <Text style={[commonStyles.headerText3BL, { color: '#000', fontSize: 15 }]}>{selectedFromYear ? selectedFromYear.toString() : 'Year'}</Text>
                               </TouchableOpacity>
                             </View>
 
@@ -335,12 +366,12 @@ const ProfileCompletion6 = ({ navigation }) => {
                             )}
 
                             <View style={{ flexDirection: 'row' }}>
-                              <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Month:</Text>
+                              <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Month  :</Text>
                               <TouchableOpacity
                                 onPress={() => toggleFromMonthPicker()}
                                 style={styles.yearDropdown}
                               >
-                                <Text style={{ color: '#000' }}>{selectedFromMonth ? selectedFromMonth.toString() : 'Month'}</Text>
+                                    <Text style={[commonStyles.headerText3BL, { color: '#000', fontSize: 15 }]}>{selectedFromMonth ? selectedFromMonth.toString() : 'Month'}</Text>
                               </TouchableOpacity>
                             </View>
 
@@ -356,12 +387,12 @@ const ProfileCompletion6 = ({ navigation }) => {
                           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
 
                             <View style={{ flexDirection: 'row' }}>
-                              <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Year:</Text>
+                              <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Year  :</Text>
                               <TouchableOpacity
                                 onPress={() => toggleToYearPicker()}
                                 style={styles.yearDropdown}
                               >
-                                <Text style={{ color: '#000' }}>{selectedToYear ? selectedToYear.toString() : 'Year'}</Text>
+                                    <Text style={[commonStyles.headerText3BL, { color: '#000', fontSize: 15 }]}>{selectedToYear ? selectedToYear.toString() : 'Year'}</Text>
                               </TouchableOpacity>
                             </View>
 
@@ -371,12 +402,12 @@ const ProfileCompletion6 = ({ navigation }) => {
                             )}
 
                             <View style={{ flexDirection: 'row' }}>
-                              <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Month:</Text>
+                              <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Month  :</Text>
                               <TouchableOpacity
                                 onPress={() => toggleToMonthPicker()}
                                 style={styles.yearDropdown}
                               >
-                                <Text style={{ color: '#000' }}>{selectedToMonth ? selectedToMonth.toString() : 'Month'}</Text>
+                                    <Text style={[commonStyles.headerText3BL, { color: '#000', fontSize: 15 }]}>{selectedToMonth ? selectedToMonth.toString() : 'Month'}</Text>
                               </TouchableOpacity>
                             </View>
 
@@ -387,14 +418,22 @@ const ProfileCompletion6 = ({ navigation }) => {
                           </View>
                         </View>
                         <TouchableOpacity
-                          style={[commonStyles.button]}
-                          onPress={handleEduModalSubmit}
+                              style={[commonStyles.button, { marginTop: height * 0.03, marginBottom: height * 0.05 }]}
+                              onPress={handleEducationModalSubmit}
                           activeOpacity={0.8}
                         >
                           <Text style={commonStyles.buttonText}>Submit</Text>
                         </TouchableOpacity>
                       </ScrollView>
+
                        </TouchableWithoutFeedback>
+                        {/* <TouchableOpacity
+                          style={[commonStyles.button, { position: 'absolute', bottom: height * 0.08, }]}
+                          onPress={handleEduModalSubmit}
+                          activeOpacity={0.8}
+                        >
+                          <Text style={commonStyles.buttonText}>Submit</Text>
+                        </TouchableOpacity> */}
                       </View>
                     </TouchableWithoutFeedback>
                   </Modal>
@@ -468,12 +507,12 @@ const ProfileCompletion6 = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
 
                               <View style={{ flexDirection: 'row' }}>
-                                <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Year:</Text>
+                                <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Year  :</Text>
                                 <TouchableOpacity
                                   onPress={() => toggleFromYearPicker()}
                                   style={styles.yearDropdown}
                                 >
-                                  <Text style={{ color: '#000' }}>{selectedFromYear ? selectedFromYear.toString() : 'Year'}</Text>
+                                  <Text style={[commonStyles.headerText3BL, { color: '#000', fontSize: 15 }]}>{selectedFromYear ? selectedFromYear.toString() : 'Year'}</Text>
                                 </TouchableOpacity>
                               </View>
 
@@ -483,12 +522,12 @@ const ProfileCompletion6 = ({ navigation }) => {
                               )}
 
                               <View style={{ flexDirection: 'row' }}>
-                                <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Month:</Text>
+                                <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Month  :</Text>
                                 <TouchableOpacity
                                   onPress={() => toggleFromMonthPicker()}
                                   style={styles.yearDropdown}
                                 >
-                                  <Text style={{ color: '#000' }}>{selectedFromMonth ? selectedFromMonth.toString() : 'Month'}</Text>
+                                  <Text style={[commonStyles.headerText3BL, { color: '#000', fontSize: 15 }]}>{selectedFromMonth ? selectedFromMonth.toString() : 'Month'}</Text>
                                 </TouchableOpacity>
                               </View>
 
@@ -527,12 +566,12 @@ const ProfileCompletion6 = ({ navigation }) => {
                               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
 
                                 <View style={{ flexDirection: 'row' }}>
-                                  <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Year:</Text>
+                                  <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Year  :</Text>
                                   <TouchableOpacity
                                     onPress={() => toggleToYearPicker()}
                                     style={styles.yearDropdown}
                                   >
-                                    <Text style={{ color: '#000' }}>{selectedToYear ? selectedToYear.toString() : 'Year'}</Text>
+                                    <Text style={[commonStyles.headerText3BL, { color: '#000', fontSize: 15 }]}>{selectedToYear ? selectedToYear.toString() : 'Year'}</Text>
                                   </TouchableOpacity>
                                 </View>
 
@@ -542,12 +581,12 @@ const ProfileCompletion6 = ({ navigation }) => {
                                 )}
 
                                 <View style={{ flexDirection: 'row' }}>
-                                  <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Month:</Text>
+                                  <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Month  :</Text>
                                   <TouchableOpacity
                                     onPress={() => toggleToMonthPicker()}
                                     style={styles.yearDropdown}
                                   >
-                                    <Text style={{ color: '#000' }}>{selectedToMonth ? selectedToMonth.toString() : 'Month'}</Text>
+                                    <Text style={[commonStyles.headerText3BL, { color: '#000', fontSize: 15 }]}>{selectedToMonth ? selectedToMonth.toString() : 'Month'}</Text>
                                   </TouchableOpacity>
                                 </View>
 
@@ -573,18 +612,17 @@ const ProfileCompletion6 = ({ navigation }) => {
                     </TouchableOpacity>
                   </Modal>
                 </View>
+                
+                <TouchableOpacity
+                  style={[commonStyles.button]}
+                  onPress={handleNext}
+                  activeOpacity={0.8}
+                >
+                  <Text style={commonStyles.buttonText}>Continue</Text>
+                </TouchableOpacity>
             </View>
           </ScrollView>
-          <TouchableOpacity
-            style={[commonStyles.button, styles.continueButton]}
-            onPress={() => {
-              navigation.navigate('ProfileCompletion7');
-              console.log('ProfileCompletion21');
-            }}
-            activeOpacity={0.8}
-          >
-            <Text style={commonStyles.buttonText}>Continue</Text>
-          </TouchableOpacity>
+          
         </View>
 
       )}
@@ -609,6 +647,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'center',
     backgroundColor: '#979797',
+    borderRadius: 10
   },
   modalContainer: {
     flex: 1,
@@ -620,7 +659,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: '90%', // Maximum height of 50%
+    maxHeight: '80%', // Maximum height of 50%
   },
   modalInput: {
     borderWidth: 1,

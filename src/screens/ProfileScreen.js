@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   PixelRatio, RefreshControl, View, Image, ImageBackground, StyleSheet, SafeAreaView, TouchableOpacity, Text, TouchableWithoutFeedback, Modal, Dimensions, FlatList
 } from 'react-native';
@@ -14,6 +14,8 @@ import Video from 'react-native-video';
 import SocialLink from '../components/SocialLinks';
 import AlertPopup from '../components/AlertPopup';
 import { moderateScale } from 'react-native-size-matters';
+import Animation from '../components/Loader';
+import LottieView from 'lottie-react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -174,6 +176,29 @@ const ProfileScreen = ({navigation, route}) => {
 
   const toggleShowAllExp = () => {
     setShowAllExp(!showAllExp);
+  };
+
+  const [showAlert, setShowAlert] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
+  const [showImage, setShowImage] = useState(true);
+
+  const handleImageClick = () => {
+    setShowAlert(true);
+  };
+
+  const handleConfirm = () => {
+    setShowAlert(false);
+    setShowLoader(true);
+    setTimeout(() => {
+      setShowLoader(false);
+      setShowImage(false);
+      // Perform navigation or any other action after loading
+      // navigation.navigate('ClinicProfileCompletion3');
+    }, 2000); // Simulated loading time, replace with actual loading logic
+  };
+
+  const handleCancel = () => {
+    setShowAlert(false);
   };
 
   const [selectedTab, setSelectedTab] = useState(0);
@@ -439,7 +464,12 @@ const ProfileScreen = ({navigation, route}) => {
     }
   };
 
+  const animationRef = useRef(null);
 
+  useEffect(() => {
+    animationRef.current?.play();
+  }, []);
+    
   const [modalVisible, setModalVisible] = useState(false);
 
   // Function to toggle the modal visibility
@@ -1203,11 +1233,65 @@ const ProfileScreen = ({navigation, route}) => {
         </View>
 
       </ScrollView>
+      {showImage && (
+        <TouchableOpacity
+          onPress={handleImageClick}
+          style={{
+            position: 'absolute',
+            bottom: 20,
+            right: 20,
+          }}
+        >
+          <Image
+            source={require('../../assets/img/DropCard.png')}
+            style={{ width: 60, height: 60 }}
+          />
+        </TouchableOpacity>
+      )}
+
+      <AlertPopup
+        visible={showAlert}
+        onRequestClose={() => setShowAlert(false)}
+        title="Drop a Card"
+        message="Do you really want to send drop card?"
+        yesLabel="Yes"
+        noLabel="No"
+        onYesPress={handleConfirm}
+        onNoPress={handleCancel}
+      />
+      {/* {showLoader && (
+        <View style={styles.animationContainer}>
+          <LottieView
+            ref={animationRef}
+            source={require('../../assets/img/loader.json')}
+            style={styles.animation}
+          />
+        </View>
+      )} */}
+
+
+      {/* <Image source={require('../../assets/img/DropCard.png')} style={{ width: 60, height: 60, position: 'absolute', bottom: 20, right: 20 }} /> */}
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  animationContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  animation: {
+    width: 200, // Adjust the width and height based on your animation's dimensions
+    height: 200,
+  },
   staticButtonsContainer: {
     flex: 1,
     flexDirection: 'row',
@@ -1743,6 +1827,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'center',
     backgroundColor: '#979797',
+    borderRadius: 10
   },
   profileImage: {
     height: height * 0.09,

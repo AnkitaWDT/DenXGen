@@ -90,7 +90,20 @@ const ProfileCompletion1 = ({ navigation }) => {
     }, []);
 
 
+    useEffect(() => {
+        const fetchPhoneNumber = async () => {
+            try {
+                const phoneno = await AsyncStorage.getItem('phoneno');
+                if (phoneno) {
+                    setSelectedContactNumber(phoneno);
+                }
+            } catch (error) {
+                console.log('Error retrieving phone number:', error);
+            }
+        };
 
+        fetchPhoneNumber();
+    }, []);
 
     const handleNext = async () => {
         // if (!selectedName) {
@@ -136,13 +149,15 @@ const ProfileCompletion1 = ({ navigation }) => {
 
         //     navigation.navigate('LoginScreen');
         // }
+        const userid = await AsyncStorage.getItem('userid');
+        const id = parseInt(userid);
 
         const userData = {
-            id: 1,
+            id: id,
             name: selectedName,
             email: selectedEmail,
             phoneno: selectedContactNumber,
-            //alternateContactNumber: selectedAlternateContactNumber,
+            alternate: selectedAlternateContactNumber,
             wp_number: selectedWappNumber,
             gen_id: selectedGenderID,
             proff_id: selectedProfessionID,
@@ -151,41 +166,17 @@ const ProfileCompletion1 = ({ navigation }) => {
 
         console.log('User Data:', userData);
 
-        // try {
-        //     const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/requserdtls-ax.php', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         },
-        //         body: JSON.stringify(userData),
-        //     });
+        try {
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/requserdtls-ax.php`, userData);
 
-        //     if (!response.ok) {
-        //         throw new Error('Network response was not ok');
-        //     }
+            console.log('dataresponse', response.data);
+            //ToastAndroid.show("Product Added Successfully!", ToastAndroid.SHORT);
+            console.log('Data Added to database');
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
 
-        //     const responseData = await response.json();
-        //     console.log('dataresponse', responseData);
-        //     //ToastAndroid.show("Product Added Successfully!", ToastAndroid.SHORT);
-        //     console.log('Data Added to database');
-        // } catch (error) {
-        //     console.error('An error occurred:', error);
-        // }
-
-        // try {
-        //     const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/requserdtls-ax.php`, {
-        //         data: userData,
-        //     });
-        //     console.log('dataresponse', response.data);
-        //     ToastAndroid.show("Product Added Successfully!", ToastAndroid.SHORT);
-        //     console.log('Data Added to database');
-           
-        // } catch (error) {
-        //     console.error('An error occurred:', error);
-        // }
-
-
-        // navigation.navigate('LocationScreen');
+        navigation.navigate('LocationScreen');
     };
 
     const toggleRectVisibility = () => {
@@ -359,15 +350,16 @@ const ProfileCompletion1 = ({ navigation }) => {
                             <View style={[styles.inputContainer1, isContactFocused && styles.inputFocused]}>
                                 <TextInput
                                     style={styles.inputs}
-                                        placeholder="Enter your phone number"
+                                    placeholder="Enter your phone number"
                                     placeholderTextColor="#979797"
                                     maxLength={10}
                                     keyboardType="phone-pad"
                                     value={selectedContactNumber}
-                                    onChangeText={(text) => setSelectedContactNumber(text)}
-                                    underlineColorAndroid="transparent"
-                                    onFocus={() => setIsContactFocused(true)}
-                                    onBlur={() => setIsContactFocused(false)}
+                                    editable={false}
+                                    // onChangeText={(text) => setSelectedContactNumber(text)}
+                                    // underlineColorAndroid="transparent"
+                                    // onFocus={() => setIsContactFocused(true)}
+                                    // onBlur={() => setIsContactFocused(false)}
                                 />
 
                                 {selectedContactNumber.length > 9 && (

@@ -58,7 +58,7 @@ const ClinicProfileCompletion2 = ({ navigation }) => {
     const progressPercentage = (currentStep / totalSteps) * 100; // Calculate progress percentage
     console.log("Progress Percentage:", progressPercentage);
 
-     const [selectedTimes, setSelectedTimes] = useState({
+    const [selectedTimes, setSelectedTimes] = useState({
         Monday: { from: '', to: '' },
         Tuesday: { from: '', to: '' },
         Wednesday: { from: '', to: '' },
@@ -95,13 +95,13 @@ const ClinicProfileCompletion2 = ({ navigation }) => {
     // };
 
     const showTimePicker = (day, type, index) => {
-    setSelectedDay(day);
-    setSelectedType(type);
-    setIsTimePickerVisible(true);
-    setSelectedAdditionalIndex(index); // Update to use setSelectedAdditionalIndex
-    setSelectedDayFromIndex(index); // Assuming setSelectedDayFromIndex and setSelectedDayToIndex are defined elsewhere
-    setSelectedDayToIndex(index); // Assuming setSelectedDayFromIndex and setSelectedDayToIndex are defined elsewhere
-};
+        setSelectedDay(day);
+        setSelectedType(type);
+        setIsTimePickerVisible(true);
+        setSelectedAdditionalIndex(index); // Update to use setSelectedAdditionalIndex
+        setSelectedDayFromIndex(index); // Assuming setSelectedDayFromIndex and setSelectedDayToIndex are defined elsewhere
+        setSelectedDayToIndex(index); // Assuming setSelectedDayFromIndex and setSelectedDayToIndex are defined elsewhere
+    };
 
 
     const [selectedDayFromIndex, setSelectedDayFromIndex] = useState(null);
@@ -127,7 +127,7 @@ const ClinicProfileCompletion2 = ({ navigation }) => {
     };
 
     const addTimeInput = (day) => {
-        if (selectedTimes[day].length < 5) { 
+        if (selectedTimes[day].length < 5) {
             setSelectedTimes(prevState => ({
                 ...prevState,
                 [day]: [...prevState[day], { from: '', to: '' }],
@@ -174,7 +174,7 @@ const ClinicProfileCompletion2 = ({ navigation }) => {
                             <View style={styles.headerTextContainer}>
                                 <Text style={[commonStyles.headerText1BL, {
                                     marginBottom: 6, textAlign: 'center'
-                                    }]}>Step 2- Timings</Text>
+                                }]}>Step 2- Timings</Text>
                                 <Text style={[commonStyles.headerText2BL, {
                                     textAlign: 'center', paddingHorizontal: width * 0.02
                                 }]}>Choose your career category and unlock endless possibilities.</Text>
@@ -185,107 +185,35 @@ const ClinicProfileCompletion2 = ({ navigation }) => {
                                     style={commonStyles.progImage}
                                 />
                             </View>
-                                {Object.keys(selectedTimes).map((day, index) => (
-                                    <View key={day}>
-                                        <View style={styles.dayRow}>
-                                            <Text style={[commonStyles.headerText4BL, {textAlign: 'center'}]}>{day} :</Text>
-                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                <TouchableOpacity
-                                                    style={styles.inputContainerT}
-                                                    activeOpacity={0.8}
-                                                    onPress={() => showTimePicker(day, 'from')}
-                                                >
-                                                    <TextInput
-                                                        style={styles.inputs}
-                                                        placeholder="00:00 AM"
-                                                        placeholderTextColor="#979797"
-                                                        value={selectedTimes[day].from}
-                                                        underlineColorAndroid="transparent"
-                                                        editable={false}
-                                                    />
-                                                </TouchableOpacity>
-
-                                                <TouchableOpacity
-                                                    style={styles.inputContainerT}
-                                                    activeOpacity={0.8}
-                                                    onPress={() => showTimePicker(day, 'to')}
-                                                >
-                                                    <TextInput
-                                                        style={styles.inputs}
-                                                        placeholder="00:00 AM"
-                                                        placeholderTextColor="#979797"
-                                                        value={selectedTimes[day].to}
-                                                        underlineColorAndroid="transparent"
-                                                        editable={false}
-                                                    />
-                                                </TouchableOpacity>
-                                            </View>
-                                        </View>
-
-                                        {additionalInputs[day].map((time, index) => (
-                                            <View style={styles.dayRow} key={index}>
-                                                <Text style={styles.dayLabel}></Text>
-                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    <TouchableOpacity
-                                                        style={styles.inputContainerT}
-                                                        activeOpacity={0.8}
-                                                        onPress={() => showTimePicker(day, 'from', index)}
-                                                    >
-                                                        <TextInput
-                                                            style={styles.inputs}
-                                                            placeholder="00:00 AM"
-                                                            placeholderTextColor="#979797"
-                                                            value={time.from}
-                                                            onChangeText={(text) => handleAdditionalInputChange(day, index, text)} 
-                                                            underlineColorAndroid="transparent"
-                                                            editable={false}
-                                                        />
-                                                    </TouchableOpacity>
-
-                                                    <TouchableOpacity
-                                                        style={styles.inputContainerT}
-                                                        activeOpacity={0.8}
-                                                        onPress={() => showTimePicker(day, 'to', index)}
-                                                    >
-                                                        <TextInput
-                                                            style={styles.inputs}
-                                                            placeholder="00:00 AM"
-                                                            placeholderTextColor="#979797"
-                                                            value={time.to}
-                                                             onChangeText={(text) => handleAdditionalInputChange(day, index, text)} 
-                                                            underlineColorAndroid="transparent"
-                                                            editable={false}
-                                                        />
-                                                    </TouchableOpacity>
-                                                </View>
-                                            </View>
-                                        ))}
-
-                                        {additionalInputs[day].length < 4 && (
-                                            <TouchableOpacity onPress={() => addAdditionalInput(day)} style={styles.addButton}>
-                                                <Text style={styles.addButtonText}>+ Add</Text>
-                                            </TouchableOpacity>
-                                        )}
-                                        {index < Object.keys(selectedTimes).length - 1 && <View style={styles.horizontalLineD} />}
-                                    </View>
-                                ))}
-                                {/* {Object.keys(selectedTimes).map(day => (
-                                    <View key={day} style={styles.dayRow}>
-                                        <Text style={[commonStyles.headerText4BL, {  }]}>{day}</Text>
+                            {Object.keys(selectedTimes).map((day, index) => (
+                                <View key={day}>
+                                    <View style={styles.dayRow}>
+                                        <Text style={[commonStyles.headerText4BL, { textAlign: 'center' }]}>{day} :</Text>
                                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                            <TouchableOpacity onPress={() => showTimePicker(day, 'from')} style={styles.inputContainerT}>
+                                            <TouchableOpacity
+                                                style={styles.inputContainerT}
+                                                activeOpacity={0.8}
+                                                onPress={() => showTimePicker(day, 'from')}
+                                            >
                                                 <TextInput
                                                     style={styles.inputs}
-                                                    placeholder="Select Time"
+                                                    placeholder="00:00 AM"
+                                                    placeholderTextColor="#979797"
                                                     value={selectedTimes[day].from}
                                                     underlineColorAndroid="transparent"
                                                     editable={false}
                                                 />
                                             </TouchableOpacity>
-                                            <TouchableOpacity onPress={() => showTimePicker(day, 'to')} style={styles.inputContainerT}>
+
+                                            <TouchableOpacity
+                                                style={styles.inputContainerT}
+                                                activeOpacity={0.8}
+                                                onPress={() => showTimePicker(day, 'to')}
+                                            >
                                                 <TextInput
                                                     style={styles.inputs}
-                                                    placeholder="Select Time"
+                                                    placeholder="00:00 AM"
+                                                    placeholderTextColor="#979797"
                                                     value={selectedTimes[day].to}
                                                     underlineColorAndroid="transparent"
                                                     editable={false}
@@ -294,40 +222,77 @@ const ClinicProfileCompletion2 = ({ navigation }) => {
                                         </View>
                                     </View>
 
-                                ))} */}
-                                {/* {isTimePickerVisible && (
-                                    <DateTimePicker
-                                        value={selectedTimes[selectedDay][selectedType] ? moment(selectedTimes[selectedDay][selectedType], 'h:mm A').toDate() : new Date()} // Updated line
-                                        mode="time" // Set mode to time
-                                        display="default"
-                                        onChange={handleTimeChange}
-                                    />
-                                )} */}
+                                    {/* {additionalInputs[day].map((time, index) => (
+                                        <View style={styles.dayRow} key={index}>
+                                            <Text style={styles.dayLabel}></Text>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                <TouchableOpacity
+                                                    style={styles.inputContainerT}
+                                                    activeOpacity={0.8}
+                                                    onPress={() => showTimePicker(day, 'from', index)}
+                                                >
+                                                    <TextInput
+                                                        style={styles.inputs}
+                                                        placeholder="00:00 AM"
+                                                        placeholderTextColor="#979797"
+                                                        value={time.from}
+                                                        onChangeText={(text) => handleAdditionalInputChange(day, index, text)}
+                                                        underlineColorAndroid="transparent"
+                                                        editable={false}
+                                                    />
+                                                </TouchableOpacity>
 
-                                {isTimePickerVisible && (
-                                    <DateTimePicker
-                                        value={selectedTimes[selectedDay][selectedType] ? moment(selectedTimes[selectedDay][selectedType], 'h:mm A').toDate() : new Date()} // Updated line
-                                        mode="time" // Set mode to time
-                                        display="default"
-                                        onChange={(event, time) => handleTimeChange(event, time, selectedType === 'from' ? selectedDayFromIndex : selectedDayToIndex)} // Pass the appropriate index based on selected type
-                                    />
-                                )}
+                                                <TouchableOpacity
+                                                    style={styles.inputContainerT}
+                                                    activeOpacity={0.8}
+                                                    onPress={() => showTimePicker(day, 'to', index)}
+                                                >
+                                                    <TextInput
+                                                        style={styles.inputs}
+                                                        placeholder="00:00 AM"
+                                                        placeholderTextColor="#979797"
+                                                        value={time.to}
+                                                        onChangeText={(text) => handleAdditionalInputChange(day, index, text)}
+                                                        underlineColorAndroid="transparent"
+                                                        editable={false}
+                                                    />
+                                                </TouchableOpacity>
+                                            </View>
+                                        </View>
+                                    ))}
+
+                                    {additionalInputs[day].length < 4 && (
+                                        <TouchableOpacity onPress={() => addAdditionalInput(day)} style={styles.addButton}>
+                                            <Text style={styles.addButtonText}>+ Add</Text>
+                                        </TouchableOpacity>
+                                    )} */}
+                                    {index < Object.keys(selectedTimes).length - 1 && <View style={styles.horizontalLineD} />}
+                                </View>
+                            ))}
+                            {isTimePickerVisible && (
+                                <DateTimePicker
+                                    value={selectedTimes[selectedDay][selectedType] ? moment(selectedTimes[selectedDay][selectedType], 'h:mm A').toDate() : new Date()} // Updated line
+                                    mode="time" // Set mode to time
+                                    display="default"
+                                    onChange={(event, time) => handleTimeChange(event, time, selectedType === 'from' ? selectedDayFromIndex : selectedDayToIndex)} // Pass the appropriate index based on selected type
+                                />
+                            )}
 
 
-                              <TouchableOpacity
-                        style={[commonStyles.button]}
-                        onPress={() => {
-                            navigation.navigate('ClinicProfileCompletion3');
-                            console.log('ProfileCompletion21');
-                        }}
-                        activeOpacity={0.8}
-                    >
-                        <Text style={commonStyles.buttonText}>Continue</Text>
-                    </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[commonStyles.button]}
+                                onPress={() => {
+                                    navigation.navigate('ClinicProfileCompletion3');
+                                    console.log('ProfileCompletion21');
+                                }}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={commonStyles.buttonText}>Continue</Text>
+                            </TouchableOpacity>
 
                         </View>
                     </ScrollView>
-             
+
                 </View>
 
             )}
@@ -349,6 +314,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 1,
         marginBottom: 16,
+        marginTop: 6,
         //marginHorizontal: 10,
         backgroundColor: '#979797',
     },
@@ -395,7 +361,7 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         backgroundColor: '#FEFCFC',
-        paddingHorizontal:16,
+        paddingHorizontal: 16,
         paddingBottom: 100,
     },
     headerContainer: {
@@ -576,7 +542,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     addButton: {
-        alignSelf: 'flex-end',  
+        alignSelf: 'flex-end',
         marginBottom: 10,
     },
     addButtonText: {
@@ -699,9 +665,9 @@ const styles = StyleSheet.create({
         //paddingHorizontal: moderateScale(18),
     },
     dayRow: {
-     flexDirection: 'row', // Ensure items are laid out horizontally
-        alignItems: 'center', 
-        justifyContent: 'space-between', 
+        flexDirection: 'row', // Ensure items are laid out horizontally
+        alignItems: 'center',
+        justifyContent: 'space-between',
         marginBottom: 10
     },
 

@@ -62,6 +62,7 @@ import SelectDentist from './SelectDentist';
 import SelectCDentist from './SelectCDentist';
 import SelectTeams from './SelectTeams';
 import ClinicProfile from './Profile/ClinicProfile';
+import WebViewScreen from '../components/WebViewScreen';
 
 const Stack = createStackNavigator();
 
@@ -379,13 +380,16 @@ const Navigation = () => {
                     component={ClinicProfile}
                     options={{ headerShown: false }}
                 /> 
+                <Stack.Screen
+                    name="WebViewScreen"
+                    component={WebViewScreen}
+                    options={{ headerShown: false }}
+                /> 
                 {/* <Stack.Screen
                     name="RegistrationInformation"
                     component={RegistrationInformation}
                     options={{ headerShown: false }}
                 />
-              
-
                 <Stack.Screen
                     name="StudentScreen"
                     component={StudentScreen}

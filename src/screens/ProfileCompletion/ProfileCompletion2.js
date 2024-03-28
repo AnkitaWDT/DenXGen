@@ -14,13 +14,15 @@ import {
     PixelRatio,
     Keyboard,
     TouchableWithoutFeedback,
-    ToastAndroid
+    ToastAndroid,
+    FlatList
 } from 'react-native';
 import Animation from '../../components/Loader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import commonStyles from '../../components/CommonStyles';
 import { moderateScale } from 'react-native-size-matters';
 import { ProgressBar } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -57,20 +59,28 @@ const ProfileCompletion2 = ({ navigation }) => {
         closeModalA();
     };
 
-    const [servicesData] = useState([
-        'Dental implant',
-        'Root canal',
-        'Teeth Whitening',
-        'Root canal treatment',
-        'Dentures',
-        'Teeth cleaning',
-        'Dental braces',
-    ]);
 
+    const [servicesData, setServiceData] = useState([]);
     const [selectedServices, setSelectedServices] = useState([]);
     const [otherService, setOtherService] = useState('');
     const [serviceModalVisible, setServiceModalVisible] = useState(false);
     const [showOtherServiceInput, setOtherServiceInput] = useState(false);
+
+    useEffect(() => {
+        fetchServiceData();
+    }, []);
+
+    const fetchServiceData = async () => {
+        try {
+            const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getservlist-ax.php');
+            const data = await response.json();
+            const storedId = await AsyncStorage.getItem('pr_ty_id');
+            const filteredData = data.data.filter(item => item.pr_ty_id === storedId);
+            setServiceData(filteredData);
+        } catch (error) {
+            console.error('Error fetching key forte data:', error);
+        }
+    };
 
     const handleServiceModal = () => {
         setServiceModalVisible(true);
@@ -120,36 +130,52 @@ const ProfileCompletion2 = ({ navigation }) => {
         setOtherServiceInput(!showOtherServiceInput);
     };
 
-    const [specialtiesData] = useState([
-        'Assist dentists during procedures',
-        'Take dental X-rays',
-        'Prepare patients for treatment',
-        'Provide chairside assistance',
-        'Educate patients on oral hygiene practices',
-        'Fabricate dental prosthetics - Crowns, bridges',
-        'Fabricate dental prosthetics - Dentures',
-        'Fabricate dental prosthetics - Orthodontic appliances',
-        'Fabricate dental prosthetics - Implant Prosthesis',
-        'Manage appointments',
-        'Handle patient inquiries',
-        'Maintain patient records',
-        'Clean, sterilize, and maintain dental instruments and equipment',
-        'Repair Dental Equipment',
-        'Take dental X-rays and assist in diagnostic imaging procedures',
-        'Oversee daily operations of the dental office',
-        'Manage staff',
-        'Manage finances',
-        'Marketing',
-        'Assist patients in understanding treatment plans',
-        'Schedule appointments',
-        'Coordinate care between different dental providers',
-    ]);
+    // const [specialtiesData] = useState([
+    //     'Assist dentists during procedures',
+    //     'Take dental X-rays',
+    //     'Prepare patients for treatment',
+    //     'Provide chairside assistance',
+    //     'Educate patients on oral hygiene practices',
+    //     'Fabricate dental prosthetics - Crowns, bridges',
+    //     'Fabricate dental prosthetics - Dentures',
+    //     'Fabricate dental prosthetics - Orthodontic appliances',
+    //     'Fabricate dental prosthetics - Implant Prosthesis',
+    //     'Manage appointments',
+    //     'Handle patient inquiries',
+    //     'Maintain patient records',
+    //     'Clean, sterilize, and maintain dental instruments and equipment',
+    //     'Repair Dental Equipment',
+    //     'Take dental X-rays and assist in diagnostic imaging procedures',
+    //     'Oversee daily operations of the dental office',
+    //     'Manage staff',
+    //     'Manage finances',
+    //     'Marketing',
+    //     'Assist patients in understanding treatment plans',
+    //     'Schedule appointments',
+    //     'Coordinate care between different dental providers',
+    // ]);
 
-
+    const [specialtiesData, setSpecialtiesData] = useState([]);
     const [selectedSpecialties, setSelectedSpecialties] = useState([]);
     const [otherSpecialty, setOtherSpecialty] = useState('');
     const [specialtiesModalVisible, setSpecialtiesModalVisible] = useState(false);
     const [showOtherSpecialtyInput, setShowOtherSpecialtyInput] = useState(false);
+
+    useEffect(() => {
+        fetchSpecialitiesData();
+    }, []);
+
+    const fetchSpecialitiesData = async () => {
+        try {
+            const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getspeclist-ax.php');
+            const data = await response.json();
+            const storedId = await AsyncStorage.getItem('pr_ty_id');
+            const filteredData = data.data.filter(item => item.pr_ty_id === storedId);
+            setSpecialtiesData(filteredData);
+        } catch (error) {
+            console.error('Error fetching key forte data:', error);
+        }
+    };
 
     const handleSpecialtiesModal = () => {
         setSpecialtiesModalVisible(true);
@@ -191,18 +217,27 @@ const ProfileCompletion2 = ({ navigation }) => {
         setShowOtherSpecialtyInput(!showOtherSpecialtyInput);
     };
 
-    const [keyForteData] = useState([
-        'Implants',
-        'Braces',
-        'Oral Surgery',
-        'Cosmetic Dentistry',
-        'Endodontics',
-    ]);
-
+    const [keyForteData, setKeyForteData] = useState([]);
     const [selectedKeyForte, setSelectedKeyForte] = useState([]);
     const [otherKeyForte, setOtherKeyForte] = useState('');
     const [keyForteModalVisible, setKeyForteModalVisible] = useState(false);
     const [showOtherKeyForteInput, setShowOtherKeyForteInput] = useState(false);
+
+    useEffect(() => {
+        fetchKeyForteData();
+    }, []);
+
+    const fetchKeyForteData = async () => {
+        try {
+            const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getkeyforlist-ax.php');
+            const data = await response.json();
+            const storedId = await AsyncStorage.getItem('pr_ty_id');
+            const filteredData = data.data.filter(item => item.pr_ty_id === storedId);
+            setKeyForteData(filteredData);
+        } catch (error) {
+            console.error('Error fetching key forte data:', error);
+        }
+    };
 
     const handleKeyForteModal = () => {
         setKeyForteModalVisible(true);
@@ -213,20 +248,49 @@ const ProfileCompletion2 = ({ navigation }) => {
     };
 
     const handleKeyForteModalSubmit = () => {
-        // Include selected key forte
         let updatedKeyForte = [...selectedKeyForte];
-
-        // If otherKeyForte is not empty, include it
         if (otherKeyForte.trim() !== '') {
             updatedKeyForte.push(otherKeyForte.trim());
         }
-
-        // Update the main text input with the combined key forte
         setSelectedKeyForte(updatedKeyForte);
-
-        // Close the modal
         setKeyForteModalVisible(false);
     };
+    // const [keyForteData] = useState([
+    //     'Implants',
+    //     'Braces',
+    //     'Oral Surgery',
+    //     'Cosmetic Dentistry',
+    //     'Endodontics',
+    // ]);
+
+    // const [selectedKeyForte, setSelectedKeyForte] = useState([]);
+    // const [otherKeyForte, setOtherKeyForte] = useState('');
+    // const [keyForteModalVisible, setKeyForteModalVisible] = useState(false);
+    // const [showOtherKeyForteInput, setShowOtherKeyForteInput] = useState(false);
+
+    // const handleKeyForteModal = () => {
+    //     setKeyForteModalVisible(true);
+    // };
+
+    // const handleCloseKeyForteModal = () => {
+    //     setKeyForteModalVisible(false);
+    // };
+
+    // const handleKeyForteModalSubmit = () => {
+    //     // Include selected key forte
+    //     let updatedKeyForte = [...selectedKeyForte];
+
+    //     // If otherKeyForte is not empty, include it
+    //     if (otherKeyForte.trim() !== '') {
+    //         updatedKeyForte.push(otherKeyForte.trim());
+    //     }
+
+    //     // Update the main text input with the combined key forte
+    //     setSelectedKeyForte(updatedKeyForte);
+
+    //     // Close the modal
+    //     setKeyForteModalVisible(false);
+    // };
 
     const toggleKeyForte = (keyForte) => {
         if (selectedKeyForte.includes(keyForte)) {
@@ -244,19 +308,27 @@ const ProfileCompletion2 = ({ navigation }) => {
         setShowOtherKeyForteInput(!showOtherKeyForteInput);
     };
 
-    const [qualificationsData] = useState([
-        'DDS',
-        'DMD',
-        'PhD',
-        'MS',
-        'MD',
-        'MPH',
-    ]);
-
+    const [qualificationsData, setQualificationsDataData] = useState([]);
     const [selectedQualifications, setSelectedQualifications] = useState([]);
     const [otherQualification, setOtherQualification] = useState('');
     const [qualificationsModalVisible, setQualificationsModalVisible] = useState(false);
     const [showOtherQualificationInput, setShowOtherQualificationInput] = useState(false);
+
+    useEffect(() => {
+        fetchQualificationsData();
+    }, []);
+
+    const fetchQualificationsData = async () => {
+        try {
+            const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getqualilist-ax.php');
+            const data = await response.json();
+            const storedId = await AsyncStorage.getItem('pr_ty_id');
+            const filteredData = data.data.filter(item => item.pr_ty_id === storedId);
+            setQualificationsDataData(filteredData);
+        } catch (error) {
+            console.error('Error fetching key forte data:', error);
+        }
+    };
 
     const handleQualificationsModal = () => {
         setQualificationsModalVisible(true);
@@ -298,6 +370,7 @@ const ProfileCompletion2 = ({ navigation }) => {
         setShowOtherQualificationInput(!showOtherQualificationInput);
     };
 
+    const [licenseNumber, setLicenseNumber] = useState('');
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -322,6 +395,31 @@ const ProfileCompletion2 = ({ navigation }) => {
     console.log("Progress Percentage:", progressPercentage);
 
     const [hoveredItem, setHoveredItem] = useState(null);
+
+    const logData = () => {
+        console.log("About Yourself:", textareaValues.aboutYourself);
+        console.log("Selected Services:", selectedServices);
+        console.log("Selected Specialties:", selectedSpecialties);
+        console.log("Selected Key Forte:", selectedKeyForte);
+        console.log("Selected Qualifications:", selectedQualifications);
+        console.log("License Number:", licenseNumber);
+        // Add more data to log if needed
+    };
+
+    const handleNext = async () => {
+        const userData = {
+            AboutYourself: textareaValues.aboutYourself,
+            SelectedServices: selectedServices,
+            SelectedSpecialties: selectedSpecialties,
+            SelectedKeyForte: selectedKeyForte,
+            SelectedQualifications: selectedQualifications,
+            LicenseNumber: licenseNumber,
+        };
+
+        console.log('User Data:', userData);
+        navigation.navigate('ProfileCompletion3');
+    };
+
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -362,10 +460,10 @@ const ProfileCompletion2 = ({ navigation }) => {
                                 underlayColor={'transparent'}
                             >
                                 <TextInput
-                                    style={styles.inputs}
+                                    style={styles.inputTA}
                                     placeholder={'Write about yourself...'}
                                     placeholderTextColor={'#979797'}
-                                    value={textareaValues['aboutYourself']}
+                                            value={textareaValues['aboutYourself'].substring(0, 40) + (textareaValues['aboutYourself'].length > 40 ? '...' : '')}
                                     underlineColorAndroid="transparent"
                                     editable={false}
                                     selection={{ start: 0, end: 0 }}
@@ -429,102 +527,6 @@ const ProfileCompletion2 = ({ navigation }) => {
                                         <Image source={require('../../../assets/img/Add.png')} style={styles.closeP} />
                                     )}
                                 </TouchableOpacity>
-                                {/* <Modal visible={serviceModalVisible} transparent>
-                                    <TouchableWithoutFeedback onPress={() => setServiceModalVisible(false)}>
-                                        <View style={styles.modalContainer}>
-                                            <TouchableWithoutFeedback>
-                                                <View style={styles.modalContent}>
-                                                    <View style={styles.horizontalLine}></View>
-                                                    <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
-                                                        Tell us your services <Text style={commonStyles.headerText3G}> (upto 5)</Text>
-                                                    </Text>
-                                                        <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
-                                                        Note: Type services like Root Canal, Aligners, Oral Surgery,  etc to show specialisation you provide.
-                                                    </Text>
-                                                    <View style={styles.servicesContainer}>
-                                                        {servicesData.map((service) => (
-                                                            <TouchableOpacity
-                                                                activeOpacity={0.8}
-                                                                key={service}
-                                                                style={[
-                                                                    styles.serviceButton,
-                                                                    selectedServices.includes(service) && styles.selectedServiceButton,
-                                                                ]}
-                                                                onPress={() => toggleService(service)}
-                                                            >
-                                                                <Text
-                                                                    style={[
-                                                                        styles.serviceButtonText,
-                                                                        selectedServices.includes(service) && styles.selectedServiceButtonText,
-                                                                    ]}
-                                                                >
-                                                                    {service}
-                                                                </Text>
-                                                                {selectedServices.includes(service) && (
-                                                                    <TouchableOpacity
-                                                                        activeOpacity={0.8}
-                                                                        style={styles.closeButton}
-                                                                        onPress={() => toggleService(service)}
-                                                                    >
-                                                                        <Image
-                                                                            source={require('../../../assets/img/close.png')}
-                                                                            style={styles.closeImage}
-                                                                        />
-                                                                    </TouchableOpacity>
-                                                                )}
-                                                            </TouchableOpacity>
-                                                        ))}
-                                                        <TouchableOpacity
-                                                            style={[
-                                                                styles.serviceButton,
-                                                                styles.otherButton,
-                                                                showOtherServiceInput && styles.selectedServiceButton,
-                                                            ]}
-                                                                activeOpacity={0.8}
-                                                            onPress={toggleOtherInput}
-                                                        >
-                                                            <Text
-                                                                style={[
-                                                                    styles.serviceButtonText,
-                                                                    showOtherServiceInput && styles.selectedServiceButtonText,
-                                                                ]}
-                                                            >
-                                                                Other
-                                                            </Text>
-                                                            {showOtherServiceInput && (
-                                                                <TouchableOpacity
-                                                                    style={styles.closeButton}
-                                                                    onPress={toggleOtherInput}
-                                                                        activeOpacity={0.8}
-                                                                >
-                                                                    <Image
-                                                                        source={require('../../../assets/img/close.png')}
-                                                                        style={styles.closeImage}
-                                                                    />
-                                                                </TouchableOpacity>
-                                                            )}
-                                                        </TouchableOpacity>
-                                                    </View>
-                                                    {showOtherServiceInput && (
-                                                        <View style={styles.inputContainer1}>
-                                                            <TextInput
-                                                                style={styles.inputs}
-                                                                placeholder="Other Service"
-                                                                placeholderTextColor="#979797"
-                                                                value={otherService}
-                                                                onChangeText={(text) => setOtherService(text)}
-                                                                underlineColorAndroid="transparent"
-                                                            />
-                                                        </View>
-                                                    )}
-                                                        <TouchableOpacity style={[commonStyles.button]} activeOpacity={0.8}  onPress={handleServiceModalSubmit}>
-                                                        <Text style={commonStyles.buttonText}>Submit</Text>
-                                                    </TouchableOpacity>
-                                                </View>
-                                            </TouchableWithoutFeedback>
-                                        </View>
-                                    </TouchableWithoutFeedback>
-                                </Modal> */}
                                     <Modal
                                         visible={serviceModalVisible}
                                         transparent
@@ -535,7 +537,9 @@ const ProfileCompletion2 = ({ navigation }) => {
                                             style={styles.modalContainer}
                                             onPress={() => setServiceModalVisible(false)} // Close the modal when clicking on the background
                                         >
-                                            <ScrollView style={styles.modalContent}>
+                                            <TouchableOpacity style={styles.modalContent}
+                                                activeOpacity={1}
+                                                onPress={() => { }}>
                                                 <View style={styles.horizontalLine}></View>
                                                 <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
                                                     Tell us your services <Text style={commonStyles.headerText3G}> (upto 5)</Text>
@@ -544,27 +548,27 @@ const ProfileCompletion2 = ({ navigation }) => {
                                                     Note: Type services like Root Canal, Aligners, Oral Surgery,  etc to show specialisation you provide.
                                                 </Text>
                                                 <View style={styles.servicesContainer11}>
-                                                    {servicesData.map((service) => (
+                                                    {servicesData.map((serviceItem) => (
                                                         <TouchableOpacity
                                                             activeOpacity={0.8}
-                                                            key={service}
-                                                            onPress={() => toggleService(service)}
-                                                            onMouseEnter={() => setHoveredItem(service)}
+                                                            key={serviceItem.id}
+                                                            onPress={() => toggleService(serviceItem.service)}
+                                                            onMouseEnter={() => setHoveredItem(serviceItem.service)}
                                                             onMouseLeave={() => setHoveredItem(null)}
                                                         >
                                                             <View
                                                                 style={[
                                                                     styles.checkboxContainer,
-                                                                    selectedServices.includes(service) && styles.selectedCheckboxContainer,
-                                                                    hoveredItem === service && styles.hoveredCheckboxContainer,
+                                                                    selectedServices.includes(serviceItem.service) && styles.selectedCheckboxContainer,
+                                                                    hoveredItem === serviceItem.service && styles.hoveredCheckboxContainer,
                                                                 ]}
                                                             >
                                                                 <Image
-                                                                    source={selectedServices.includes(service) ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
+                                                                    source={selectedServices.includes(serviceItem.service) ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
                                                                     style={styles.checkboxImage}
                                                                 />
-                                                                <Text style={selectedServices.includes(service) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
-                                                                    {service}
+                                                                <Text style={selectedServices.includes(serviceItem.service) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
+                                                                    {serviceItem.service}
                                                                 </Text>
                                                             </View>
                                                         </TouchableOpacity>
@@ -602,10 +606,11 @@ const ProfileCompletion2 = ({ navigation }) => {
                                                         />
                                                     </View>
                                                 )}
-                                                <TouchableOpacity style={[commonStyles.button, { marginBottom: 20 }]} activeOpacity={0.8} onPress={handleServiceModalSubmit}>
-                                                    <Text style={commonStyles.buttonText}>Submit</Text>
-                                                </TouchableOpacity>
-                                            </ScrollView>
+                                              
+                                            </TouchableOpacity>
+                                            <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: height * 0.08, }]} activeOpacity={0.8} onPress={handleServiceModalSubmit}>
+                                                <Text style={commonStyles.buttonText}>Submit</Text>
+                                            </TouchableOpacity>
                                         </TouchableOpacity>
                                     </Modal>
 
@@ -642,7 +647,9 @@ const ProfileCompletion2 = ({ navigation }) => {
                                             style={styles.modalContainer}
                                             onPress={() => setSpecialtiesModalVisible(false)} // Close the modal when clicking on the background
                                         >
-                                            <ScrollView style={styles.modalContent}>
+                                            <TouchableOpacity style={styles.modalContent}
+                                                activeOpacity={1}
+                                                onPress={() => { }}>
                                                 <View style={styles.horizontalLine}></View>
                                                 <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
                                                     Tell us your speciality <Text style={commonStyles.headerText3G}> (up to 5)</Text>
@@ -651,27 +658,27 @@ const ProfileCompletion2 = ({ navigation }) => {
                                                     Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
                                                 </Text>
                                                 <View style={styles.servicesContainer11}>
-                                                    {specialtiesData.map((specialty) => (
+                                                    {specialtiesData.map((specialityItem) => (
                                                         <TouchableOpacity
                                                             activeOpacity={0.8}
-                                                            key={specialty}
-                                                            onPress={() => toggleSpecialty(specialty)}
-                                                            onMouseEnter={() => setHoveredItem(specialty)}
+                                                            key={specialityItem.id}
+                                                            onPress={() => toggleSpecialty(specialityItem.speciality)}
+                                                            onMouseEnter={() => setHoveredItem(specialityItem.speciality)}
                                                             onMouseLeave={() => setHoveredItem(null)}
                                                         >
                                                             <View
                                                                 style={[
                                                                     styles.checkboxContainer,
-                                                                    selectedSpecialties.includes(specialty) && styles.selectedCheckboxContainer,
-                                                                    hoveredItem === specialty && styles.hoveredCheckboxContainer,
+                                                                    selectedSpecialties.includes(specialityItem.speciality) && styles.selectedCheckboxContainer,
+                                                                    hoveredItem === specialityItem.speciality && styles.hoveredCheckboxContainer,
                                                                 ]}
                                                             >
                                                                 <Image
-                                                                    source={selectedSpecialties.includes(specialty) ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
+                                                                    source={selectedSpecialties.includes(specialityItem.speciality) ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
                                                                     style={styles.checkboxImage}
                                                                 />
-                                                                <Text style={selectedSpecialties.includes(specialty) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
-                                                                    {specialty}
+                                                                <Text style={selectedSpecialties.includes(specialityItem.speciality) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
+                                                                    {specialityItem.speciality}
                                                                 </Text>
                                                             </View>
                                                         </TouchableOpacity>
@@ -709,10 +716,11 @@ const ProfileCompletion2 = ({ navigation }) => {
                                                         />
                                                     </View>
                                                 )}
-                                                <TouchableOpacity style={[commonStyles.button, {marginBottom: 20}]} activeOpacity={0.8} onPress={handleSpecialtiesModalSubmit}>
-                                                    <Text style={commonStyles.buttonText}>Submit</Text>
-                                                </TouchableOpacity>
-                                            </ScrollView>
+                                             
+                                            </TouchableOpacity>
+                                            <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: height * 0.08, }]} activeOpacity={0.8} onPress={handleSpecialtiesModalSubmit}>
+                                                <Text style={commonStyles.buttonText}>Submit</Text>
+                                            </TouchableOpacity>
                                         </TouchableOpacity>
                                     </Modal>
                             </View>
@@ -738,99 +746,6 @@ const ProfileCompletion2 = ({ navigation }) => {
                                         <Image source={require('../../../assets/img/Add.png')} style={styles.closeP} />
                                     )}
                                 </TouchableOpacity>
-                                {/* <Modal visible={keyForteModalVisible} transparent>
-                                    <TouchableWithoutFeedback onPress={() => handleCloseKeyForteModal()}>
-                                        <View style={styles.modalContainer}>
-                                            <TouchableWithoutFeedback >
-                                                <View style={styles.modalContent}>
-                                                    <View style={styles.horizontalLine}></View>
-                                                    <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
-                                                        Tell us your key forte <Text style={commonStyles.headerText3G}> (upto 5)</Text>
-                                                    </Text>
-                                                    <View style={styles.servicesContainer}>
-                                                        {keyForteData.map((keyForte) => (
-                                                            <TouchableOpacity
-                                                                activeOpacity={0.8}
-                                                                key={keyForte}
-                                                                style={[
-                                                                    styles.serviceButton,
-                                                                    selectedKeyForte.includes(keyForte) && styles.selectedServiceButton,
-                                                                ]}
-                                                                onPress={() => toggleKeyForte(keyForte)}
-                                                            >
-                                                                <Text
-                                                                    style={[
-                                                                        styles.serviceButtonText,
-                                                                        selectedKeyForte.includes(keyForte) && styles.selectedServiceButtonText,
-                                                                    ]}
-                                                                >
-                                                                    {keyForte}
-                                                                </Text>
-                                                                {selectedKeyForte.includes(keyForte) && (
-                                                                    <TouchableOpacity
-                                                                        activeOpacity={0.8}
-                                                                        style={styles.closeButton}
-                                                                        onPress={() => toggleKeyForte(keyForte)}
-                                                                    >
-                                                                        <Image
-                                                                            source={require('../../../assets/img/close.png')}
-                                                                            style={styles.closeImage}
-                                                                        />
-                                                                    </TouchableOpacity>
-                                                                )}
-                                                            </TouchableOpacity>
-                                                        ))}
-                                                        <TouchableOpacity
-                                                            style={[
-                                                                styles.serviceButton,
-                                                                styles.otherButton,
-                                                                showOtherKeyForteInput && styles.selectedServiceButton,
-                                                            ]}
-                                                                activeOpacity={0.8}
-                                                            onPress={toggleOtherKeyForteInput}
-                                                        >
-                                                            <Text
-                                                                style={[
-                                                                    styles.serviceButtonText,
-                                                                    showOtherKeyForteInput && styles.selectedServiceButtonText,
-                                                                ]}
-                                                            >
-                                                                Other
-                                                            </Text>
-                                                            {showOtherKeyForteInput && (
-                                                                <TouchableOpacity
-                                                                    style={styles.closeButton}
-                                                                    onPress={toggleOtherKeyForteInput}
-                                                                        activeOpacity={0.8}
-                                                                >
-                                                                    <Image
-                                                                        source={require('../../../assets/img/close.png')}
-                                                                        style={styles.closeImage}
-                                                                    />
-                                                                </TouchableOpacity>
-                                                            )}
-                                                        </TouchableOpacity>
-                                                    </View>
-                                                    {showOtherKeyForteInput && (
-                                                        <View style={styles.inputContainer1}>
-                                                            <TextInput
-                                                                style={styles.inputs}
-                                                                placeholder="Other Key Forte"
-                                                                placeholderTextColor="#979797"
-                                                                value={otherKeyForte}
-                                                                onChangeText={(text) => setOtherKeyForte(text)}
-                                                                underlineColorAndroid="transparent"
-                                                            />
-                                                        </View>
-                                                    )}
-                                                        <TouchableOpacity style={[commonStyles.button]} activeOpacity={0.8} onPress={handleKeyForteModalSubmit}>
-                                                        <Text style={commonStyles.buttonText}>Submit</Text>
-                                                    </TouchableOpacity>
-                                                </View>
-                                            </TouchableWithoutFeedback>
-                                        </View>
-                                    </TouchableWithoutFeedback>
-                                </Modal> */}
                                     <Modal
                                         visible={keyForteModalVisible}
                                         transparent
@@ -841,63 +756,57 @@ const ProfileCompletion2 = ({ navigation }) => {
                                             style={styles.modalContainer}
                                             onPress={() => setKeyForteModalVisible(false)} // Close the modal when clicking on the background
                                         >
-                                            <ScrollView style={styles.modalContent}>
+                                            <TouchableOpacity style={styles.modalContent}
+                                                activeOpacity={1}
+                                                onPress={() => { }}>
                                                 <View style={styles.horizontalLine}></View>
                                                 <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
-                                                   Tell us your key forte <Text style={commonStyles.headerText3G}> (up to 5)</Text>
+                                                    Tell us your key forte <Text style={commonStyles.headerText3G}> (upto 5)</Text>
                                                 </Text>
                                                 <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
-                                                    Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
+                                                    Note: Tell us something about yourself to let users know you better
                                                 </Text>
-                                                <View style={styles.servicesContainer11}>
-                                                    {keyForteData.map((keyForte) => (
+                                                <FlatList
+                                                    data={[...keyForteData, { id: 'other', keyforte: 'Other' }]} // Add 'Other' as an additional item
+                                                    renderItem={({ item }) => (
                                                         <TouchableOpacity
                                                             activeOpacity={0.8}
-                                                            key={keyForte}
-                                                            onPress={() => toggleKeyForte(keyForte)}
-                                                            onMouseEnter={() => setHoveredItem(keyForte)}
+                                                            onPress={() => {
+                                                                if (item.id === 'other') {
+                                                                    toggleOtherKeyForteInput();
+                                                                } else {
+                                                                    toggleKeyForte(item.keyforte);
+                                                                }
+                                                            }}
+                                                            onMouseEnter={() => setHoveredItem(item.keyforte)}
                                                             onMouseLeave={() => setHoveredItem(null)}
                                                         >
                                                             <View
                                                                 style={[
                                                                     styles.checkboxContainer,
-                                                                    selectedKeyForte.includes(keyForte) && styles.selectedCheckboxContainer,
-                                                                    hoveredItem === keyForte && styles.hoveredCheckboxContainer,
+                                                                    selectedKeyForte.includes(item.keyforte) && styles.selectedCheckboxContainer,
+                                                                    hoveredItem === item.keyforte && styles.hoveredCheckboxContainer,
                                                                 ]}
                                                             >
                                                                 <Image
-                                                                    source={selectedKeyForte.includes(keyForte) ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
+                                                                    source={
+                                                                        selectedKeyForte.includes(item.keyforte) || (showOtherKeyForteInput && item.id === 'other')
+                                                                            ? require('../../../assets/img/Rect1.png')
+                                                                            : require('../../../assets/img/Rect.png')
+                                                                    }
                                                                     style={styles.checkboxImage}
                                                                 />
-                                                                <Text style={selectedKeyForte.includes(keyForte) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
-                                                                    {keyForte}
+                                                                <Text style={selectedKeyForte.includes(item.keyforte) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
+                                                                    {item.keyforte}
                                                                 </Text>
                                                             </View>
                                                         </TouchableOpacity>
-                                                    ))}
-                                                    <TouchableOpacity
-                                                        activeOpacity={0.8}
-                                                        onPress={toggleOtherKeyForteInput}
-                                                        onMouseEnter={() => setHoveredItem('Other')}
-                                                        onMouseLeave={() => setHoveredItem(null)}
-                                                    >
-                                                        <View
-                                                            style={[
-                                                                styles.checkboxContainer,
-                                                                showOtherKeyForteInput && styles.selectedCheckboxContainer,
-                                                                hoveredItem === 'Other' && styles.hoveredCheckboxContainer,
-                                                            ]}
-                                                        >
-                                                            <Image
-                                                                source={showOtherKeyForteInput ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
-                                                                style={styles.checkboxImage}
-                                                            />
-                                                            <Text style={showOtherKeyForteInput ? commonStyles.headerText4B : commonStyles.headerText4BL}>Other</Text>
-                                                        </View>
-                                                    </TouchableOpacity>
-                                                </View>
+                                                    )}
+                                                    keyExtractor={item => item.id}
+                                                />
+
                                                 {showOtherKeyForteInput && (
-                                                    <View style={styles.inputContainer1}>
+                                                    <View style={[styles.inputContainer1]}>
                                                         <TextInput
                                                             style={styles.inputs}
                                                             placeholder="Other Key Forte"
@@ -908,10 +817,19 @@ const ProfileCompletion2 = ({ navigation }) => {
                                                         />
                                                     </View>
                                                 )}
-                                                <TouchableOpacity style={[commonStyles.button, { marginBottom: 20 }]} activeOpacity={0.8} onPress={handleKeyForteModalSubmit}>
+
+                                                {showOtherKeyForteInput && (
+                                                    <TouchableOpacity style={[commonStyles.button, {}]} activeOpacity={0.8} onPress={handleKeyForteModalSubmit}>
+                                                        <Text style={commonStyles.buttonText}>Submit</Text>
+                                                    </TouchableOpacity>
+                                                )}
+
+                                            </TouchableOpacity>
+                                            {showOtherKeyForteInput ?
+                                                null :
+                                                <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: 20 }]} activeOpacity={0.8} onPress={handleKeyForteModalSubmit}>
                                                     <Text style={commonStyles.buttonText}>Submit</Text>
-                                                </TouchableOpacity>
-                                            </ScrollView>
+                                                </TouchableOpacity>}
                                         </TouchableOpacity>
                                     </Modal>
                             </View>
@@ -937,99 +855,6 @@ const ProfileCompletion2 = ({ navigation }) => {
                                         <Image source={require('../../../assets/img/Add.png')} style={styles.closeP} />
                                     )}
                                 </TouchableOpacity>
-                                {/* <Modal visible={qualificationsModalVisible} transparent>
-                                    <TouchableWithoutFeedback onPress={() => handleCloseQualificationsModal()}>
-                                        <View style={styles.modalContainer}>
-                                            <TouchableWithoutFeedback >
-                                                <View style={styles.modalContent}>
-                                                    <View style={styles.horizontalLine}></View>
-                                                  <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
-                                                        Tell us your qualifications <Text style={commonStyles.headerText3G}> (upto 5)</Text>
-                                                    </Text>
-                                                    <View style={styles.servicesContainer}>
-                                                        {qualificationsData.map((qualification) => (
-                                                            <TouchableOpacity
-                                                                key={qualification}
-                                                                style={[
-                                                                    styles.serviceButton,
-                                                                    selectedQualifications.includes(qualification) && styles.selectedServiceButton,
-                                                                ]}
-                                                                activeOpacity={0.8}
-                                                                onPress={() => toggleQualification(qualification)}
-                                                            >
-                                                                <Text
-                                                                    style={[
-                                                                        styles.serviceButtonText,
-                                                                        selectedQualifications.includes(qualification) && styles.selectedServiceButtonText,
-                                                                    ]}
-                                                                >
-                                                                    {qualification}
-                                                                </Text>
-                                                                {selectedQualifications.includes(qualification) && (
-                                                                    <TouchableOpacity
-                                                                        style={styles.closeButton}
-                                                                        onPress={() => toggleQualification(qualification)}
-                                                                        activeOpacity={0.8}
-                                                                    >
-                                                                        <Image
-                                                                            source={require('../../../assets/img/close.png')}
-                                                                            style={styles.closeImage}
-                                                                        />
-                                                                    </TouchableOpacity>
-                                                                )}
-                                                            </TouchableOpacity>
-                                                        ))}
-                                                        <TouchableOpacity
-                                                            style={[
-                                                                styles.serviceButton,
-                                                                styles.otherButton,
-                                                                showOtherQualificationInput && styles.selectedServiceButton,
-                                                            ]}
-                                                            activeOpacity={0.8}
-                                                            onPress={toggleOtherQualificationInput}
-                                                        >
-                                                            <Text
-                                                                style={[
-                                                                    styles.serviceButtonText,
-                                                                    showOtherQualificationInput && styles.selectedServiceButtonText,
-                                                                ]}
-                                                            >
-                                                                Other
-                                                            </Text>
-                                                            {showOtherQualificationInput && (
-                                                                <TouchableOpacity
-                                                                    style={styles.closeButton}
-                                                                    onPress={toggleOtherQualificationInput}
-                                                                    activeOpacity={0.8}
-                                                                >
-                                                                    <Image
-                                                                        source={require('../../../assets/img/close.png')}
-                                                                        style={styles.closeImage}
-                                                                    />
-                                                                </TouchableOpacity>
-                                                            )}
-                                                        </TouchableOpacity>
-                                                    </View>
-                                                    {showOtherQualificationInput && (
-                                                        <View style={styles.inputContainer1}>
-                                                            <TextInput
-                                                                style={styles.inputs}
-                                                                placeholder="Other Qualification"
-                                                                placeholderTextColor="#979797"
-                                                                value={otherQualification}
-                                                                onChangeText={(text) => setOtherQualification(text)}
-                                                                underlineColorAndroid="transparent"
-                                                            />
-                                                        </View>
-                                                    )}
-                                                        <TouchableOpacity style={[commonStyles.button]} activeOpacity={0.8}  onPress={handleQualificationsModalSubmit}>
-                                                        <Text style={commonStyles.buttonText}>Submit</Text>
-                                                    </TouchableOpacity>
-                                                </View>
-                                            </TouchableWithoutFeedback>
-                                        </View>
-                                    </TouchableWithoutFeedback>
-                                </Modal> */}
                                     <Modal
                                         visible={qualificationsModalVisible}
                                         transparent
@@ -1040,7 +865,9 @@ const ProfileCompletion2 = ({ navigation }) => {
                                             style={styles.modalContainer}
                                             onPress={() => setQualificationsModalVisible(false)} // Close the modal when clicking on the background
                                         >
-                                            <ScrollView style={styles.modalContent}>
+                                            <TouchableOpacity style={styles.modalContent}
+                                                activeOpacity={1}
+                                                onPress={() => { }}>
                                                 <View style={styles.horizontalLine}></View>
                                                 <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
                                                     Tell us your qualifications <Text style={commonStyles.headerText3G}> (upto 5)</Text>
@@ -1048,53 +875,44 @@ const ProfileCompletion2 = ({ navigation }) => {
                                                 <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
                                                     Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
                                                 </Text>
-                                                <View style={styles.servicesContainer11}>
-                                                    {qualificationsData.map((qualification) => (
+                                                <FlatList
+                                                    data={[...qualificationsData, { id: 'other', qualification: 'Other' }]} // Add 'Other' as an additional item
+                                                    renderItem={({ item }) => (
                                                         <TouchableOpacity
                                                             activeOpacity={0.8}
-                                                            key={qualification}
-                                                            onPress={() => toggleQualification(qualification)}
-                                                            onMouseEnter={() => setHoveredItem(qualification)}
+                                                            onPress={() => {
+                                                                if (item.id === 'other') {
+                                                                    toggleOtherQualificationInput();
+                                                                } else {
+                                                                    toggleQualification(item.qualification);
+                                                                }
+                                                            }}
+                                                            onMouseEnter={() => setHoveredItem(item.qualification)}
                                                             onMouseLeave={() => setHoveredItem(null)}
                                                         >
                                                             <View
                                                                 style={[
                                                                     styles.checkboxContainer,
-                                                                    selectedQualifications.includes(qualification) && styles.selectedCheckboxContainer,
-                                                                    hoveredItem === qualification && styles.hoveredCheckboxContainer,
+                                                                    selectedQualifications.includes(item.qualification) && styles.selectedCheckboxContainer,
+                                                                    hoveredItem === item.qualification && styles.hoveredCheckboxContainer,
                                                                 ]}
                                                             >
                                                                 <Image
-                                                                    source={selectedQualifications.includes(qualification) ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
+                                                                    source={
+                                                                        selectedQualifications.includes(item.qualification) || (showOtherQualificationInput && item.id === 'other')
+                                                                            ? require('../../../assets/img/Rect1.png')
+                                                                            : require('../../../assets/img/Rect.png')
+                                                                    }
                                                                     style={styles.checkboxImage}
                                                                 />
-                                                                <Text style={selectedQualifications.includes(qualification) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
-                                                                    {qualification}
+                                                                <Text style={selectedQualifications.includes(item.qualification) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
+                                                                    {item.qualification}
                                                                 </Text>
                                                             </View>
                                                         </TouchableOpacity>
-                                                    ))}
-                                                    <TouchableOpacity
-                                                        activeOpacity={0.8}
-                                                        onPress={toggleOtherQualificationInput}
-                                                        onMouseEnter={() => setHoveredItem('Other')}
-                                                        onMouseLeave={() => setHoveredItem(null)}
-                                                    >
-                                                        <View
-                                                            style={[
-                                                                styles.checkboxContainer,
-                                                                showOtherQualificationInput && styles.selectedCheckboxContainer,
-                                                                hoveredItem === 'Other' && styles.hoveredCheckboxContainer,
-                                                            ]}
-                                                        >
-                                                            <Image
-                                                                source={showOtherQualificationInput ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
-                                                                style={styles.checkboxImage}
-                                                            />
-                                                            <Text style={showOtherQualificationInput ? commonStyles.headerText4B : commonStyles.headerText4BL}>Other</Text>
-                                                        </View>
-                                                    </TouchableOpacity>
-                                                </View>
+                                                    )}
+                                                    keyExtractor={item => item.id}
+                                                />
                                                 {showOtherQualificationInput && (
                                                     <View style={styles.inputContainer1}>
                                                         <TextInput
@@ -1107,10 +925,19 @@ const ProfileCompletion2 = ({ navigation }) => {
                                                         />
                                                     </View>
                                                 )}
-                                                <TouchableOpacity style={[commonStyles.button, { marginBottom: 20 }]} activeOpacity={0.8} onPress={handleQualificationsModalSubmit}>
+
+                                                {showOtherQualificationInput && (
+                                                    <TouchableOpacity style={[commonStyles.button, {}]} activeOpacity={0.8} onPress={handleQualificationsModalSubmit}>
+                                                        <Text style={commonStyles.buttonText}>Submit</Text>
+                                                    </TouchableOpacity>
+                                                )}
+                                            </TouchableOpacity>
+                                            {showOtherQualificationInput ?
+                                                null :
+                                                <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: 20 }]} activeOpacity={0.8} onPress={handleQualificationsModalSubmit}>
                                                     <Text style={commonStyles.buttonText}>Submit</Text>
-                                                </TouchableOpacity>
-                                            </ScrollView>
+                                                </TouchableOpacity>}
+                                          
                                         </TouchableOpacity>
                                     </Modal>
                             </View>
@@ -1124,8 +951,8 @@ const ProfileCompletion2 = ({ navigation }) => {
                                         style={styles.inputs}
                                         placeholder="License Number"
                                         placeholderTextColor="#979797"
-                                        //value={selectedEmail}
-                                        //onChangeText={(text) => setSelectedEmail(text)}
+                                            value={licenseNumber}
+                                            onChangeText={(text) => setLicenseNumber(text)}
                                         underlineColorAndroid="transparent"
                                     />
                                 </View>
@@ -1133,27 +960,12 @@ const ProfileCompletion2 = ({ navigation }) => {
 
                                 <TouchableOpacity
                                     style={[commonStyles.button, ]}
-                                    onPress={() => {
-                                        navigation.navigate('ProfileCompletion3');
-                                        console.log('ProfileCompletion21');
-                                    }}
+                                    onPress={handleNext}
                                     activeOpacity={0.8}
                                 >
                                     <Text style={commonStyles.buttonText}>Continue</Text>
                                 </TouchableOpacity>
 
-{/* 
-   
-                        <TouchableOpacity
-                                style={[commonStyles.button, { marginBottom: moderateScale(50), }]}
-                            onPress={() => {
-                                navigation.navigate('ProfileCompletion3');
-                                console.log('ProfileCompletion21');
-                            }}
-                            activeOpacity={0.8}
-                        >
-                            <Text style={commonStyles.buttonText}>Continue</Text>
-                        </TouchableOpacity> */}
 
                     </View>
                 </ScrollView>
@@ -1182,6 +994,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignSelf: 'center',
         backgroundColor: '#979797',
+        borderRadius: 10
     },
     modalContainer: {
         flex: 1,
@@ -1195,6 +1008,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 20,
         paddingHorizontal: moderateScale(16),
         maxHeight: '95%', 
+        minHeight: 350, 
         paddingBottom: 30,
     },
     modalInput: {
@@ -1327,6 +1141,14 @@ const styles = StyleSheet.create({
         //fontSize: responsiveFontSize(14),
         fontFamily: 'DMSans-Medium',
         flex: 1
+    },
+    inputTA: {
+        marginLeft: width * 0.04,
+        marginRight: width * 0.04,
+        color: '#121212',
+        //fontSize: responsiveFontSize(14),
+        fontFamily: 'DMSans-Medium',
+        flex: 1,
     },
     button: {
         alignSelf: 'center',

@@ -1189,6 +1189,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignSelf: 'center',
         backgroundColor: '#979797',
+        borderRadius: 10
     },
     modalContainer: {
         flex: 1,

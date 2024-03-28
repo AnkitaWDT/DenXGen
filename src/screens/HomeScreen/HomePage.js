@@ -375,7 +375,7 @@ const HomePage = ({ navigation, route }) => {
                     activeOpacity={0.8}
                     onPress={() => navigation.navigate('Notifications')}>
                 <Image
-                  source={require('../../../assets/img/notificationW.png')}
+                  source={require('../../../assets/img/notifications.png')}
                   style={commonStyles.icon}
                 />
 
@@ -1124,6 +1124,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'center',
     backgroundColor: '#979797',
+    borderRadius: 10
   },
   modalContainer: {
     flex: 1,

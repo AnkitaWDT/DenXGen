@@ -1,15 +1,63 @@
 /* eslint-disable prettier/prettier */
-import React from 'react';
-import { View, Image, PixelRatio, Text, TextInput, Button, TouchableOpacity, StyleSheet, Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Image, PixelRatio, Text, TextInput, Button, TouchableOpacity, StyleSheet, Dimensions, KeyboardAvoidingView, Platform, ScrollView, ToastAndroid } from 'react-native';
 import {moderateScale} from 'react-native-size-matters';
 import commonStyles from '../../components/CommonStyles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {width, height} = Dimensions.get('window');
 
-const LoginScreen = ({navigation}) => {
-  const handleRegistration = async () => {
-    navigation.navigate('OTPScreen');
-  };
+const LoginScreen = ({navigation, route}) => {
+
+    const [phoneNumber, setPhoneNumber] = useState('');
+//   const handleRegistration = async () => {
+//     navigation.navigate('OTPScreen');
+//   };
+
+    const handleRegistration = async () => {
+        try {
+           
+
+            const endpoint = `https://temp.wedeveloptech.in/denxgen/appdata/requserlogin-ax.php?phno=${encodeURIComponent(
+                phoneNumber
+            )}`;
+
+            const response2 = await fetch(endpoint);
+            const data = await response2.json();
+
+            if (data.code === 1) {
+                console.log('OTP sent to phoneNumber!');
+                ToastAndroid.show('OTP sent successfully!', ToastAndroid.SHORT);
+
+                await AsyncStorage.setItem('userid', String(data.data.id));
+                await AsyncStorage.setItem('phoneno', data.data.phoneno);
+                await AsyncStorage.setItem('password', String(data.data.password));
+                await AsyncStorage.setItem('name', data.data.name);
+
+                // Navigate to OTPScreen
+                navigation.navigate('OTPScreen', { phoneNumber });
+                setPhoneNumber('');
+            } else {
+                console.log('Failed to send OTP. Please try again.');
+                ToastAndroid.show(
+                    'Please Check Number and Try Again.',
+                    ToastAndroid.SHORT
+                );
+            }
+        } catch (error) {
+            console.log('Error occurred:', error);
+            ToastAndroid.show('Network Error.', ToastAndroid.SHORT);
+        }
+        setPhoneNumber('');
+    };
+
+    useEffect(() => {
+        // Check if route and route.params are defined
+        if (route && route.params && route.params.phoneNumber) {
+            setPhoneNumber(route.params.phoneNumber);
+        }
+    }, [route]);
+
 
   return (
     <KeyboardAvoidingView
@@ -23,7 +71,7 @@ const LoginScreen = ({navigation}) => {
         </View>
 
         {/* White container */}
-              <ScrollView style={[styles.whiteContainer, { height: moderateScale(height * 0.95) }]}>
+              <ScrollView style={[styles.whiteContainer, {  }]}>
           {/* Content inside the white container */}
                   <Image source={require('../../../assets/img/LoginOTP.png')} style={styles.headerImageBackground} />
                   <Text style={[commonStyles.headerText1BL, {
@@ -52,6 +100,8 @@ const LoginScreen = ({navigation}) => {
                               keyboardType="phone-pad"
                               placeholder="Enter Mobile Number"
                               placeholderTextColor="#979797"
+                              value={phoneNumber}
+                              onChangeText={setPhoneNumber}
                           />
                       </View>
                   </View>

@@ -52,25 +52,40 @@ const ProfileCompletion5 = ({ navigation }) => {
 
     const [selectedButton, setSelectedButton] = useState('');
 
-    const [languagesData] = useState([
-        'English',
-        'Hindi',
-        'Marathi',
-        'Bengali',
-        'Telugu',
-        'Tamil',
-        'Gujarati',
-        'Urdu',
-        'Kannada',
-        'Odia',
-        'Malayalam',
-        'Punjabi',
-    ]);
+    // const [languagesData] = useState([
+    //     'English',
+    //     'Hindi',
+    //     'Marathi',
+    //     'Bengali',
+    //     'Telugu',
+    //     'Tamil',
+    //     'Gujarati',
+    //     'Urdu',
+    //     'Kannada',
+    //     'Odia',
+    //     'Malayalam',
+    //     'Punjabi',
+    // ]);
 
+    const [languagesData, setLanguagesData] = useState([]);
     const [selectedLanguages, setSelectedLanguages] = useState([]);
     const [otherLanguages, setOtherLanguages] = useState('');
     const [languagesModalVisible, setLanguagesModalVisible] = useState(false);
     const [showOtherLanguagesInput, setShowOtherLanguagesInput] = useState(false);
+
+    useEffect(() => {
+        fetchLanguagesData();
+    }, []);
+
+    const fetchLanguagesData = async () => {
+        try {
+            const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getlang-ax.php');
+            const data = await response.json();
+            setLanguagesData(data.data);
+        } catch (error) {
+            console.error('Error fetching key forte data:', error);
+        }
+    };
 
     const handleLanguagesModal = () => {
         setLanguagesModalVisible(true);
@@ -111,18 +126,33 @@ const ProfileCompletion5 = ({ navigation }) => {
         setShowOtherLanguagesInput(!showOtherLanguagesInput);
     };
 
-    const [experienceData] = useState([
-        '>2 years',
-        '2-5 years',
-        '5-10 years',
-        '10-15 years',
-        '15+ years',
-    ]);
+    // const [experienceData] = useState([
+    //     '>2 years',
+    //     '2-5 years',
+    //     '5-10 years',
+    //     '10-15 years',
+    //     '15+ years',
+    // ]);
 
+    const [experienceData, setExperienceData] = useState([]);
     const [selectedExperience, setSelectedExperience] = useState('');
     const [otherExperience, setOtherExperience] = useState('');
     const [experienceModalVisible, setExperienceModalVisible] = useState(false);
     const [showOtherExperienceInput, setShowOtherExperienceInput] = useState(false);
+
+    useEffect(() => {
+        fetchExperienceData();
+    }, []);
+
+    const fetchExperienceData = async () => {
+        try {
+            const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getexplist-ax.php');
+            const data = await response.json();
+            setExperienceData(data.data);
+        } catch (error) {
+            console.error('Error fetching key forte data:', error);
+        }
+    };
 
     const handleExperienceModal = () => {
         setExperienceModalVisible(true);
@@ -159,6 +189,25 @@ const ProfileCompletion5 = ({ navigation }) => {
     const toggleOtherExperienceInput = () => {
         setShowOtherExperienceInput(!showOtherExperienceInput);
     };
+
+    const [registerNumber, setRegisterNumber] = useState('');
+    const [paymentLink, setPaymentLink] = useState('');
+
+    const handleNext = async () => {
+        const userData = {
+            AvailableForHomeVisits: selectedButton === 'button1' ? "Yes" : "No",
+            SelectedLanguages: selectedLanguages,
+            SelectedExperience: selectedExperience,
+            LicenseNumber: registerNumber,
+            PaymentLink: paymentLink,
+            availableForHomeVisitsValue: selectedButton === 'button1' ? 1 : 2,
+
+        };
+
+        console.log('User Data:', userData);
+        navigation.navigate('ProfileCompletion6');
+    };
+
 
     const currentStep = 5; // For example, current step is 4
     const totalSteps = 9; // Total number of steps
@@ -363,27 +412,27 @@ const ProfileCompletion5 = ({ navigation }) => {
                                                 </Text>
                                                 <View style={styles.servicesContainer11}>
 
-                                                    {languagesData.map((languages) => (
+                                                    {languagesData.map((languagesItem) => (
                                                         <TouchableOpacity
                                                             activeOpacity={0.8}
-                                                            key={languages}
-                                                        onPress={() => toggleLanguages(languages)}
-                                                        onMouseEnter={() => setHoveredItem(languages)}
+                                                            key={languagesItem.id}
+                                                        onPress={() => toggleLanguages(languagesItem.language)}
+                                                        onMouseEnter={() => setHoveredItem(languagesItem.language)}
                                                             onMouseLeave={() => setHoveredItem(null)}
                                                         >
                                                             <View
                                                                 style={[
                                                                     styles.checkboxContainer,
-                                                                selectedLanguages.includes(languages) && styles.selectedCheckboxContainer,
-                                                                hoveredItem === languages && styles.hoveredCheckboxContainer,
+                                                                    selectedLanguages.includes(languagesItem.language) && styles.selectedCheckboxContainer,
+                                                                    hoveredItem === languagesItem.language && styles.hoveredCheckboxContainer,
                                                                 ]}
                                                             >
                                                                 <Image
-                                                                source={selectedLanguages.includes(languages) ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
+                                                                    source={selectedLanguages.includes(languagesItem.language) ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
                                                                     style={styles.checkboxImage}
                                                                 />
-                                                            <Text style={selectedLanguages.includes(languages) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
-                                                                {languages}
+                                                                <Text style={selectedLanguages.includes(languagesItem.language) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
+                                                                    {languagesItem.language}
                                                                 </Text>
                                                             </View>
                                                         </TouchableOpacity>
@@ -421,10 +470,11 @@ const ProfileCompletion5 = ({ navigation }) => {
                                                         />
                                                     </View>
                                                 )}
-                                            <TouchableOpacity style={[commonStyles.button, { marginBottom: 20 }]} activeOpacity={0.8} onPress={handleLanguagesModalSubmit}>
-                                                    <Text style={commonStyles.buttonText}>Submit</Text>
-                                                </TouchableOpacity>
+                                          
                                             </ScrollView>
+                                            <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: height * 0.08, }]} activeOpacity={0.8} onPress={handleLanguagesModalSubmit}>
+                                                <Text style={commonStyles.buttonText}>Submit</Text>
+                                            </TouchableOpacity>
                                         </TouchableOpacity>
                                     </Modal>
                                 </View>
@@ -466,27 +516,27 @@ const ProfileCompletion5 = ({ navigation }) => {
                                                     Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
                                                 </Text>
                                                 <View style={styles.servicesContainer11}>
-                                                    {experienceData.map((experience) => (
+                                                    {experienceData.map((experienceItem) => (
                                                         <TouchableOpacity
                                                             activeOpacity={0.8}
-                                                            key={experience}
-                                                            onPress={() => toggleExperience(experience)}
-                                                            onMouseEnter={() => setHoveredItem(experience)}
+                                                            key={experienceItem.id}
+                                                            onPress={() => toggleExperience(experienceItem.experience)}
+                                                            onMouseEnter={() => setHoveredItem(experienceItem.experience)}
                                                             onMouseLeave={() => setHoveredItem(null)}
                                                         >
                                                             <View
                                                                 style={[
                                                                     styles.checkboxContainer,
-                                                                    selectedExperience.includes(experience) && styles.selectedCheckboxContainer,
-                                                                    hoveredItem === experience && styles.hoveredCheckboxContainer,
+                                                                    selectedExperience.includes(experienceItem.experience) && styles.selectedCheckboxContainer,
+                                                                    hoveredItem === experienceItem.experience && styles.hoveredCheckboxContainer,
                                                                 ]}
                                                             >
                                                                 <Image
-                                                                    source={selectedExperience.includes(experience) ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
+                                                                    source={selectedExperience.includes(experienceItem.experience) ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
                                                                     style={styles.checkboxImage}
                                                                 />
-                                                                <Text style={selectedExperience.includes(experience) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
-                                                                    {experience}
+                                                                <Text style={selectedExperience.includes(experienceItem.experience) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
+                                                                    {experienceItem.experience}
                                                                 </Text>
                                                             </View>
                                                         </TouchableOpacity>
@@ -524,10 +574,10 @@ const ProfileCompletion5 = ({ navigation }) => {
                                                         />
                                                     </View>
                                                 )} */}
-                                                <TouchableOpacity style={[commonStyles.button, { marginBottom: 20 }]} activeOpacity={0.8} onPress={handleExperienceModalSubmit}>
-                                                    <Text style={commonStyles.buttonText}>Submit</Text>
-                                                </TouchableOpacity>
                                             </ScrollView>
+                                            <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: height * 0.08, }]} activeOpacity={0.8} onPress={handleExperienceModalSubmit}>
+                                                <Text style={commonStyles.buttonText}>Submit</Text>
+                                            </TouchableOpacity>
                                         </TouchableOpacity>
                                     </Modal>
 
@@ -542,8 +592,8 @@ const ProfileCompletion5 = ({ navigation }) => {
                                     style={styles.inputs}
                                         placeholder="Registration Number"
                                     placeholderTextColor="#979797"
-                                    //value={selectedEmail}
-                                    //onChangeText={(text) => setSelectedEmail(text)}
+                                            value={registerNumber}
+                                            onChangeText={(text) => setRegisterNumber(text)}
                                     underlineColorAndroid="transparent"
                                 />
                             </View>
@@ -558,8 +608,8 @@ const ProfileCompletion5 = ({ navigation }) => {
                                             style={styles.inputs}
                                             placeholder="upi@okicici"
                                             placeholderTextColor="#979797"
-                                            //value={selectedEmail}
-                                            //onChangeText={(text) => setSelectedEmail(text)}
+                                            value={paymentLink}
+                                            onChangeText={(text) => setPaymentLink(text)}
                                             underlineColorAndroid="transparent"
                                         />
                                     </View>
@@ -567,10 +617,11 @@ const ProfileCompletion5 = ({ navigation }) => {
                                 {/* Continue Button */}
                                 <TouchableOpacity
                                     style={[commonStyles.button]}
-                                    onPress={() => {
-                                        navigation.navigate('ProfileCompletion6');
-                                        console.log('ProfileCompletion21');
-                                    }}
+                                    // onPress={() => {
+                                    //     navigation.navigate('ProfileCompletion6');
+                                    //     console.log('ProfileCompletion21');
+                                    // }}
+                                    onPress={handleNext}
                                     activeOpacity={0.8}
                                 >
                                     <Text style={commonStyles.buttonText}>Continue</Text>
@@ -605,6 +656,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignSelf: 'center',
         backgroundColor: '#979797',
+        borderRadius: 10
     },
     modalContainer: {
         flex: 1,

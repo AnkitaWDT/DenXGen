@@ -530,7 +530,7 @@ const PersonalProfile = ({ navigation, route }) => {
                         <Text style={[commonStyles.headerText1BL, {}]} adjustsFontSizeToFit numberOfLines={1} ellipsizeMode="tail">Naina Swaroop</Text>
                         <Text style={[commonStyles.headerText2BL, {
                             marginVertical: 3,
-                        }]} numberOfLines={1} ellipsizeMode="tail">MDS,BDS l Prosthodontics l 10+ years exp</Text>
+                        }]} numberOfLines={1} ellipsizeMode="tail">MDS,BDS ┃ Prosthodontics ┃ 10+ years exp</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}>
                             <Image source={require('../../assets/img/LocationHome.png')} style={{ width: 15, height: 15, }} />
                             <Text style={[commonStyles.headerText5BL, {
@@ -1089,6 +1089,7 @@ const PersonalProfile = ({ navigation, route }) => {
                 </View>
 
             </ScrollView>
+        
         </SafeAreaView>
     );
 };
@@ -1631,6 +1632,7 @@ containerButton:{
         justifyContent: 'center',
         alignSelf: 'center',
         backgroundColor: '#979797',
+        borderRadius: 10
     },
     profileImage: {
         height: height * 0.09,

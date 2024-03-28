@@ -87,15 +87,16 @@ const OnBoardScreen = ({ navigation }) => {
     };
 
     const goToNextSlide = () => {
-        const nextSlideIndex = currentSlideIndex + 1;
-        if (nextSlideIndex < slides.length) {
-            const offset = nextSlideIndex * width;
-            ref?.current.scrollToOffset({ offset });
-            setCurrentSlideIndex(nextSlideIndex);
-        }
-        else {
-            navigation.navigate('LoginScreen'); 
-        }
+        // const nextSlideIndex = currentSlideIndex + 1;
+        // if (nextSlideIndex < slides.length) {
+        //     const offset = nextSlideIndex * width;
+        //     ref?.current.scrollToOffset({ offset });
+        //     setCurrentSlideIndex(nextSlideIndex);
+        // }
+        // else {
+        //     navigation.navigate('LoginScreen'); 
+        // }
+        navigation.replace('LoginScreen'); 
     };
 
 
@@ -125,7 +126,30 @@ const OnBoardScreen = ({ navigation }) => {
                 alignItems: 'center',
             }}>
             {/* Render indicator */}
-            {currentSlideIndex === slides.length - 1 ? (
+            {/* {currentSlideIndex === slides.length - 1 ? (
+                <View>
+                     <TouchableOpacity
+                    style={styles.button}
+                    onPress={goToNextSlide}
+                    activeOpacity={0.8}
+                >
+                    <Text style={styles.buttonText}>Get Started</Text>
+                </TouchableOpacity>
+                </View>
+               
+            ) : (
+                <View style={styles.dotsContainer}>
+                    {slides.map((_, i) => (
+                        <View key={i} style={i === currentSlideIndex ? styles.activeDot : styles.dot} />
+                    ))}
+                </View>
+            )} */}
+            <View>
+                <View style={styles.dotsContainer}>
+                    {slides.map((_, i) => (
+                        <View key={i} style={i === currentSlideIndex ? styles.activeDot : styles.dot} />
+                    ))}
+                </View>
                 <TouchableOpacity
                     style={styles.button}
                     onPress={goToNextSlide}
@@ -133,13 +157,7 @@ const OnBoardScreen = ({ navigation }) => {
                 >
                     <Text style={styles.buttonText}>Get Started</Text>
                 </TouchableOpacity>
-            ) : (
-                <View style={styles.dotsContainer}>
-                    {slides.map((_, i) => (
-                        <View key={i} style={i === currentSlideIndex ? styles.activeDot : styles.dot} />
-                    ))}
-                </View>
-            )}
+            </View>
         </View>
     );
 };
@@ -193,7 +211,7 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         justifyContent: "center",
         alignItems: "center",
-        //marginTop: moderateScale(18),
+        marginTop: 18,
     },
     buttonText: {
         color: '#FFFFFF',

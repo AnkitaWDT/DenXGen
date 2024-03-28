@@ -7,6 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animation from '../../components/Loader';
 import AlertPopup from '../../components/AlertPopup';
+import { API_CONFIG } from '../../API/APIConfig';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const { width, height } = Dimensions.get('window');
@@ -37,6 +39,7 @@ const MyProfile = ({ navigation }) => {
 
             // Execute the fakeAsyncOperation
             fakeAsyncOperation();
+            fetchConfigData();
 
             // Return a cleanup function (optional)
             return () => {
@@ -45,6 +48,25 @@ const MyProfile = ({ navigation }) => {
         }, [])
     );
 
+    const [version, setVersion] = useState('');
+    const [developerUrl, setDeveloperUrl] = useState('');
+
+    const fetchConfigData = async () => {
+        try {
+            const response = await fetch(API_CONFIG.CONFIG_FILE);
+            const data = await response.json();
+            console.log(data);
+            const { appversion, developerurl } = data.data;
+            setVersion(appversion);
+            setDeveloperUrl(developerurl);
+        } catch (error) {
+            console.error('Error fetching config data:', error);
+        }
+    };
+
+  const openWebView = (url, pageName) => {
+      navigation.navigate('WebViewScreen', { url: developerUrl, pageName: 'WeDevelopTech' });
+  };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -73,58 +95,24 @@ const MyProfile = ({ navigation }) => {
 
                     <ScrollView style={styles.subContainer} showsVerticalScrollIndicator={false}>
                         <View>
-                            <View style={{ height: 1, backgroundColor: '#ccc' }} />
 
                                 <TouchableOpacity
-                                    style={styles.CContainer}
                                     activeOpacity={0.8}
                                     onPress={() => navigation.navigate('PersonalProfile')}
-                                >
-                                    {/* Left side content */}
-                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        <Image source={require('../../../assets/img/Premium.png')} style={{ width: 24, height: 24, marginRight: 20 }} />
-                                        <Text style={styles.leftText}>My Profile</Text>
-                                        {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 250 }}>
-                                <Text style={{ fontSize: 17, fontWeight: '400', color: 'black', fontFamily: 'Mukta-Regular' }}>Receive Request</Text>
-                                <Text style={{ fontSize: 14, fontWeight: '400', color: '#979797', fontFamily: 'Mukta-Regular' }}>(54+ others)</Text>
-                            </View> */}
-
+                                 style={styles.profileRowContainer}>
+                                    <View style={styles.profileImageContainer}>
+                                        <Image source={require('../../../assets/img/clinicDefault.jpg')} style={styles.profileImage} />
                                     </View>
-
-                                    {/* Right side content */}
-                                    {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={require('../../../assets/img/ViewAll.png')} style={{ width: 18, height: 18, marginRight: 10 }} />
-                        </View> */}
+                                    <View style={styles.profileInfoContainer}>
+                                        <Text style={[commonStyles.headerText0BL, {}]} adjustsFontSizeToFit numberOfLines={1} ellipsizeMode="tail">Naina Swaroop</Text>
+                                        <Text style={[commonStyles.headerText2BL, {
+                                            marginVertical: 3,
+                                        }]} numberOfLines={1} ellipsizeMode="tail">MDS,BDS ┃ Prosthodontics ┃ 10+ years exp</Text>
+                                    </View>
                                 </TouchableOpacity>
-
-
-                                {/* Horizontal line */}
-                                <View style={{ height: 1, backgroundColor: '#ccc' }} />
-                            {/* Content row with text and button */}
-                            <TouchableOpacity
-                                style={styles.CContainer}
-                                activeOpacity={0.8}
-                                onPress={() => navigation.navigate('EditProfile')}
-                            >
-                                {/* Left side content */}
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        <Image source={require('../../../assets/img/EditPro.png')} style={{ width: 24, height: 24, marginRight: 20 }} />
-                                    <Text style={styles.leftText}>Edit Profile</Text>
-
-                                    {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 250 }}>
-                                <Text style={{ fontSize: 17, fontWeight: '400', color: 'black', fontFamily: 'Mukta-Regular' }}>My Connections</Text>
-                                <Text style={{ fontSize: 14, fontWeight: '400', color: '#979797', fontFamily: 'Mukta-Regular' }}>(100+ others)</Text>
-                            </View> */}
-                                </View>
-
-                                {/* Right side content */}
-                                {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={require('../../../assets/img/ViewAll.png')} style={{ width: 18, height: 18, marginRight: 10 }} />
-                        </View> */}
-                            </TouchableOpacity>
-
-                            {/* Horizontal line */}
                             <View style={{ height: 1, backgroundColor: '#ccc' }} />
+
+                              
 
                             {/* <TouchableOpacity
                                 style={styles.CContainer}
@@ -219,6 +207,49 @@ const MyProfile = ({ navigation }) => {
                             {/* Horizontal line */}
                             <View style={{ height: 1, backgroundColor: '#ccc' }} />
 
+                                <TouchableOpacity
+                                    style={styles.CContainer}
+                                    activeOpacity={0.8}
+                                    //onPress={() => navigation.navigate('PersonalProfile')}
+                                >
+                                    {/* Left side content */}
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Image source={require('../../../assets/img/Premium.png')} style={{ width: 24, height: 24, marginRight: 20 }} />
+                                        <Text style={styles.leftText}>Terms & Conditions</Text>
+
+                                    </View>
+
+                                </TouchableOpacity>
+
+
+                                {/* Horizontal line */}
+                                <View style={{ height: 1, backgroundColor: '#ccc' }} />
+                                {/* Content row with text and button */}
+                                <TouchableOpacity
+                                    style={styles.CContainer}
+                                    activeOpacity={0.8}
+                                    //onPress={() => navigation.navigate('EditProfile')}
+                                >
+                                    {/* Left side content */}
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Image source={require('../../../assets/img/EditPro.png')} style={{ width: 24, height: 24, marginRight: 20 }} />
+                                        <Text style={styles.leftText}>Privacy Policy</Text>
+
+                                        {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 250 }}>
+                                <Text style={{ fontSize: 17, fontWeight: '400', color: 'black', fontFamily: 'Mukta-Regular' }}>My Connections</Text>
+                                <Text style={{ fontSize: 14, fontWeight: '400', color: '#979797', fontFamily: 'Mukta-Regular' }}>(100+ others)</Text>
+                            </View> */}
+                                    </View>
+
+                                    {/* Right side content */}
+                                    {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={require('../../../assets/img/ViewAll.png')} style={{ width: 18, height: 18, marginRight: 10 }} />
+                        </View> */}
+                                </TouchableOpacity>
+
+                                {/* Horizontal line */}
+                                <View style={{ height: 1, backgroundColor: '#ccc' }} />
+
                             <TouchableOpacity
                                 style={styles.CContainer}
                                 activeOpacity={0.8}
@@ -297,13 +328,24 @@ const MyProfile = ({ navigation }) => {
                                 message="Do you want to logout from your account?"
                                 yesLabel="Yes"
                                 noLabel="No"
-                                onYesPress={() => {
+                                onYesPress={async () => {
                                     setShowPopup(false);
-                                    navigation.navigate('LoginScreen');
+                                    console.log('Logged Out');
+                                    await AsyncStorage.setItem('userLoggedIn', 'false');
+                                    navigation.replace('LoginScreen');
                                 }}
                             />
-
+                              
                         </View>
+                            <View style={styles.bottomContainer}>
+                                {/* <Image source={require('../../../assets/img/DenXGenLogo.png')} style={styles.image} /> */}
+                                <Text style={styles.leftText1}>App Version {version}</Text>
+                                <TouchableOpacity onPress={openWebView}>
+                                    <Text style={styles.leftText1}>Developed By <Text style={styles.leftText}>WeDevelopTech</Text></Text>
+                                </TouchableOpacity>
+                               
+                            </View>
+                          
                     </ScrollView>
                 </View>
             )}
@@ -312,14 +354,42 @@ const MyProfile = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+    bottomContainer: {
+        alignItems: 'center',
+        marginTop: 15
+    },
+    image: {
+        width: width * 0.4,
+        height: height * 0.07,
+        marginTop: height * 0.1,
+        //marginTop: 20
+    },
+    profileRowContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingBottom: 20,
+    },
+    profileImageContainer: {
+        marginRight: 20,
+    },
+    profileImage: {
+        width: 70,
+        height: 70,
+        borderRadius: 100,
+    },
+    profileInfoContainer: {
+        flex: 1,
+    },
     container: {
         flexGrow: 1,
         backgroundColor: '#FEFCFC',
-        paddingVertical: 10,
-        paddingHorizontal: 20
+        paddingTop: 10,
+        paddingHorizontal: 20,
+        paddingBottom: 15,
     },
     subContainer: {
-        marginVertical: 15
+        marginBottom: 15,
+        marginTop: 20,
     },
     CContainer: {
         flexDirection: 'row',
@@ -328,10 +398,16 @@ const styles = StyleSheet.create({
         paddingVertical: 6,
     },
     leftText: {
-        fontSize: responsiveFontSize(16),
+        fontSize: 16,
         color: '#121212',
         fontFamily: 'DMSans-Medium',
-        lineHeight: height * 0.028 //28
+        lineHeight: 24
+    },
+    leftText1: {
+        fontSize: 14,
+        color: '#979797',
+        fontFamily: 'DMSans-Medium',
+        lineHeight: 22
     },
 });
 

@@ -71,7 +71,7 @@ const Connections = ({ navigation }) => {
                             >
                                 {/* Left side content */}
                                 <View style={styles.leftContent}>
-                                        <Image source={require('../../../assets/img/MyConnection1.png')} style={styles.image} />
+                                        <Image source={require('../../../assets/img/MyConnectCC.png')} style={styles.image} />
                                     <Text style={styles.leftText}>My Connections</Text>
                                 </View>
 
@@ -95,7 +95,7 @@ const Connections = ({ navigation }) => {
                                 >
                                     {/* Left side content */}
                                     <View style={styles.leftContent}>
-                                        <Image source={require('../../../assets/img/BlockedAcc1.png')} style={styles.image} />
+                                        <Image source={require('../../../assets/img/CardsDropCC.png')} style={styles.image} />
                                         <Text style={styles.leftText}>Cards Dropped</Text>
                                     </View>
 
@@ -119,7 +119,7 @@ const Connections = ({ navigation }) => {
                             >
                                 {/* Left side content */}
                                 <View style={styles.leftContent}>
-                                        <Image source={require('../../../assets/img/SentRequest1.png')} style={styles.image} />
+                                        <Image source={require('../../../assets/img/SentReqCC.png')} style={styles.imageL} />
                                     <Text style={styles.leftText}>Sent Requests</Text>
                                 </View>
 
@@ -144,7 +144,7 @@ const Connections = ({ navigation }) => {
                             >
                                 {/* Left side content */}
                                 <View style={styles.leftContent}>
-                                        <Image source={require('../../../assets/img/PendingReq1.png')} style={styles.image} />
+                                        <Image source={require('../../../assets/img/PendingReqCC.png')} style={styles.imageL} />
                                     <Text style={styles.leftText}>Pending Requests</Text>
                                 </View>
 
@@ -170,7 +170,7 @@ const Connections = ({ navigation }) => {
                             >
                                 {/* Left side content */}
                                 <View style={styles.leftContent}>
-                                        <Image source={require('../../../assets/img/BlockedAcc1.png')} style={styles.image} />
+                                        <Image source={require('../../../assets/img/BlockedAccCC.png')} style={styles.imageL} />
                                     <Text style={styles.leftText}>Blocked Account</Text>
                                 </View>
 
@@ -223,6 +223,11 @@ const styles = StyleSheet.create({
     },
     image: {
         width: 24,
+        height: 24,
+        marginRight: 15,
+    },
+    imageL: {
+        width: 22,
         height: 24,
         marginRight: 15,
     },

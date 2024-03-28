@@ -1,8 +1,9 @@
 /* eslint-disable prettier/prettier */
 import React, { useRef, useEffect, useState } from 'react';
-import { PixelRatio, View, Image, Text, TextInput, Button, TouchableOpacity, StyleSheet, Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { PixelRatio, View, Image, Text, TextInput, Button, TouchableOpacity, StyleSheet, Dimensions, KeyboardAvoidingView, Platform, ScrollView, ToastAndroid } from 'react-native';
 import commonStyles from '../../components/CommonStyles';
 import { moderateScale } from 'react-native-size-matters';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -12,10 +13,32 @@ const responsiveFontSize = (size) => {
     return Math.round(PixelRatio.roundToNearestPixel(newSize));
 };
 
-const OTPScreen = ({ navigation }) => {
+const OTPScreen = ({ navigation, route }) => {
+
+    const { phoneNumber } = route.params;
+    const [otp, setOtp] = useState(['', '', '', '', '']);
 
     const [inputValues, setInputValues] = useState(['', '', '', '', '']);
     const inputRefs = useRef([]);
+
+    const [timer, setTimer] = useState(60); // Initial timer value
+    const [showResendButton, setShowResendButton] = useState(false); // State to toggle between timer and resend button
+
+    useEffect(() => {
+        let intervalId;
+        if (timer > 0) {
+            // Start the timer countdown
+            intervalId = setInterval(() => {
+                setTimer((prevTimer) => prevTimer - 1);
+            }, 1000);
+        } else {
+            // Timer expired, show resend button
+            setShowResendButton(true);
+        }
+
+        // Clear the interval when component unmounts or timer reaches 0
+        return () => clearInterval(intervalId);
+    }, [timer]);
 
 
     const handleRegistration = async () => {
@@ -70,10 +93,92 @@ const OTPScreen = ({ navigation }) => {
     //     newInputValues[index] = '';
     //     setInputValues(newInputValues);
     // };
-    const handleVerify = () => {
-        navigation.navigate('Personalize');
+
+    const handleVerify = async () => {
+        try {
+
+            const endpoint = `https://temp.wedeveloptech.in/denxgen/appdata/requserlogin-ax.php?phno=${encodeURIComponent(phoneNumber)}`;
+
+            const response2 = await fetch(endpoint);
+            const data = await response2.json();
+
+            if (data.code === 1) {
+                const correctOTP = data.data.password.toString();
+                const enteredOTP = otp.join('');
+
+                console.log(correctOTP);
+                console.log(enteredOTP);
+
+                if (enteredOTP === correctOTP) {
+                    console.log('OTP Verified Successfully!');
+
+                    await AsyncStorage.setItem('userLoggedIn', 'true');
+                    await AsyncStorage.setItem('isregistered', data.data.isregistered.toString());
+                    await AsyncStorage.setItem('status', data.data.status.toString());
+                    await AsyncStorage.setItem('userid', String(data.data.id));
+                    const userid = await AsyncStorage.getItem('userid');
+
+                    ToastAndroid.show('OTP Verified Successfully!', ToastAndroid.SHORT);
+
+                    console.log("Status:", data.data.status);
+                    console.log("IsRegistered:", data.data.isregistered);
+
+                    if (parseInt(data.data.status) === 0 && parseInt(data.data.isregistered) === 0) {
+                        navigation.replace('Personalize', { phoneNumber: phoneNumber });
+                    } else if (parseInt(data.data.status) === 0 && parseInt(data.data.isregistered) === 1) {
+                        navigation.replace('Personalize', { phoneNumber: phoneNumber });
+                    } else if (parseInt(data.data.status) === 1 && parseInt(data.data.isregistered) === 1) {
+                        navigation.replace('HomeScreen');
+                    } else {
+                        console.log('WaitingScreen2');
+                        navigation.replace('WaitingScreen', { phoneNumber: phoneNumber });
+                    }
+                } else {
+                    console.log('Invalid OTP!');
+                    ToastAndroid.show('Invalid OTP!', ToastAndroid.SHORT);
+                    // Perform invalid OTP action
+                }
+            } else {
+                console.log('Failed to retrieve OTP. Please try again.');
+                ToastAndroid.show(
+                    'Failed to retrieve OTP. Please try again.',
+                    ToastAndroid.SHORT,
+                );
+                // Perform OTP retrieval failure action
+            }
+
+            setOtp(['', '', '', '', '']); // Reset OTP input fields
+        } catch (error) {
+            console.log('Error occurred:', error);
+            // Perform error handling
+        }
     };
 
+
+    const focusPreviousInput = index => {
+        if (inputRefs.current[index - 1]) {
+            inputRefs.current[index - 1].focus();
+        }
+    };
+
+    const focusNextInput = index => {
+        if (inputRefs.current[index + 1]) {
+            inputRefs.current[index + 1].focus();
+        }
+    };
+
+    const handleKeyPress = (index, event) => {
+        if (event.nativeEvent.key === 'Backspace' && otp[index] === '') {
+            focusPreviousInput(index);
+        } else if (event.nativeEvent.key !== 'Backspace' && otp[index] === '' && index < 4) {
+            // If a digit is entered and the current input field is empty, move focus to the next input field
+            focusNextInput(index);
+        }
+    };
+
+    const handleEditNumber = () => {
+        navigation.goBack(); // Navigate back to the LoginScreen
+    };
 
     const renderInputs = () => {
         const inputs = [];
@@ -91,7 +196,14 @@ const OTPScreen = ({ navigation }) => {
                     ]}
                     maxLength={1}
                     keyboardType="numeric"
-                    onChangeText={(value) => handleInputChange(i, value)}
+                    onChangeText={text => {
+                        const newOtp = [...otp];
+                        newOtp[i] = text;
+                        setOtp(newOtp);
+                        if (text.length === 1) {
+                            focusNextInput(i);
+                        }
+                    }}
                     onKeyPress={({ nativeEvent }) => {
                         if (nativeEvent.key === 'Backspace') {
                             const value = inputValues[i] || '';
@@ -106,6 +218,34 @@ const OTPScreen = ({ navigation }) => {
         return inputs;
     };
 
+    const handleResendCode = async () => {
+        try {
+            // Fetch the OTP again
+            const endpoint = `https://temp.wedeveloptech.in/denxgen/appdata/requserlogin-ax.php?phno=${encodeURIComponent(phoneNumber)}`;
+            const response = await fetch(endpoint);
+            const data = await response.json();
+
+            if (data.code === 1) {
+                // Reset the timer to 00:59
+                setTimer(60);
+                setShowResendButton(false); // Hide the resend button
+            } else {
+                console.log('Failed to resend OTP. Please try again.');
+                ToastAndroid.show(
+                    'Failed to resend OTP. Please try again.',
+                    ToastAndroid.SHORT,
+                );
+            }
+        } catch (error) {
+            console.log('Error occurred while resending OTP:', error);
+            ToastAndroid.show(
+                'Error occurred while resending OTP.',
+                ToastAndroid.SHORT,
+            );
+        }
+    };
+
+
     return (
         <KeyboardAvoidingView
             style={{ flex: 1 }}
@@ -117,7 +257,7 @@ const OTPScreen = ({ navigation }) => {
                 <View style={[styles.blueContainer, { height: moderateScale(height * 0.05) }]}>
                     {/* No content inside the blue container */}
                 </View>
-                <ScrollView style={[styles.whiteContainer, { height: moderateScale(height * 0.95) }]}>
+                <ScrollView style={[styles.whiteContainer, {  }]}>
 
                     <Image source={require('../../../assets/img/LoginOTP.png')} style={styles.headerImageBackground} />
                     <Text style={[commonStyles.headerText1BL, {
@@ -128,9 +268,39 @@ const OTPScreen = ({ navigation }) => {
                     <Text style={[commonStyles.headerText3BL, {
 
                     }]}>Enter the verification code we just sent to your number +91 *******53.</Text>
-                    <View style={styles.otpContainer}>{renderInputs()}</View>
+                    {/* <View style={styles.otpContainer}>{renderInputs()}</View> */}
+                    <View style={styles.inputContainer}>
+                        {otp.map((value, index) => (
+                            <TextInput
+                                key={index}
+                                ref={ref => (inputRefs.current[index] = ref)}
+                                style={[
+                                    styles.input,
+                                    {
+                                        backgroundColor: value !== '' ? '#FEFCFC' : '#FEFCFC',
+                                        borderColor: value !== '' ? 'rgba(40, 158, 245, 1)' : 'rgba(0, 0, 0, 0.1)',
+                                    },
+                                ]}
+                                value={value}
+                                onChangeText={text => {
+                                    const newOtp = [...otp];
+                                    newOtp[index] = text;
+                                    setOtp(newOtp);
+                                    if (text.length === 1) {
+                                        focusNextInput(index);
+                                    }
+                                }}
+                                keyboardType="number-pad"
+                                maxLength={1}
+                                onSubmitEditing={() => focusNextInput(index)}
+                                onKeyPress={event => handleKeyPress(index, event)}
+                                textAlign="center"
+                                textAlignVertical="center"
+                            />
+                        ))}
+                    </View>
                     <View style={styles.buttonRow}>
-                        <View style={styles.resend}>
+                        {/* <View style={styles.resend}>
                             <View style={styles.textedContainerR}>
                                 <Image
                                     source={require('../../../assets/img/resend.png')}
@@ -142,9 +312,36 @@ const OTPScreen = ({ navigation }) => {
                                     paddingHorizontal: width * 0.02,
                                 }]}>Resend CODE</Text>
                             </View>
-                        </View>
+                        </View> */}
+                        {showResendButton ? (
+                            <TouchableOpacity style={styles.resend} onPress={handleResendCode}>
+                                <View style={styles.textedContainerR}>
+                                    <Image
+                                        source={require('../../../assets/img/resend.png')}
+                                        style={styles.icon}
+                                    />
+                                </View>
+                                <View style={styles.wrapShortR}>
+                                    <Text style={[commonStyles.headerText3B, { paddingHorizontal: width * 0.02 }]}>Resend CODE</Text>
+                                </View>
+                            </TouchableOpacity>
+                        ) : (
+                            <View style={styles.resend}>
+                                <View style={styles.textedContainerT}>
+                                    <Image
+                                        source={require('../../../assets/img/timerL.png')}
+                                        style={styles.icon}
+                                    />
+                                </View>
+                                <View style={styles.wrapShortR}>
+                                    <Text style={[commonStyles.headerText3B, { paddingHorizontal: width * 0.02 }]}>00:{timer}</Text>
+                                </View>
+                            </View>
+                        )}
+
+
                         <View style={styles.verticalLine} />
-                        <View style={styles.resend}>
+                        <TouchableOpacity style={styles.resend} onPress={() => navigation.navigate('LoginScreen', { phoneNumber: phoneNumber })}>
                             <View style={styles.textedEContainer}>
                                 <Image
                                     source={require('../../../assets/img/Edit.png')}
@@ -156,7 +353,7 @@ const OTPScreen = ({ navigation }) => {
                                     paddingHorizontal: width * 0.02,
                                 }]}>Edit Number</Text>
                             </View>
-                        </View>
+                        </TouchableOpacity>
                     </View>
                     <TouchableOpacity
                         style={[commonStyles.button, { marginTop: moderateScale(20) }]} // Wrap style object inside curly braces
@@ -200,8 +397,8 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         backgroundColor: '#FEFCFC',
-        paddingTop: moderateScale(30),
-        paddingHorizontal: moderateScale(16),
+        paddingTop:30,
+        paddingHorizontal: 16,
     },
     headerImageBackground: {
         width: width * 0.9,
@@ -239,6 +436,8 @@ const styles = StyleSheet.create({
         width: '20%',
         marginVertical: 10
     },
+   
+
     inputs: {
         padding: 10,
         color: '#000'
@@ -367,6 +566,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
 
     },
+    textedContainerT: {
+        height: 20,
+        width: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+
+    },
     textedEContainer: {
         height: 16,
         width: 16,
@@ -389,6 +595,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginVertical: moderateScale(34)
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        marginVertical: 34,
+        borderRadius: 20, // Adjust the borderRadius based on device size
+        borderColor: '#ffffffff',
+        color: 'white',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     input: {
         width: 45,
