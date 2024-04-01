@@ -149,11 +149,13 @@ const ProfileCompletion1 = ({ navigation }) => {
 
         //     navigation.navigate('LoginScreen');
         // }
-        const userid = await AsyncStorage.getItem('userid');
-        const id = parseInt(userid);
+        const pr_id = await AsyncStorage.getItem('pr_id');
+        const id = parseInt(pr_id);
+         const pr_ty_id = await AsyncStorage.getItem('pr_ty_id');
 
         const userData = {
-            id: id,
+            pr_ty_id: parseInt(pr_ty_id),
+            pr_id: id,
             name: selectedName,
             email: selectedEmail,
             phoneno: selectedContactNumber,
@@ -167,7 +169,7 @@ const ProfileCompletion1 = ({ navigation }) => {
         console.log('User Data:', userData);
 
         try {
-            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/requserdtls-ax.php`, userData);
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls1-ax.php`, userData);
 
             console.log('dataresponse', response.data);
             //ToastAndroid.show("Product Added Successfully!", ToastAndroid.SHORT);

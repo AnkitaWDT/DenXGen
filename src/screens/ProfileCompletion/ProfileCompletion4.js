@@ -25,6 +25,7 @@ import { moderateScale } from 'react-native-size-matters';
 import Geolocation from '@react-native-community/geolocation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ProgressBar } from 'react-native-paper';
+import axios from 'axios';
 
 const { width, height } = Dimensions.get('window');
 
@@ -62,13 +63,35 @@ const SavedLocationContainer = ({ savedLocations }) => {
 
 const ProfileCompletion4 = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(true);
+    const [savedLocations, setSavedLocations] = useState([]);
 
-    const [savedLocations, setSavedLocations] = useState([
-        { name: 'The Smilax Clinic', address: 'Godrej & boyce Industry, Vikhroli West, Mumbai', distance: '1.5 km' },
-        { name: 'Location 2', address: 'Andheri East', distance: '2.3 km' },
-        { name: 'Location 3', address: 'Godrej & boyce Industry', distance: '3.1 km' },
-    ]);
-   
+    const fetchSavedLocations = async () => {
+        try {
+            const response = await axios.get('https://temp.wedeveloptech.in/denxgen/appdata/getpersonaldtls4-ax.php?pr_id=1');
+            const data = response.data;
+            if (data && data.data && data.data.length > 0) {
+                setSavedLocations(data.data.map(location => ({
+                    loc_one: location.loc_one,
+                    loc_two: location.loc_two,
+                    city: location.city,
+                    state: location.state,
+                    pincode: location.pincode,
+                    landmark: location.landmark,
+                    address: `${location.loc_two}, ${location.city}`,
+                    name: location.loc_one,
+                })));
+            }
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error fetching saved locations:', error);
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        // Fetch saved locations when the component mounts
+        fetchSavedLocations();
+    }, []);
 
     useEffect(() => {
         // Simulate an asynchronous operation (e.g., fetching data) before rendering the profile screen
@@ -138,13 +161,49 @@ const ProfileCompletion4 = ({ navigation }) => {
         // }
     };
 
+    const [houseNumber, setHouseNumber] = useState('');
+    const [area, setArea] = useState('');
+    const [city, setCity] = useState('');
+    const [state, setState] = useState('');
+    const [pincode, setPincode] = useState('');
+    const [landmark, setLandmark] = useState('');
+
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isModalVisible1, setIsModalVisible1] = useState(false);
+    const [selectedLocation, setSelectedLocation] = useState(null);
+
     const openModal = () => {
         setIsModalVisible(true);
     };
 
+    const openModal1 = (location) => {
+        setSelectedLocation(location); // Set the selected location
+        console.log(selectedLocation);
+        setHouseNumber(location.loc_one || ''); // Assuming loc_one corresponds to houseNumber
+        setArea(location.loc_two || ''); // Assuming loc_two corresponds to area
+        setCity(location.city || '');
+        setState(location.state || '');
+        setPincode(location.pincode || '');
+        setLandmark(location.landmark || '');
+        setIsModalVisible1(true); // Open the modal
+    };
+
+
     const closeModal = () => {
         setIsModalVisible(false);
+        setIsModalVisible1(false);
+        setHouseNumber('');
+        setArea('');
+        setCity('');
+        setState('');
+        setPincode('');
+        setLandmark('');
+    };
+
+
+    const handleSavedLocationClick = (location) => {
+        setSelectedLocation(location); // Set selected location data
+        setIsModalVisible(true); // Open the modal
     };
 
     // Assuming currentStep is the variable holding the current step number
@@ -152,8 +211,105 @@ const ProfileCompletion4 = ({ navigation }) => {
     const totalSteps = 9; // Total number of steps
 
     const progressPercentage = (currentStep / totalSteps) * 100; // Calculate progress percentage
-    console.log("Progress Percentage:", progressPercentage);
+    //console.log("Progress Percentage:", progressPercentage);
 
+    const handleSubmit = async () => {
+        if (!houseNumber) {
+            ToastAndroid.show('Please enter house number.', ToastAndroid.SHORT);
+            return;
+        }
+        if (!area) {
+            ToastAndroid.show('Please enter area.', ToastAndroid.SHORT);
+            return;
+        }
+        if (!city) {
+            ToastAndroid.show('Please enter city.', ToastAndroid.SHORT);
+            return;
+        }
+        if (!state) {
+            ToastAndroid.show('Please enter state.', ToastAndroid.SHORT);
+            return;
+        }
+        if (!pincode) {
+            ToastAndroid.show('Please enter pincode.', ToastAndroid.SHORT);
+            return;
+        }
+        if (isNaN(Number(pincode)) || pincode.length !== 6) {
+            ToastAndroid.show('Please enter a valid 6-digit pincode.', ToastAndroid.SHORT);
+            return;
+        }
+        const pr_id = await AsyncStorage.getItem('pr_id');
+        const id = parseInt(pr_id);
+
+        // Form data
+        const formData = {
+            pr_id: id,
+            loc_one: houseNumber,
+            loc_two: area,
+            city: city,
+            state: state,
+            pincode: pincode,
+            landmark: landmark || ''
+        };
+
+        try {
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls4-ax.php`, formData);
+
+            console.log('dataresponse', response.data);
+            //ToastAndroid.show("Product Added Successfully!", ToastAndroid.SHORT);
+            console.log('Data Added to database');
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+        await fetchSavedLocations();
+        // Log the form data
+        console.log('Form Data:', formData);
+        setIsModalVisible(false);
+
+        // Clear all fields
+        setHouseNumber('');
+        setArea('');
+        setCity('');
+        setState('');
+        setPincode('');
+        setLandmark('');
+
+    };
+
+    const handleUpdate = async () => {
+     
+        const pr_id = await AsyncStorage.getItem('pr_id');
+        const id = parseInt(pr_id);
+
+
+        const updateData = {
+            pr_id: id,
+            loc_one: houseNumber,
+            loc_two: area,
+            city: city,
+            state: state,
+            pincode: pincode,
+            landmark: landmark || ''
+        };
+
+
+
+        try {
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/requpdatepersonaldtls4-ax.php`, updateData);
+
+            console.log('dataresponse', response.data);
+            //ToastAndroid.show("Product Added Successfully!", ToastAndroid.SHORT);
+            console.log('Data Updated to database');
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+        await fetchSavedLocations();
+        // Log the form data
+        console.log('Form Data:', updateData);
+        setIsModalVisible1(false);
+
+
+    };
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -197,31 +353,42 @@ const ProfileCompletion4 = ({ navigation }) => {
                                         <Image source={require('../../../assets/img/ViewMore.png')} style={styles.rightIconImageAdd} />
                                     </View>
                                 </TouchableOpacity>
-                                <Modal visible={isModalVisible} transparent>
-                                    <TouchableWithoutFeedback onPress={() => closeModal()}>
-                                        <View style={styles.modalContainer}>
-                                            <TouchableWithoutFeedback>
-                                                <ScrollView style={styles.modalContent}>
+                              <Modal
+                                  visible={isModalVisible}
+                                  transparent
+                                        activeOpacity={1}
+                                  onRequestClose={() => closeModal()}
+                              >
+                                  <TouchableOpacity
+                                            activeOpacity={1}
+                                      style={styles.modalContainer}
+                                      onPress={() => closeModal()}
+                                  >
+                                      <TouchableOpacity style={styles.modalContent}
+                                          activeOpacity={1}
+                                          onPress={() => { }}>
+                                                <ScrollView>
                                                     <View style={styles.horizontalLineM}></View>
                                                     <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
                                                         Enter your Full Address
                                                     </Text>
-                                                        <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
+                                                    <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
                                                         Note: Type services like Root Canal, Aligners, Oral Surgery,  etc to show specialisation you provide.
                                                     </Text>
 
                                                     <View style={styles.inputContainerWithLabel}>
                                                         <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>
-                                                            Flat / House no / Floor / Building 
+                                                            Flat / House no / Floor / Building
                                                         </Text>
                                                         <View style={styles.inputContainer1}>
                                                             <TextInput
                                                                 style={styles.inputs}
                                                                 placeholder="House Number"
                                                                 placeholderTextColor="#979797"
-                                                                //value={selectedEmail}
-                                                                //onChangeText={(text) => setSelectedEmail(text)}
+                                                                value={houseNumber}
+                                                                onChangeText={text => setHouseNumber(text)}
                                                                 underlineColorAndroid="transparent"
+                                                            
                                                             />
                                                         </View>
                                                     </View>
@@ -234,53 +401,53 @@ const ProfileCompletion4 = ({ navigation }) => {
                                                                 style={styles.inputs}
                                                                 placeholder="Area / Sector / Locality"
                                                                 placeholderTextColor="#979797"
-                                                                //value={selectedEmail}
-                                                                //onChangeText={(text) => setSelectedEmail(text)}
+                                                                value={area}
+                                                                onChangeText={text => setArea(text)}
                                                                 underlineColorAndroid="transparent"
                                                             />
                                                         </View>
                                                     </View>
 
-                                                        <View style={styles.inputContainerWithLabel}>
-                                                            <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>
-                                                                City
-                                                            </Text>
-                                                            <View style={styles.inputContainer1}>
-                                                                <TextInput
-                                                                    style={styles.inputs}
-                                                                    placeholder="City"
-                                                                    placeholderTextColor="#979797"
-                                                                    //value={selectedEmail}
-                                                                    //onChangeText={(text) => setSelectedEmail(text)}
-                                                                    underlineColorAndroid="transparent"
-                                                                />
-                                                            </View>
+                                                    <View style={styles.inputContainerWithLabel}>
+                                                        <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>
+                                                            City
+                                                        </Text>
+                                                        <View style={styles.inputContainer1}>
+                                                            <TextInput
+                                                                style={styles.inputs}
+                                                                placeholder="City"
+                                                                placeholderTextColor="#979797"
+                                                                value={city}
+                                                                onChangeText={text => setCity(text)}
+                                                                underlineColorAndroid="transparent"
+                                                            />
                                                         </View>
+                                                    </View>
 
                                                     <View style={styles.inputRow}>
-                                                        <View style={[styles.inputContainer, {  }]}>
+                                                        <View style={[styles.inputContainer, {}]}>
                                                             <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>State</Text>
                                                             <View style={[styles.inputContainer1, { width: width * 0.43 }]}>
                                                                 <TextInput
                                                                     style={[styles.inputs, { textAlign: 'left' }]}
                                                                     placeholder="State"
                                                                     placeholderTextColor="#979797"
+                                                                    value={state}
+                                                                    onChangeText={text => setState(text)}
                                                                     underlineColorAndroid="transparent"
-                                                                    selection={{ start: 0, end: 0 }}
-                                                                    //value={locationInfo?.state || ''}
                                                                 />
                                                             </View>
                                                         </View>
-                                                        <View style={[styles.inputContainer, { }]}>
+                                                        <View style={[styles.inputContainer, {}]}>
                                                             <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>Pincode</Text>
                                                             <View style={[styles.inputContainer1, { width: width * 0.43 }]}>
                                                                 <TextInput
                                                                     style={[styles.inputs, { textAlign: 'left' }]}
                                                                     placeholder="Pincode"
                                                                     placeholderTextColor="#979797"
+                                                                    value={pincode}
+                                                                    onChangeText={text => setPincode(text)}
                                                                     underlineColorAndroid="transparent"
-                                                                    selection={{ start: 0, end: 0 }}
-                                                                    //value={locationInfo?.pincode || ''}
                                                                 />
                                                             </View>
                                                         </View>
@@ -288,29 +455,28 @@ const ProfileCompletion4 = ({ navigation }) => {
 
                                                     <View style={styles.inputContainerWithLabel}>
                                                         <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>
-                                                           Nearby Landmark
+                                                            Nearby Landmark
                                                         </Text>
                                                         <View style={styles.inputContainer1}>
                                                             <TextInput
                                                                 style={styles.inputs}
                                                                 placeholder="Nearby Landmark"
                                                                 placeholderTextColor="#979797"
-                                                                //value={selectedEmail}
-                                                                //onChangeText={(text) => setSelectedEmail(text)}
+                                                                value={landmark}
+                                                                onChangeText={text => setLandmark(text)}
                                                                 underlineColorAndroid="transparent"
                                                             />
                                                         </View>
                                                     </View>
 
 
-                                                    <TouchableOpacity style={[commonStyles.button]} >
+                                                    <TouchableOpacity style={[commonStyles.button]} onPress={handleSubmit} activeOpacity={0.8}>
                                                         <Text style={commonStyles.buttonText}>Submit</Text>
                                                     </TouchableOpacity>
                                                 </ScrollView>
-                                            </TouchableWithoutFeedback>
-                                        </View>
-                                    </TouchableWithoutFeedback>
-                                </Modal>
+                                                </TouchableOpacity>
+                                        </TouchableOpacity>
+                                    </Modal>
 
                                 {/* Horizontal line */}
                                 {/* <View style={styles.horizontalLine} /> */}
@@ -336,7 +502,7 @@ const ProfileCompletion4 = ({ navigation }) => {
                                     <Text style={[commonStyles.headerText4BL, {  alignSelf: 'flex-start',marginTop: moderateScale(24) }]}>Saved Locations</Text>
                                 )}
                                 {savedLocations.map((location, index) => (
-                                    <TouchableOpacity key={index} style={styles.savedLocationBox} activeOpacity={0.8}>
+                                    <TouchableOpacity key={index} style={styles.savedLocationBox} activeOpacity={0.8} onPress={() => openModal1(location)}>
                                         <View style={styles.buttonContent}>
                                             <View style={styles.leftContainer}>
                                                 <Image source={require('../../../assets/img/HomeSaved.png')} style={styles.iconImage} />
@@ -345,7 +511,7 @@ const ProfileCompletion4 = ({ navigation }) => {
                                                 </View>
                                             </View>
                                             {/* Right side content (location distance) */}
-                                            <Text style={commonStyles.headerText5G}>{location.distance}</Text>
+                                            {/* <Text style={commonStyles.headerText5G}>{location.distance}</Text> */}
                                         </View>
                                         <View style={styles.textContainer}>
                                             <Text style={commonStyles.headerText3G}>{location.address}</Text>
@@ -353,7 +519,130 @@ const ProfileCompletion4 = ({ navigation }) => {
                                     </TouchableOpacity>
                                 ))}
 
+                                <Modal
+                                    visible={isModalVisible1}
+                                    transparent
+                                    activeOpacity={1}
+                                    onRequestClose={() => closeModal()}
+                                >
+                                    <TouchableOpacity
+                                        activeOpacity={1}
+                                        style={styles.modalContainer}
+                                        onPress={() => closeModal()}
+                                    >
+                                        <TouchableOpacity style={styles.modalContent}
+                                            activeOpacity={1}
+                                            onPress={() => { }}>
+                                            <ScrollView>
+                                                <View style={styles.horizontalLineM}></View>
+                                                <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
+                                                    Enter your Full Address
+                                                </Text>
+                                                <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
+                                                    Note: Type services like Root Canal, Aligners, Oral Surgery,  etc to show specialisation you provide.
+                                                </Text>
 
+                                                <View style={styles.inputContainerWithLabel}>
+                                                    <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>
+                                                        Flat / House no / Floor / Building
+                                                    </Text>
+                                                    <View style={styles.inputContainer1}>
+                                                        <TextInput
+                                                            style={styles.inputs}
+                                                            placeholder="House Number"
+                                                            placeholderTextColor="#979797"
+                                                            value={houseNumber}
+                                                            onChangeText={text => setHouseNumber(text)}
+                                                            underlineColorAndroid="transparent"
+
+                                                        />
+                                                    </View>
+                                                </View>
+                                                <View style={styles.inputContainerWithLabel}>
+                                                    <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>
+                                                        Area / Sector / Locality
+                                                    </Text>
+                                                    <View style={styles.inputContainer1}>
+                                                        <TextInput
+                                                            style={styles.inputs}
+                                                            placeholder="Area / Sector / Locality"
+                                                            placeholderTextColor="#979797"
+                                                            value={area}
+                                                            onChangeText={text => setArea(text)}
+                                                            underlineColorAndroid="transparent"
+                                                        />
+                                                    </View>
+                                                </View>
+
+                                                <View style={styles.inputContainerWithLabel}>
+                                                    <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>
+                                                        City
+                                                    </Text>
+                                                    <View style={styles.inputContainer1}>
+                                                        <TextInput
+                                                            style={styles.inputs}
+                                                            placeholder="City"
+                                                            placeholderTextColor="#979797"
+                                                            value={city}
+                                                            onChangeText={text => setCity(text)}
+                                                            underlineColorAndroid="transparent"
+                                                        />
+                                                    </View>
+                                                </View>
+
+                                                <View style={styles.inputRow}>
+                                                    <View style={[styles.inputContainer, {}]}>
+                                                        <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>State</Text>
+                                                        <View style={[styles.inputContainer1, { width: width * 0.43 }]}>
+                                                            <TextInput
+                                                                style={[styles.inputs, { textAlign: 'left' }]}
+                                                                placeholder="State"
+                                                                placeholderTextColor="#979797"
+                                                                value={state}
+                                                                onChangeText={text => setState(text)}
+                                                                underlineColorAndroid="transparent"
+                                                            />
+                                                        </View>
+                                                    </View>
+                                                    <View style={[styles.inputContainer, {}]}>
+                                                        <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>Pincode</Text>
+                                                        <View style={[styles.inputContainer1, { width: width * 0.43 }]}>
+                                                            <TextInput
+                                                                style={[styles.inputs, { textAlign: 'left' }]}
+                                                                placeholder="Pincode"
+                                                                placeholderTextColor="#979797"
+                                                                value={pincode}
+                                                                onChangeText={text => setPincode(text)}
+                                                                underlineColorAndroid="transparent"
+                                                            />
+                                                        </View>
+                                                    </View>
+                                                </View>
+
+                                                <View style={styles.inputContainerWithLabel}>
+                                                    <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>
+                                                        Nearby Landmark
+                                                    </Text>
+                                                    <View style={styles.inputContainer1}>
+                                                        <TextInput
+                                                            style={styles.inputs}
+                                                            placeholder="Nearby Landmark"
+                                                            placeholderTextColor="#979797"
+                                                            value={landmark}
+                                                            onChangeText={text => setLandmark(text)}
+                                                            underlineColorAndroid="transparent"
+                                                        />
+                                                    </View>
+                                                </View>
+
+
+                                                <TouchableOpacity style={[commonStyles.button]} onPress={handleUpdate} activeOpacity={0.8}>
+                                                    <Text style={commonStyles.buttonText}>Submit</Text>
+                                                </TouchableOpacity>
+                                            </ScrollView>
+                                        </TouchableOpacity>
+                                    </TouchableOpacity>
+                                </Modal>
                     </View>
                 </ScrollView>
                         <TouchableOpacity
@@ -464,10 +753,13 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         backgroundColor: '#FEFCFC',
-        padding: 20,
+        paddingVertical: 20,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        maxHeight: '90%', // Maximum height of 50%
+        paddingHorizontal: moderateScale(16),
+        maxHeight: '95%',
+        minHeight: 100,
+        //paddingBottom: 30,
     },
     horizontalLineM: {
         width: '20%',

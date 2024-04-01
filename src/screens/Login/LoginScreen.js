@@ -4,6 +4,7 @@ import { View, Image, PixelRatio, Text, TextInput, Button, TouchableOpacity, Sty
 import {moderateScale} from 'react-native-size-matters';
 import commonStyles from '../../components/CommonStyles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_CONFIG } from '../../API/APIConfig';
 
 const {width, height} = Dimensions.get('window');
 
@@ -18,21 +19,27 @@ const LoginScreen = ({navigation, route}) => {
         try {
            
 
-            const endpoint = `https://temp.wedeveloptech.in/denxgen/appdata/requserlogin-ax.php?phno=${encodeURIComponent(
+            const endpoint = `https://temp.wedeveloptech.in/denxgen/appdata/reqpersonallogin-ax.php?phno=${encodeURIComponent(
                 phoneNumber
             )}`;
 
             const response2 = await fetch(endpoint);
             const data = await response2.json();
+            console.log(data);
 
-            if (data.code === 1) {
+            if (data) {
                 console.log('OTP sent to phoneNumber!');
                 ToastAndroid.show('OTP sent successfully!', ToastAndroid.SHORT);
 
-                await AsyncStorage.setItem('userid', String(data.data.id));
+                await AsyncStorage.setItem('pr_id', String(data.data.pr_id));
                 await AsyncStorage.setItem('phoneno', data.data.phoneno);
                 await AsyncStorage.setItem('password', String(data.data.password));
                 await AsyncStorage.setItem('name', data.data.name);
+
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                const id = parseInt(pr_id);
+
+                console.log('pr_id', id)
 
                 // Navigate to OTPScreen
                 navigation.navigate('OTPScreen', { phoneNumber });

@@ -162,12 +162,12 @@ const HomeScreen = ({ barColor, route }) => {
             </BottomBar.Navigator>
 
             {/* Popup component */}
-            <CustomPopup
+            {/* <CustomPopup
                 visible={showPopup}
                 onClose={() => setShowPopup(false)}
                 onContinue={handleContinue}
                 onSkip={handleSkip}
-            />
+            /> */}
         </View>
     );
 };

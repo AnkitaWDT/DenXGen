@@ -15,6 +15,8 @@ import {
 } from 'react-native';
 import Animation from '../../components/Loader';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 import { moderateScale } from 'react-native-size-matters';
 
@@ -225,7 +227,40 @@ const ProfileCompletion8 = ({ navigation }) => {
     const totalSteps = 9; // Total number of steps
 
     const progressPercentage = (currentStep / totalSteps) * 100; // Calculate progress percentage
-    console.log("Progress Percentage:", progressPercentage);
+    //console.log("Progress Percentage:", progressPercentage);
+
+
+        const handleNext = async () => {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+
+            const userData = {
+                pr_id: id,
+                videoLinks: videoInputs,
+                awards: awardsInputs,
+                blogs: blogsInputs,
+                socialMedia: {
+                    instagram: instaLink || "",
+                    linkedIn: linkedinLink || "",
+                    facebook: facebookLink || "",
+                    other: otherLink || "",
+                },                                                                                                                                                                                                                                                                                                              
+            };
+
+            try {
+                const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/requpdatepersonaldtls8-ax.php`, userData);
+
+                console.log('dataresponse', response.data);
+                //ToastAndroid.show("Product Added Successfully!", ToastAndroid.SHORT);
+                console.log('Data Updated to database');
+            } catch (error) {
+                console.error('An error occurred:', error);
+            }
+
+            console.log('User Data:', userData);
+            //navigation.navigate('HomeScreen');
+        };
+
 
   return (
       <SafeAreaView style={{ flex: 1 }}>
@@ -242,7 +277,7 @@ const ProfileCompletion8 = ({ navigation }) => {
                           <View style={styles.headerTextContainer}>
                               <Text style={[commonStyles.headerText1BL, {
                                   marginBottom: moderateScale(6), textAlign: 'center'
-                              }]}>Step 7 - Gallery</Text>
+                              }]}>Step 8 - Gallery</Text>
                               <Text style={[commonStyles.headerText2BL, {
                                   textAlign: 'center', paddingHorizontal: width * 0.02
                               }]}>Choose your career category and unlock endless possibilities.</Text>
@@ -255,7 +290,7 @@ const ProfileCompletion8 = ({ navigation }) => {
                           </View>
 
                           <View style={styles.inputContainerWithLabel}>
-                              <Text style={[commonStyles.headerText4BL, { marginBottom: height * 0.005 }]}>
+                              <Text style={[commonStyles.headerText4BL, { marginBottom: 8 }]}>
                                   Video Links <Text style={styles.requiredIndicator}>*</Text>
                               </Text>
                               {videoInputs.map((value, index) => (
@@ -281,13 +316,19 @@ const ProfileCompletion8 = ({ navigation }) => {
                                   </TouchableOpacity>
                               )}
 
-                              <Modal visible={videoModalVisible} animationType="slide" transparent>
+                              <Modal
+                                  visible={videoModalVisible}
+                                  transparent
+                                  onRequestClose={() => setVideoModalVisible(false)} // To handle Android back button
+                              >
                                   <TouchableOpacity
+                                      activeOpacity={0.8}
                                       style={styles.modalContainer}
-                                      onPress={() => setVideoModalVisible(false)}
-                                      activeOpacity={1} // Prevents the touchable opacity from immediately closing the modal
+                                      onPress={() => setVideoModalVisible(false)} // Close the modal when clicking on the background
                                   >
-                                      <View style={styles.modalContent}>
+                                      <TouchableOpacity style={styles.modalContent}
+                                          activeOpacity={1}
+                                          onPress={() => { }}>
                                           <View style={styles.horizontalLine}></View>
                                           <Text style={[commonStyles.headerText2BL, { marginVertical: height * 0.02 }]}>Video Links
                                               <Text style={commonStyles.headerText3G}> (up to 5)</Text>
@@ -311,13 +352,14 @@ const ProfileCompletion8 = ({ navigation }) => {
                                           >
                                               <Text style={commonStyles.buttonText}>Submit</Text>
                                           </TouchableOpacity>
-                                      </View>
+
+                                      </TouchableOpacity>
                                   </TouchableOpacity>
                               </Modal>
                           </View>
 
                           <View style={styles.inputContainerWithLabel}>
-                              <Text style={[commonStyles.headerText4BL, { marginBottom: height * 0.005 }]}>
+                              <Text style={[commonStyles.headerText4BL, { marginBottom: 8 }]}>
                                   Awards <Text style={styles.requiredIndicator}>*</Text>
                               </Text>
                               {awardsInputs.map((value, index) => (
@@ -343,14 +385,19 @@ const ProfileCompletion8 = ({ navigation }) => {
                                   </TouchableOpacity>
                               )}
 
-                              {/* Modal for adding new input */}
-                              <Modal visible={awardsModalVisible} animationType="slide" transparent>
+                              <Modal
+                                  visible={awardsModalVisible}
+                                  transparent
+                                  onRequestClose={() => setAwardsModalVisible(false)}
+                              >
                                   <TouchableOpacity
+                                      activeOpacity={0.8}
                                       style={styles.modalContainer}
                                       onPress={() => setAwardsModalVisible(false)}
-                                      activeOpacity={1} // Prevents the touchable opacity from immediately closing the modal
                                   >
-                                      <View style={styles.modalContent}>
+                                      <TouchableOpacity style={styles.modalContent}
+                                          activeOpacity={1}
+                                          onPress={() => { }}>
                                           <View style={styles.horizontalLine}></View>
                                           <Text style={[commonStyles.headerText2BL, { marginVertical: height * 0.02 }]}>Awards
                                               <Text style={commonStyles.headerText3G}> (up to 5)</Text>
@@ -374,13 +421,14 @@ const ProfileCompletion8 = ({ navigation }) => {
                                           >
                                               <Text style={commonStyles.buttonText}>Submit</Text>
                                           </TouchableOpacity>
-                                      </View>
+                                      </TouchableOpacity>
                                   </TouchableOpacity>
                               </Modal>
+                
                           </View>
 
                           <View style={styles.inputContainerWithLabel}>
-                              <Text style={[commonStyles.headerText4BL, { marginBottom: height * 0.005 }]}>
+                              <Text style={[commonStyles.headerText4BL, { marginBottom: 8 }]}>
                                  Publication / Blog Links <Text style={styles.requiredIndicator}>*</Text>
                               </Text>
                               {blogsInputs.map((value, index) => (
@@ -406,14 +454,19 @@ const ProfileCompletion8 = ({ navigation }) => {
                                   </TouchableOpacity>
                               )}
 
-                              {/* Modal for adding new input */}
-                              <Modal visible={blogsModalVisible} animationType="slide" transparent>
+                              <Modal
+                                  visible={blogsModalVisible}
+                                  transparent
+                                  onRequestClose={() => setBlogsModalVisible(false)}
+                              >
                                   <TouchableOpacity
+                                      activeOpacity={0.8}
                                       style={styles.modalContainer}
                                       onPress={() => setBlogsModalVisible(false)}
-                                      activeOpacity={1} // Prevents the touchable opacity from immediately closing the modal
                                   >
-                                      <View style={styles.modalContent}>
+                                      <TouchableOpacity style={styles.modalContent}
+                                          activeOpacity={1}
+                                          onPress={() => { }}>
                                           <View style={styles.horizontalLine}></View>
                                           <Text style={[commonStyles.headerText2BL, { marginVertical: height * 0.02 }]}>Publication / Blog Links
                                               <Text style={commonStyles.headerText3G}> (up to 5)</Text>
@@ -437,31 +490,16 @@ const ProfileCompletion8 = ({ navigation }) => {
                                           >
                                               <Text style={commonStyles.buttonText}>Submit</Text>
                                           </TouchableOpacity>
-                                      </View>
+                                      </TouchableOpacity>
                                   </TouchableOpacity>
                               </Modal>
                           </View>
 
                           <View style={styles.inputContainerWithLabel}>
-                              <Text style={[commonStyles.headerText4BL, { marginBottom: height * 0.005 }]}>
+                              <Text style={[commonStyles.headerText4BL, { marginBottom: 8 }]}>
                                   Social Media Links <Text style={styles.requiredIndicator}>*</Text>
                               </Text>
-                              {/* <View style={[styles.inputContainer1]}>
-                                  <TextInput
-                                      style={styles.inputs}
-                                      placeholder="Social Medis Links"
-                                      placeholderTextColor="#121212"
-                                      //value={value}
-                                      underlineColorAndroid="transparent"
-                                      editable={false}
-                                  />
-                                  <TouchableOpacity onPress={openModalA} style={styles.closeContainer} activeOpacity={0.8}>
-                                      <Image
-                                          source={require('../../assets/img/close.png')} // Close image for removing key forte
-                                          style={styles.closeImage}
-                                      />
-                                  </TouchableOpacity>
-                              </View>*/}
+
                               <TouchableHighlight 
                                   style={styles.inputContainer1}
                                   onPress={openModalA}
@@ -477,130 +515,115 @@ const ProfileCompletion8 = ({ navigation }) => {
                                   />
                               </TouchableHighlight>
 
-                              {/* About Yourself Modal */}
-                              <Modal visible={socialModalVisible} animationType="slide" transparent>
+                              <Modal
+                                  visible={socialModalVisible}
+                                  transparent
+                                  onRequestClose={() => closeModalA()}
+                              >
                                   <TouchableOpacity
+                                      activeOpacity={0.8}
                                       style={styles.modalContainer}
                                       onPress={() => closeModalA()}
-                                      activeOpacity={1} // Prevents the touchable opacity from immediately closing the modal
                                   >
-                                      <ScrollView style={styles.modalContent1}>
-                                          <View style={styles.horizontalLine}></View>
-                                          <Text style={[commonStyles.headerText2BL, { marginVertical: height * 0.02 }]}>Social Media Links
-                                            
-                                          </Text>
-                                          <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
-                                              Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
-                                          </Text>
+                                      <TouchableOpacity style={styles.modalContent}
+                                          activeOpacity={1}
+                                          onPress={() => { }}>
+                                          <ScrollView>
+                                              <View style={styles.horizontalLine}></View>
+                                              <Text style={[commonStyles.headerText2BL, { marginVertical: height * 0.02 }]}>Social Media Links
 
-                                          <View>
-                                              <Text style={[commonStyles.headerText2BL, { marginBottom: height * 0.005 }]}>
-                                                  Instagram
                                               </Text>
-                                              <View style={[styles.inputContainer1]}>
-                                                  <TextInput
-                                                      style={styles.inputs}
-                                                      placeholder="Instagram"
-                                                      placeholderTextColor="#979797"
-                                                      value={instaLink}
-                                                      onChangeText={(text) => setInstaLink(text)}
-                                                      underlineColorAndroid="transparent"
-                                                  />
-                                              </View>
-
-                                          </View>
-
-{/* 
-                                          <View>
-                                              <Text style={[commonStyles.headerText2BL, { marginBottom: height * 0.005 }]}>
-                                                  WhatsApp
+                                              <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
+                                                  Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
                                               </Text>
-                                              <View style={[styles.inputContainerM]}>
-                                                  <TextInput
-                                                      style={styles.inputs}
-                                                      placeholder="WhatsApp"
-                                                      placeholderTextColor="#979797"
-                                                      value={whatsappLink}
-                                                      onChangeText={(text) => setWhatsappLink(text)}
-                                                      underlineColorAndroid="transparent"
-                                                  />
+
+                                              <View>
+                                                  <Text style={[commonStyles.headerText2BL, { marginBottom: 8 }]}>
+                                                      Instagram
+                                                  </Text>
+                                                  <View style={[styles.inputContainer1]}>
+                                                      <TextInput
+                                                          style={styles.inputs}
+                                                          placeholder="Instagram"
+                                                          placeholderTextColor="#979797"
+                                                          value={instaLink}
+                                                          onChangeText={(text) => setInstaLink(text)}
+                                                          underlineColorAndroid="transparent"
+                                                      />
+                                                  </View>
 
                                               </View>
 
-                                          </View> */}
 
-                                          <View>
-                                              <Text style={[commonStyles.headerText2BL, { marginBottom: height * 0.005 }]}>
-                                                  LinkedIn
-                                              </Text>
-                                              <View style={[styles.inputContainer1]}>
-                                                  <TextInput
-                                                      style={styles.inputs}
-                                                      placeholder="LinkedIn"
-                                                      placeholderTextColor="#979797"
-                                                      value={linkedinLink}
-                                                      onChangeText={(text) => setLinkedInLink(text)}
-                                                      underlineColorAndroid="transparent"
-                                                  />
+                                              <View>
+                                                  <Text style={[commonStyles.headerText2BL, { marginBottom: 8 }]}>
+                                                      LinkedIn
+                                                  </Text>
+                                                  <View style={[styles.inputContainer1]}>
+                                                      <TextInput
+                                                          style={styles.inputs}
+                                                          placeholder="LinkedIn"
+                                                          placeholderTextColor="#979797"
+                                                          value={linkedinLink}
+                                                          onChangeText={(text) => setLinkedInLink(text)}
+                                                          underlineColorAndroid="transparent"
+                                                      />
+
+                                                  </View>
+
+                                              </View>
+                                              <View>
+                                                  <Text style={[commonStyles.headerText2BL, { marginBottom: 8 }]}>
+                                                      Facebook
+                                                  </Text>
+                                                  <View style={[styles.inputContainer1]}>
+                                                      <TextInput
+                                                          style={[styles.inputs, { width: '100%' }]}
+                                                          placeholder="Facebook"
+                                                          placeholderTextColor="#979797"
+                                                          value={facebookLink}
+                                                          onChangeText={(text) => setFacebookLink(text)}
+                                                          underlineColorAndroid="transparent"
+                                                      />
+                                                  </View>
+
+                                              </View>
+                                              <View>
+                                                  <Text style={[commonStyles.headerText2BL, { marginBottom: 8 }]}>
+                                                      Other Links
+                                                  </Text>
+                                                  <View style={[styles.inputContainer1]}>
+                                                      <TextInput
+                                                          style={[styles.inputs, { width: '100%' }]}
+                                                          placeholder="Other"
+                                                          placeholderTextColor="#979797"
+                                                          value={otherLink}
+                                                          onChangeText={(text) => setOtherLink(text)}
+                                                          underlineColorAndroid="transparent"
+                                                      />
+                                                  </View>
 
                                               </View>
 
-                                          </View>
-                                          <View>
-                                              <Text style={[commonStyles.headerText2BL, { marginBottom: height * 0.005 }]}>
-                                                  Facebook 
-                                              </Text>
-                                              <View style={[styles.inputContainer1]}>
-                                                  <TextInput
-                                                      style={[styles.inputs, { width: '100%' }]}
-                                                      placeholder="Facebook"
-                                                      placeholderTextColor="#979797"
-                                                      value={facebookLink}
-                                                      onChangeText={(text) => setFacebookLink(text)}
-                                                      underlineColorAndroid="transparent"
-                                                  />
-                                              </View>
 
-                                          </View>
-                                          <View>
-                                              <Text style={[commonStyles.headerText2BL, { marginBottom: height * 0.005 }]}>
-                                                  Other Links
-                                              </Text>
-                                              <View style={[styles.inputContainer1]}>
-                                                  <TextInput
-                                                      style={[styles.inputs, { width: '100%' }]}
-                                                      placeholder="Other"
-                                                      placeholderTextColor="#979797"
-                                                      value={otherLink}
-                                                      onChangeText={(text) => setOtherLink(text)}
-                                                      underlineColorAndroid="transparent"
-                                                  />
-                                              </View>
-
-                                          </View>
-
-
-                                          <TouchableOpacity
-                                              style={[commonStyles.button, { marginBottom: height * 0.06 }]} // Adjust the marginBottom value as needed
-                                              onPress={closeModalA}
-                                              activeOpacity={0.8}
-                                          >
-                                              <Text style={commonStyles.buttonText}>Submit</Text>
-                                          </TouchableOpacity>
-
-                                      </ScrollView>
+                                              <TouchableOpacity
+                                                  style={[commonStyles.button, { marginBottom: 20 }]} // Adjust the marginBottom value as needed
+                                                  onPress={closeModalA}
+                                                  activeOpacity={0.8}
+                                              >
+                                                  <Text style={commonStyles.buttonText}>Submit</Text>
+                                              </TouchableOpacity>
+                                          </ScrollView>
+                                     
+                                      </TouchableOpacity>
                                   </TouchableOpacity>
                               </Modal>
                           </View>
 
-              {/* Continue Button */}
-
                        
                           <TouchableOpacity
                               style={[commonStyles.button]}
-                  onPress={() => {
-                      navigation.navigate('HomeScreen');
-                  }}
+                              onPress={handleNext}
                               activeOpacity={0.8}
               >
                               <Text style={commonStyles.buttonText}>Continue</Text>
@@ -639,10 +662,13 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         backgroundColor: '#FEFCFC',
-        padding: 20,
+        paddingVertical: 20,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        maxHeight: '90%', // Maximum height of 50%
+        paddingHorizontal: moderateScale(16),
+        maxHeight: '95%',
+        minHeight: 100,
+        paddingBottom: 30,
     },
     modalContent1: {
         backgroundColor: '#FEFCFC',
@@ -717,7 +743,7 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         alignSelf: 'center',
         backgroundColor: '#FEFCFC',
-        height: moderateScale(41),
+        height: 42,
         width: '100%',
         marginBottom: moderateScale(16),
         justifyContent: 'space-between',
@@ -742,14 +768,14 @@ const styles = StyleSheet.create({
     },
     inputContainerM: {
         flexDirection: 'row',
-        borderColor: '#494949',
+        borderColor: '#1C1C1C',
         borderWidth: 0.5,
         borderRadius: 24,
         alignSelf: 'center',
-        backgroundColor: '#fff',
-        height: height * 0.06,
-        width: width * 0.9,
-        marginBottom: height * 0.015,
+        backgroundColor: '#FEFCFC',
+        height: 42,
+        width: '100%',
+        marginBottom: moderateScale(16),
         justifyContent: 'space-between',
     },
     inputContainer: {

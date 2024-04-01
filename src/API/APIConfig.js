@@ -4,8 +4,13 @@
 export const API_CONFIG = {
     CONFIG_FILE:'https://temp.wedeveloptech.in/denxgen/appdata/getconfig-ax.php',
     API_DOMAIN: 'https://temp.wedeveloptech.in/denxgen/appdata/',
+    loginUrl: 'reqpersonallogin-ax.php',
     professionListUrl: 'getprofflist-ax.php',
     genderListUrl: 'getgenderlist-ax.php',
+    serviceListUrl: 'getservlist-ax.php',
+    specialityListUrl: 'getspeclist-ax.php',
+    keyForteListUrl: 'getkeyforlist-ax.php',
+    userDtlsUrl: 'requserdtls-ax.php',
 };
 
 export const fetchAndUpdateConfig = async () => {

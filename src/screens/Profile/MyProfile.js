@@ -330,12 +330,13 @@ const MyProfile = ({ navigation }) => {
                                 noLabel="No"
                                 onYesPress={async () => {
                                     setShowPopup(false);
-                                    console.log('Logged Out');
-                                    await AsyncStorage.setItem('userLoggedIn', 'false');
-                                    navigation.replace('LoginScreen');
+                                    // console.log('Logged Out');
+                                    // await AsyncStorage.setItem('userLoggedIn', 'false');
+                                    navigation.navigate('LoginScreen'); 
+                                    
+                                    
                                 }}
                             />
-                              
                         </View>
                             <View style={styles.bottomContainer}>
                                 {/* <Image source={require('../../../assets/img/DenXGenLogo.png')} style={styles.image} /> */}
