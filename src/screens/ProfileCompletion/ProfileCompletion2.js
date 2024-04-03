@@ -494,13 +494,13 @@ const ProfileCompletion2 = ({ navigation }) => {
             const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls2-ax.php`, userData);
 
             console.log('dataresponse', response.data);
-            //ToastAndroid.show("Product Added Successfully!", ToastAndroid.SHORT);
-            console.log('Data Added to database');
+            ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
+            //console.log('Data Added to database');
         } catch (error) {
             console.error('An error occurred:', error);
         }
 
-        navigation.navigate('ProfileCompletion4');
+        navigation.navigate('NDProfileCompletion3');
     };
 
 
@@ -632,7 +632,7 @@ const ProfileCompletion2 = ({ navigation }) => {
                                                     Note: Type services like Root Canal, Aligners, Oral Surgery,  etc to show specialisation you provide.
                                                 </Text>
                                                 <FlatList
-                                                    style={{ paddingBottom: showOtherServiceInput ? 0 : 46 }}
+                                                    style={{ paddingBottom: showOtherServiceInput ? 0 : height * 0.06 }}
                                                     data={[...servicesData, { id: 'other', service: 'Other' }]} // Add 'Other' as an additional item
                                                     renderItem={({ item }) => (
                                                         <TouchableOpacity
@@ -672,7 +672,7 @@ const ProfileCompletion2 = ({ navigation }) => {
                                                     keyExtractor={item => item.id}
                                                 />
                                                 {showOtherServiceInput && (
-                                                    <View style={styles.inputContainer1}>
+                                                    <View style={styles.otherContainer1}>
                                                         <TextInput
                                                             style={styles.inputs}
                                                             placeholder="Other Services"
@@ -694,7 +694,7 @@ const ProfileCompletion2 = ({ navigation }) => {
                                             </TouchableOpacity>
                                             {showOtherServiceInput ?
                                                 null :
-                                                <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: 20, }]} activeOpacity={0.8} onPress={handleServiceModalSubmit}>
+                                                <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: height * 0.03, }]} activeOpacity={0.8} onPress={handleServiceModalSubmit}>
                                                 <Text style={commonStyles.buttonText}>Submit</Text>
                                             </TouchableOpacity>}
 
@@ -747,7 +747,7 @@ const ProfileCompletion2 = ({ navigation }) => {
                                                     Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
                                                 </Text>
                                                 <FlatList
-                                                    style={{ paddingBottom: showOtherSpecialityInput ? 0 : 46 }}
+                                                    style={{ paddingBottom: showOtherSpecialityInput ? 0 : height * 0.06 }}
                                                     data={[...specialtiesData, { id: 'other', speciality: 'Other' }]} // Add 'Other' as an additional item
                                                     renderItem={({ item }) => (
                                                         <TouchableOpacity
@@ -786,7 +786,7 @@ const ProfileCompletion2 = ({ navigation }) => {
                                                     keyExtractor={item => item.id}
                                                 />
                                                 {showOtherSpecialityInput && (
-                                                    <View style={[styles.inputContainer1]}>
+                                                    <View style={[styles.otherContainer1]}>
                                                         <TextInput
                                                             style={styles.inputs}
                                                             placeholder="Other Speciality"
@@ -807,7 +807,7 @@ const ProfileCompletion2 = ({ navigation }) => {
                                             </TouchableOpacity>
                                             {showOtherSpecialityInput ?
                                                 null :
-                                                <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: 20, }]} activeOpacity={0.8} onPress={handleSpecialtiesModalSubmit}>
+                                                <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: height * 0.03, }]} activeOpacity={0.8} onPress={handleSpecialtiesModalSubmit}>
                                                     <Text style={commonStyles.buttonText}>Submit</Text>
                                                 </TouchableOpacity>}
 
@@ -858,7 +858,7 @@ const ProfileCompletion2 = ({ navigation }) => {
                                                     Note: Tell us something about yourself to let users know you better
                                                 </Text>
                                                 <FlatList
-                                                    style={{ paddingBottom: showOtherKeyForteInput ? 0 : 46 }}
+                                                    style={{ paddingBottom: showOtherKeyForteInput ? 0 : height * 0.06 }}
                                                     data={[...keyForteData, { id: 'other', keyforte: 'Other' }]} // Add 'Other' as an additional item
                                                     renderItem={({ item }) => (
                                                         <TouchableOpacity
@@ -898,7 +898,7 @@ const ProfileCompletion2 = ({ navigation }) => {
                                                 />
 
                                                 {showOtherKeyForteInput && (
-                                                    <View style={[styles.inputContainer1]}>
+                                                    <View style={[styles.otherContainer1]}>
                                                         <TextInput
                                                             style={styles.inputs}
                                                             placeholder="Other Key Forte"
@@ -919,7 +919,7 @@ const ProfileCompletion2 = ({ navigation }) => {
                                             </TouchableOpacity>
                                             {showOtherKeyForteInput ?
                                                 null :
-                                                <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: 20 }]} activeOpacity={0.8} onPress={handleKeyForteModalSubmit}>
+                                                <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: height * 0.03 }]} activeOpacity={0.8} onPress={handleKeyForteModalSubmit}>
                                                     <Text style={commonStyles.buttonText}>Submit</Text>
                                                 </TouchableOpacity>}
                                         </TouchableOpacity>
@@ -970,7 +970,7 @@ const ProfileCompletion2 = ({ navigation }) => {
                                                 </Text>
                                                 <FlatList
                                                     data={[...qualificationsData, { id: 'other', qualification: 'Other' }]} // Add 'Other' as an additional item
-                                                    style={{ paddingBottom: showOtherQualificationInput ? 0 : 46 }} // Add paddingBottom conditionally
+                                                    style={{ paddingBottom: showOtherQualificationInput ? 0 : height * 0.06 }} // Add paddingBottom conditionally
                                                     renderItem={({ item }) => (
                                                         <TouchableOpacity
                                                             activeOpacity={0.8}
@@ -1009,7 +1009,7 @@ const ProfileCompletion2 = ({ navigation }) => {
                                                 />
 
                                                 {showOtherQualificationInput && (
-                                                    <View style={styles.inputContainer1}>
+                                                    <View style={styles.otherContainer1}>
                                                         <TextInput
                                                             style={styles.inputs}
                                                             placeholder="Other Qualification"
@@ -1029,7 +1029,7 @@ const ProfileCompletion2 = ({ navigation }) => {
                                             </TouchableOpacity>
                                             {showOtherQualificationInput ?
                                                 null :
-                                                <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: 20 }]} activeOpacity={0.8} onPress={handleQualificationsModalSubmit}>
+                                                <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: height * 0.03 }]} activeOpacity={0.8} onPress={handleQualificationsModalSubmit}>
                                                     <Text style={commonStyles.buttonText}>Submit</Text>
                                                 </TouchableOpacity>}
                                           
@@ -1174,6 +1174,18 @@ const styles = StyleSheet.create({
         height: moderateScale(41),
         width:'100%',
         marginBottom: moderateScale(16),
+        justifyContent: 'space-between',
+    },
+    otherContainer1:{
+        flexDirection: 'row',
+        borderColor: '#1C1C1C',
+        borderWidth: 0.5,
+        borderRadius: 24,
+        alignSelf: 'center',
+        backgroundColor: '#FEFCFC',
+        height: moderateScale(41),
+        width: '100%',
+        //  marginBottom: moderateScale(16),
         justifyContent: 'space-between',
     },
     totalServiceText: {

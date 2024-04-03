@@ -140,7 +140,7 @@ const MyProfile = ({ navigation }) => {
                             >
                                 {/* Left side content */}
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Image source={require('../../../assets/img/Notification.png')} style={{ width: 26, height: 26, marginRight: 20 }} />
+                                    <Image source={require('../../../assets/img/Notification.png')} style={{ width: 24, height: 24, marginRight: 15 }} />
                                     <Text style={styles.leftText}>Notifications</Text>
                                     {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 250 }}>
                                 <Text style={{ fontSize: 17, fontWeight: '400', color: 'black', fontFamily: 'Mukta-Regular' }}>Block Account</Text>
@@ -163,7 +163,7 @@ const MyProfile = ({ navigation }) => {
                             >
                                 {/* Left side content */}
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Image source={require('../../../assets/img/RateApp.png')} style={{ width: 24, height: 24, marginRight: 20 }} />
+                                        <Image source={require('../../../assets/img/Rating.png')} style={{ width: 24, height: 24, marginRight: 15 }} />
                                     <Text style={styles.leftText}>Rate App</Text>
                                     {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 250 }}>
                                 <Text style={{ fontSize: 17, fontWeight: '400', color: 'black', fontFamily: 'Mukta-Regular' }}>Receive Request</Text>
@@ -188,7 +188,7 @@ const MyProfile = ({ navigation }) => {
                             >
                                 {/* Left side content */}
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Image source={require('../../../assets/img/About.png')} style={{ width: 24, height: 24, marginRight: 20 }} />
+                                    <Image source={require('../../../assets/img/About.png')} style={{ width: 24, height: 24, marginRight: 15 }} />
                                     <Text style={styles.leftText}>About Us</Text>
                                     {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 250 }}>
                                 <Text style={{ fontSize: 17, fontWeight: '400', color: 'black', fontFamily: 'Mukta-Regular' }}>Receive Request</Text>
@@ -214,7 +214,7 @@ const MyProfile = ({ navigation }) => {
                                 >
                                     {/* Left side content */}
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        <Image source={require('../../../assets/img/Premium.png')} style={{ width: 24, height: 24, marginRight: 20 }} />
+                                        <Image source={require('../../../assets/img/Terms.png')} style={{ width: 24, height: 24, marginRight: 15 }} />
                                         <Text style={styles.leftText}>Terms & Conditions</Text>
 
                                     </View>
@@ -232,7 +232,7 @@ const MyProfile = ({ navigation }) => {
                                 >
                                     {/* Left side content */}
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        <Image source={require('../../../assets/img/EditPro.png')} style={{ width: 24, height: 24, marginRight: 20 }} />
+                                        <Image source={require('../../../assets/img/Privacy.png')} style={{ width: 24, height: 24, marginRight: 15 }} />
                                         <Text style={styles.leftText}>Privacy Policy</Text>
 
                                         {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 250 }}>
@@ -259,7 +259,7 @@ const MyProfile = ({ navigation }) => {
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Image
                                         source={require('../../../assets/img/Settings.png')}
-                                        style={{ width: 24, height: 24, marginRight: 20 }}
+                                        style={{ width: 24, height: 24, marginRight: 15 }}
                                     />
                                     <Text style={styles.leftText}>
                                         Settings
@@ -279,7 +279,7 @@ const MyProfile = ({ navigation }) => {
                             >
                                 {/* Left side content */}
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Image source={require('../../../assets/img/HelpSupport.png')} style={{ width: 24, height: 24, marginRight: 20 }} />
+                                    <Image source={require('../../../assets/img/HelpSupport.png')} style={{ width: 24, height: 24, marginRight: 15 }} />
                                     <Text style={styles.leftText}>Help and Support</Text>
                                     {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 250 }}>
                                 <Text style={{ fontSize: 17, fontWeight: '400', color: 'black', fontFamily: 'Mukta-Regular' }}>Receive Request</Text>
@@ -306,7 +306,7 @@ const MyProfile = ({ navigation }) => {
                             >
                                 {/* Left side content */}
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Image source={require('../../../assets/img/LogOut.png')} style={{ width: 24, height: 24, marginRight: 20 }} />
+                                        <Image source={require('../../../assets/img/logged.png')} style={{ width: 24, height: 24, marginRight: 15 }} />
                                     <Text style={styles.leftText}>Logout</Text>
                                     {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 250 }}>
                                 <Text style={{ fontSize: 17, fontWeight: '400', color: 'black', fontFamily: 'Mukta-Regular' }}>Receive Request</Text>

@@ -11,7 +11,8 @@ import {
     ScrollView,
     Modal,
     TouchableHighlight,
-    PixelRatio
+    PixelRatio,
+    ToastAndroid
 } from 'react-native';
 import Animation from '../../components/Loader';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -234,31 +235,45 @@ const ProfileCompletion8 = ({ navigation }) => {
             const pr_id = await AsyncStorage.getItem('pr_id');
             const id = parseInt(pr_id);
 
+            const socialMediaArray = [
+                { instagram: instaLink || "" },
+                { linkedIn: linkedinLink || "" },
+                { facebook: facebookLink || "" },
+                { other: otherLink || "" }
+            ];
+
+
             const userData = {
                 pr_id: id,
-                videoLinks: videoInputs,
-                awards: awardsInputs,
-                blogs: blogsInputs,
-                socialMedia: {
-                    instagram: instaLink || "",
-                    linkedIn: linkedinLink || "",
-                    facebook: facebookLink || "",
-                    other: otherLink || "",
-                },                                                                                                                                                                                                                                                                                                              
+                vid_id: videoInputs,
+                awa_id: awardsInputs,
+                pub_id: blogsInputs,
+                // socialMedia: [
+                //     instaLink || "", // Instagram link
+                //     linkedinLink || "", // LinkedIn link
+                //     facebookLink || "", // Facebook link
+                //     otherLink || "" // Other link
+                // ],
+                soc_id: socialMediaArray,
+                //  socialMedia: {
+                //     instagram: instaLink || "",
+                //     linkedIn: linkedinLink || "",
+                //     facebook: facebookLink || "",
+                //     other: otherLink || "",
+                // },    
             };
 
             try {
-                const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/requpdatepersonaldtls8-ax.php`, userData);
+                const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls8-ax.php`, userData);
 
                 console.log('dataresponse', response.data);
-                //ToastAndroid.show("Product Added Successfully!", ToastAndroid.SHORT);
-                console.log('Data Updated to database');
+                ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
             } catch (error) {
                 console.error('An error occurred:', error);
             }
 
             console.log('User Data:', userData);
-            //navigation.navigate('HomeScreen');
+            navigation.navigate('HomeScreen');
         };
 
 

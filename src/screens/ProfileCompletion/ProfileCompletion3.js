@@ -522,70 +522,65 @@
 
 
 import React, { useState } from 'react';
-import { View, Button, Image, Alert } from 'react-native';
-import ImageCropPicker from 'react-native-image-crop-picker';
+import { View, Button, Image } from 'react-native';
+import ImagePicker from 'react-native-image-crop-picker';
 
 
 const ProfileCompletion3 = () => {
-    const [imageSource, setImageSource] = useState(null);
+    const [pickedImage, setPickedImage] = useState(null);
 
-    const selectImage = async () => {
+    const pickImage = async () => {
         try {
-            const image = await ImageCropPicker.openPicker({
-                width: 300,
+            const image = await ImagePicker.openPicker({
+                width: 400,
                 height: 400,
                 cropping: true,
-                cropperCircleOverlay: true,
-                compressImageQuality: 0.7 // Adjust as needed
             });
 
-            setImageSource({ uri: image.path });
-            sendImageToApi(image.path);
-        } catch (error) {
-            console.error('Error selecting image:', error);
-        }
-    };
+            setPickedImage(image);
 
-    const sendImageToApi = async (imageUri) => {
-        try {
-
-            const uriParts = imageUri.split('/');
-            const filename = uriParts[uriParts.length - 1];
-
+            // Prepare the image data to send to the backend
             const formData = new FormData();
             formData.append('image', {
-                uri: imageUri,
-                name: filename,
-                type: 'image/jpeg',
+                uri: image.path,
+                type: image.mime,
+                name: 'image.jpg',
             });
 
-            const response = await fetch('https://v2.convertapi.com/upload ', {
+            // Send formData to your backend using fetch or any other network library
+            // Replace 'YOUR_BACKEND_URL' with your actual backend endpoint
+            fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqimagedata-temp-ax.php', {
                 method: 'POST',
                 body: formData,
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    // Add any additional headers if required
                 },
-            });
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Image uploaded successfully:', data);
+                    // Handle response from the backend
+                })
+                .catch(error => {
+                    console.error('Error uploading image:', error);
+                    // Handle error
+                });
 
-            const data = await response.json();
-            console.log(data);
-            if (data.success) {
-                Alert.alert('Success', 'Image uploaded successfully');
-            } else {
-                Alert.alert('Error', 'Failed to upload image');
-            }
         } catch (error) {
-            console.error('Error sending image to API:', error);
-            Alert.alert('Error', 'Failed to upload image');
+            console.log(error);
         }
     };
 
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Button title="Select Image" onPress={selectImage} />
-            {imageSource && <Image source={imageSource} style={{ width: 200, height: 200, marginTop: 20 }} />}
+            {pickedImage && (
+                <Image source={{ uri: pickedImage.path }} style={{ width: 200, height: 200 }} />
+            )}
+            <Button title="Pick Image" onPress={pickImage} />
         </View>
     );
 };
+
 
 export default ProfileCompletion3;

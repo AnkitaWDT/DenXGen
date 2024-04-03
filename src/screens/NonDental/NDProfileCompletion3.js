@@ -22,6 +22,7 @@ import commonStyles from '../../components/CommonStyles';
 import { moderateScale } from 'react-native-size-matters';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { ProgressBar } from 'react-native-paper';
+import ImagePicker from 'react-native-image-crop-picker';
 
 const { width, height } = Dimensions.get('window');
 
@@ -34,94 +35,98 @@ const responsiveFontSize = (size) => {
 
 const NDProfileCompletion3 = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(true);
-    const [bannerImage, setBannerImage] = useState(null);
     const [profileImage, setProfileImage] = useState(null);
+    const [bannerImage, setBannerImage] = useState(null);
 
-    const defaultBannerImage = require('../../../assets/img/DBanner.png');
     const defaultProfileImage = require('../../../assets/img/DProfile.png');
-
-    const handleBannerUpload = () => {
-        launchImagePicker('banner');
-    };
+    const defaultBannerImage = require('../../../assets/img/DBanner.png');
 
     const handleProfileUpload = () => {
-        launchImagePicker('profile');
+        pickImage('profile');
     };
 
-    const launchImagePicker = (type) => {
-        const options = {
-            mediaType: 'photo',
-            cropping: false, // Set cropping to false initially
-        };
+    const handleBannerUpload = () => {
+        pickImage('banner');
+    };
 
-        ImageCropPicker.openPicker(options).then((response) => {
-            if (!response.path) {
-                console.log('User cancelled image picker');
-                return;
+    const pickImage = async (type) => {
+        try {
+            const image = await ImagePicker.openPicker({
+                width: 400,
+                height: 400,
+                cropping: true,
+            });
+
+            if (type === 'profile') {
+                setProfileImage(image);
+            } else if (type === 'banner') {
+                setBannerImage(image);
             }
 
-            const aspectRatio = type === 'banner' ? 16 / 9 : 1 / 1;
-
-            cropImage(response.path, aspectRatio, type === 'banner' ? setBannerImage : setProfileImage);
-        }).catch((error) => {
-            console.log('ImagePicker Error: ', error);
-        });
-    };
-
-    const cropImage = (path, aspectRatio, setImage) => {
-        ImageCropPicker.openCropper({
-            path,
-            width: aspectRatio * 100,
-            height: 100,
-            cropperCircleOverlay: false,
-            cropping: true,
-            includeBase64: false,
-            freeStyleCropEnabled: true,
-            cropperToolbarTitle: 'Crop Image',
-            cropperToolbarColor: '#3498db',
-            cropperActiveWidgetColor: '#3498db',
-            cropperStatusBarColor: '#3498db',
-            cropperToolbarWidgetColor: 'white',
-            cropperToolbarWidgetSize: 40,
-            hideBottomControls: true,
-            showCropFrame: true,
-            showCropGrid: true,
-            aspectRatio,
-        }).then((croppedImage) => {
-            setImage({ uri: croppedImage.path, width: croppedImage.width, height: croppedImage.height });
-        }).catch((error) => {
-            console.log('ImageCropPicker Error: ', error);
-        });
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     const handleNext = () => {
+        // Upload profile image
+        if (profileImage) {
+            const profileFormData = new FormData();
+            profileFormData.append('profileImage', {
+                uri: profileImage.path,
+                type: profileImage.mime,
+                name: 'profile_image.jpg',
+            });
 
-        // console.log('Banner Image URI:', bannerImage ? bannerImage.uri : 'No banner image');
-        // console.log('Profile Image URI:', profileImage ? profileImage.uri : 'No profile image');
+            // Send profile image to the backend
+            fetch('YOUR_PROFILE_IMAGE_UPLOAD_URL', {
+                method: 'POST',
+                body: profileFormData,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Profile image uploaded successfully:', data);
+                    // Handle response from the backend
+                })
+                .catch(error => {
+                    console.error('Error uploading profile image:', error);
+                    // Handle error
+                });
+        }
 
-        // // Show URIs in toast
-        // ToastAndroid.show(
-        //     `Banner Image URI: ${bannerImage ? bannerImage.uri : 'No banner image'}`,
-        //     ToastAndroid.LONG,
-        //     ToastAndroid.TOP,
-        //     25,
-        //     50
-        // );
+        // Upload banner image
+        if (bannerImage) {
+            const bannerFormData = new FormData();
+            bannerFormData.append('bannerImage', {
+                uri: bannerImage.path,
+                type: bannerImage.mime,
+                name: 'banner_image.jpg',
+            });
 
-        // ToastAndroid.show(
-        //     `Profile Image URI: ${profileImage ? profileImage.uri : 'No profile image'}`,
-        //     ToastAndroid.LONG,
-        //     ToastAndroid.TOP,
-        //     25,
-        //     50
-        // );
+            // Send banner image to the backend
+            fetch('YOUR_BANNER_IMAGE_UPLOAD_URL', {
+                method: 'POST',
+                body: bannerFormData,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Banner image uploaded successfully:', data);
+                    // Handle response from the backend
+                })
+                .catch(error => {
+                    console.error('Error uploading banner image:', error);
+                    // Handle error
+                });
+        }
 
-        //sendImageToApi();
-
-        navigation.navigate('NDProfileCompletion4');
         console.log('ProfileCompletion4');
     };
-
 
     useEffect(() => {
         // Simulate an asynchronous operation (e.g., fetching data) before rendering the profile screen
@@ -138,11 +143,12 @@ const NDProfileCompletion3 = ({ navigation }) => {
         fakeAsyncOperation();
     }, []);
 
+
     const currentStep = 3; // For example, current step is 4
     const totalSteps = 9; // Total number of steps
 
     const progressPercentage = (currentStep / totalSteps) * 100; // Calculate progress percentage
-    console.log("Progress Percentage:", progressPercentage);
+    //console.log("Progress Percentage:", progressPercentage);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -152,70 +158,62 @@ const NDProfileCompletion3 = ({ navigation }) => {
                 </View>
 
             ) : (
-                <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+                    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
 
-                    <View style={styles.contentContainer}>
+                        <View style={styles.contentContainer}>
+                            <View style={styles.headerTextContainer}>
+                                <Text style={[commonStyles.headerText1BL, {
+                                    marginBottom: moderateScale(6), textAlign: 'center'
+                                }]}>Step 3 - Update Photo</Text>
+                                <Text style={[commonStyles.headerText2BL, {
+                                    textAlign: 'center', paddingHorizontal: width * 0.02
+                                }]}>Choose your career category and unlock endless possibilities.</Text>
+                                <ProgressBar
+                                    progress={progressPercentage / 100}
+                                    color="#00B0FF"
+                                    style={commonStyles.progImage}
+                                />
+                            </View>
 
-                        <View style={styles.headerTextContainer}>
-                            <Text style={[commonStyles.headerText1BL, {
-                                marginBottom: moderateScale(6), textAlign: 'center'
-                            }]}>Step 3 - Update Photo</Text>
-                            <Text style={[commonStyles.headerText2BL, {
-                                textAlign: 'center', paddingHorizontal: width * 0.02
-                            }]}>Choose your career category and unlock endless possibilities.</Text>
-                            {/* <Image source={require('../../../assets/img/Prog2.png')} style={commonStyles.progImage} /> */}
-                            <ProgressBar
-                                progress={progressPercentage / 100}
-                                color="#00B0FF"
-                                style={commonStyles.progImage}
-                            />
+                            <View style={styles.defaultContainer}>
+                                {profileImage ? (
+                                    <Image source={{ uri: profileImage.path }} style={styles.profileImage} />
+                                ) : (
+                                    <Image source={defaultProfileImage} style={styles.defaultProfileImage} />
+                                )}
+                            </View>
+
+                            <TouchableOpacity onPress={handleProfileUpload} style={[commonStyles.button1, { marginTop: height * 0.001, marginBottom: height * 0.02, }]} activeOpacity={0.8}>
+                                <Text style={commonStyles.buttonText1}>Select Profile Photo</Text>
+                            </TouchableOpacity>
+
+                            <View style={styles.defaultContainer}>
+                                {bannerImage ? (
+                                    <Image source={{ uri: bannerImage.path }} style={styles.bannerImage} />
+                                ) : (
+                                    <Image source={defaultBannerImage} style={styles.defaultBannerImage} />
+                                )}
+                            </View>
+
+                            <TouchableOpacity onPress={handleBannerUpload} style={[commonStyles.button1, { marginTop: height * 0.001, marginBottom: height * 0.02, }]} activeOpacity={0.8}>
+                                <Text style={commonStyles.buttonText1}>Select Banner Photo</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={[commonStyles.button]}
+                                onPress={handleNext}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={commonStyles.buttonText}>Continue</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity style={[commonStyles.button1, { marginBottom: height * 0.05, marginTop: height * 0.001, }]}
+                                activeOpacity={0.8}>
+                                <Text style={commonStyles.buttonText1}>Skip</Text>
+                            </TouchableOpacity>
+
                         </View>
-
-
-                        <View style={styles.defaultContainer}>
-                            {profileImage ? (
-                                <Image source={{ uri: profileImage.uri }} style={styles.previewImage} />
-                            ) : (
-                                <Image source={defaultProfileImage} style={styles.defaultImage} />
-                            )}
-                        </View>
-
-
-
-                        <TouchableOpacity onPress={handleProfileUpload} style={[commonStyles.button1, { marginTop: height * 0.001, marginBottom: height * 0.02, }]} activeOpacity={0.8}>
-                            <Text style={commonStyles.buttonText1}>Select Photo</Text>
-                        </TouchableOpacity>
-
-                        <View style={styles.defaultContainer}>
-                            {bannerImage ? (
-                                <Image source={{ uri: bannerImage.uri }} style={styles.bannerImage} />
-                            ) : (
-                                <Image source={defaultBannerImage} style={styles.defaultBannerImage} />
-                            )}
-                        </View>
-
-
-                        <TouchableOpacity onPress={handleBannerUpload} style={[commonStyles.button1, { marginTop: height * 0.001, }]} activeOpacity={0.8}>
-                            <Text style={commonStyles.buttonText1}>Select Banner Photo</Text>
-                        </TouchableOpacity>
-
-
-
-                        <TouchableOpacity
-                            style={[commonStyles.button]}
-                            onPress={handleNext}
-                            activeOpacity={0.8}
-                        >
-                            <Text style={commonStyles.buttonText}>Continue</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={[commonStyles.button1, { marginBottom: height * 0.05, marginTop: height * 0.001, }]}
-                            activeOpacity={0.8}>
-                            <Text style={commonStyles.buttonText1}>Skip</Text>
-                        </TouchableOpacity>
-
-                    </View>
-                </ScrollView>
+                    </ScrollView>
             )}
         </SafeAreaView>
     );

@@ -225,8 +225,7 @@ const ProfileCompletion5 = ({ navigation }) => {
             const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls5-ax.php`, userData);
 
             console.log('dataresponse', response.data);
-            //ToastAndroid.show("Product Added Successfully!", ToastAndroid.SHORT);
-            console.log('Data Added to database');
+             ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
         } catch (error) {
             console.error('An error occurred:', error);
         }
