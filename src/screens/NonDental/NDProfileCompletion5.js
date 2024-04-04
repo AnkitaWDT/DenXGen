@@ -14,13 +14,16 @@ import {
     PixelRatio,
     Keyboard,
     TouchableWithoutFeedback,
-    ToastAndroid
+    ToastAndroid,
+    FlatList
 } from 'react-native';
 import Animation from '../../components/Loader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import commonStyles from '../../components/CommonStyles';
 import { moderateScale } from 'react-native-size-matters';
 import { ProgressBar } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const { width, height } = Dimensions.get('window');
 
@@ -52,25 +55,59 @@ const NDProfileCompletion5 = ({ navigation }) => {
 
     const [selectedButton, setSelectedButton] = useState('');
 
-    const [languagesData] = useState([
-        'English',
-        'Hindi',
-        'Marathi',
-        'Bengali',
-        'Telugu',
-        'Tamil',
-        'Gujarati',
-        'Urdu',
-        'Kannada',
-        'Odia',
-        'Malayalam',
-        'Punjabi',
-    ]);
+    const [userData, setUserData] = useState(null);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                const id = parseInt(pr_id);
+
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getvic-ax.php?prid=${id}`);
+                const data = await response.json();
+                setUserData(data.data);
+                console.log('Experience from API:', data.data.experience);
+                setSelectedButton(data.data.ho_vi_id === 1 ? 'button1' : 'button2');
+                setRegisterNumber(data.data.reg_no);
+                setPaymentLink(data.data.payment);
+                const selectedLanguagesIds = data.data.langList.map(language => parseInt(language.lang_id));
+                setSelectedLanguages(selectedLanguagesIds);
+                const selectedLanguagesNames = data.data.languages.map(language => language.language);
+                setSelectedLanguagesName(selectedLanguagesNames);
+                setSelectedExperience(data.data.experience); // Set selected experience from API
+                setSelectedExperienceName(data.data.experience);
+
+                setIsLoading(false);
+            } catch (error) {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData(); // Call the function immediately
+    }, []);
+
+
+
+    const [languagesData, setLanguagesData] = useState([]);
     const [selectedLanguages, setSelectedLanguages] = useState([]);
+    const [selectedLanguagesName, setSelectedLanguagesName] = useState('');
     const [otherLanguages, setOtherLanguages] = useState('');
     const [languagesModalVisible, setLanguagesModalVisible] = useState(false);
     const [showOtherLanguagesInput, setShowOtherLanguagesInput] = useState(false);
+
+    useEffect(() => {
+        fetchLanguagesData();
+    }, []);
+
+    const fetchLanguagesData = async () => {
+        try {
+            const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getlang-ax.php');
+            const data = await response.json();
+            setLanguagesData(data.data);
+        } catch (error) {
+            console.error('Error fetching key forte data:', error);
+        }
+    };
 
     const handleLanguagesModal = () => {
         setLanguagesModalVisible(true);
@@ -81,48 +118,64 @@ const NDProfileCompletion5 = ({ navigation }) => {
     };
 
     const handleLanguagesModalSubmit = () => {
-        let updatedLanguages = [...selectedLanguages];
 
-        // If otherSpecialty is not empty, include it
+
+        let updatedLanguages = [...selectedLanguages];
+        const otherIndex = updatedLanguages.findIndex(service => service.hasOwnProperty('other'));
+
         if (otherLanguages.trim() !== '') {
-            updatedLanguages.push(otherLanguages.trim());
+            const newOtherLanguage = { other: otherLanguages.trim() };
+            if (otherIndex !== -1) {
+                // Replace the existing "other" service with the new one
+                updatedLanguages[otherIndex] = newOtherLanguage;
+            } else {
+                // Add the new "other" service
+                updatedLanguages.push(newOtherLanguage);
+            }
+        } else {
+            // If otherService is empty, remove the "other" service from selectedServices
+            if (otherIndex !== -1) {
+                updatedLanguages.splice(otherIndex, 1);
+            }
         }
 
-        // Update the main text input with the combined specialties
         setSelectedLanguages(updatedLanguages);
-
-        // Close the modal
+        console.log('updatedServices', updatedLanguages)
         setLanguagesModalVisible(false);
     };
 
-    const toggleLanguages = (languages) => {
-        if (selectedLanguages.includes(languages)) {
-            setSelectedLanguages(selectedLanguages.filter((item) => item !== languages));
-        } else {
-            if (selectedLanguages.length < 5) {
-                setSelectedLanguages([...selectedLanguages, languages]);
-            } else {
-                ToastAndroid.show('You can select only upto 5 specialties!', ToastAndroid.SHORT);
-            }
-        }
+    const toggleLanguages = (id, language) => {
+        const isSelected = selectedLanguages.includes(id);
+        setSelectedLanguages(prev => isSelected ? prev.filter(item => item !== id) : [...prev, id]);
+        //setSelectedLanguages(prev => prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]);
+        setSelectedLanguagesName(isSelected ? [] : [language]);
+  
     };
 
     const toggleOtherLanguagesInput = () => {
         setShowOtherLanguagesInput(!showOtherLanguagesInput);
     };
 
-    const [experienceData] = useState([
-        '>2 years',
-        '2-5 years',
-        '5-10 years',
-        '10-15 years',
-        '15+ years',
-    ]);
-
+    const [experienceData, setExperienceData] = useState([]);
     const [selectedExperience, setSelectedExperience] = useState('');
     const [otherExperience, setOtherExperience] = useState('');
+    const [selectedExperienceName, setSelectedExperienceName] = useState('');
     const [experienceModalVisible, setExperienceModalVisible] = useState(false);
     const [showOtherExperienceInput, setShowOtherExperienceInput] = useState(false);
+
+    useEffect(() => {
+        fetchExperienceData();
+    }, []);
+
+    const fetchExperienceData = async () => {
+        try {
+            const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getexplist-ax.php');
+            const data = await response.json();
+            setExperienceData(data.data);
+        } catch (error) {
+            console.error('Error fetching key forte data:', error);
+        }
+    };
 
     const handleExperienceModal = () => {
         setExperienceModalVisible(true);
@@ -138,33 +191,59 @@ const NDProfileCompletion5 = ({ navigation }) => {
         setExperienceModalVisible(false);
     };
 
-    // const toggleExperience = (experience) => {
-    //     if (selectedExperience.includes(experience)) {
-    //         setSelectedExperience(selectedExperience.filter((item) => item !== experience));
-    //     } else {
-    //         if (selectedExperience.length < 5) {
-    //             setSelectedExperience([...selectedExperience, experience]);
-    //         } else {
-    //             ToastAndroid.show('You can select only upto 5 experiences!', ToastAndroid.SHORT);
-    //         }
-    //     }
-    // };
 
-    const toggleExperience = (experience) => {
+    const toggleExperience = (id, experience) => {
         // If the clicked experience is already selected, deselect it
         // Otherwise, select the clicked experience
-        setSelectedExperience(selectedExperience === experience ? '' : experience);
+        setSelectedExperience(id);
+        setSelectedExperienceName(experience);
+        // setSelectedExperience(selectedExperience === id ? '' : id);
+        // setSelectedExperienceName(selectedExperienceName === experience ? '' : experience);
     };
 
     const toggleOtherExperienceInput = () => {
         setShowOtherExperienceInput(!showOtherExperienceInput);
     };
 
+    const [registerNumber, setRegisterNumber] = useState('');
+    const [paymentLink, setPaymentLink] = useState('');
+
+    const handleNext = async () => {
+
+
+        const pr_id = await AsyncStorage.getItem('pr_id');
+        const id = parseInt(pr_id);
+
+        const userData = {
+            pr_id: id,
+            lang_id: selectedLanguages,
+            exp_id: selectedExperience,
+            reg_no: registerNumber,
+            payment: paymentLink,
+            ho_vi_id: selectedButton === 'button1' ? 1 : 2,
+        };
+
+        console.log('User Data:', userData);
+
+        try {
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls5-ax.php`, userData);
+
+            console.log('dataresponse', response.data);
+            ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
+            navigation.navigate('EditProfile')
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+
+        
+    };
+
+
     const currentStep = 5; // For example, current step is 4
     const totalSteps = 9; // Total number of steps
 
     const progressPercentage = (currentStep / totalSteps) * 100; // Calculate progress percentage
-    console.log("Progress Percentage:", progressPercentage);
+    //console.log("Progress Percentage:", progressPercentage);
 
     const [hoveredItem, setHoveredItem] = useState(null);
 
@@ -184,23 +263,23 @@ const NDProfileCompletion5 = ({ navigation }) => {
                             <View style={styles.headerTextContainer}>
                                 <Text style={[commonStyles.headerText1BL, {
                                     marginBottom: moderateScale(6), textAlign: 'center'
-                                }]}>Step 5 - Additional Details</Text>
+                                }]}>Additional Details</Text>
                                 <Text style={[commonStyles.headerText2BL, {
                                     textAlign: 'center', paddingHorizontal: width * 0.02
                                 }]}>Choose your career category and unlock endless possibilities.</Text>
                                 {/* <Image source={require('../../../assets/img/Prog2.png')} style={commonStyles.progImage} /> */}
-                                <ProgressBar
+                                {/* <ProgressBar
                                     progress={progressPercentage / 100}
                                     color="#00B0FF"
                                     style={commonStyles.progImage}
-                                />
+                                /> */}
                             </View>
 
 
 
                             <View style={styles.inputContainerWithLabel}>
                                 <Text style={[commonStyles.headerText4BL, { marginBottom: moderateScale(8), }]}>
-                                    Office / Clinic Pickups & Drops <Text style={styles.requiredIndicator}>*</Text>
+                                    Available For Home Visits <Text style={styles.requiredIndicator}>*</Text>
                                 </Text>
                                 <View style={styles.buttonContainer}>
                                     <TouchableOpacity
@@ -240,8 +319,8 @@ const NDProfileCompletion5 = ({ navigation }) => {
                                         style={styles.inputs}
                                         placeholder="Languages"
                                         placeholderTextColor="#979797"
-                                        // value={selectedServices.join(', ')}
-                                        value={selectedLanguages.length > 0 ? selectedLanguages[0] : ''}
+                                        value={selectedLanguagesName.length > 0 ? selectedLanguagesName[0] : ''}
+                                        //value={selectedLanguages.length > 0 ? selectedLanguages[0] : ''}
                                         underlineColorAndroid="transparent"
                                         editable={false}
                                     />
@@ -251,98 +330,6 @@ const NDProfileCompletion5 = ({ navigation }) => {
                                         <Image source={require('../../../assets/img/Add.png')} style={styles.closeP} />
                                     )}
                                 </TouchableOpacity>
-                                {/* <Modal visible={languagesModalVisible} transparent>
-                                        <TouchableWithoutFeedback onPress={() => setLanguagesModalVisible(false)}>
-                                            <View style={styles.modalContainer}>
-                                                <TouchableWithoutFeedback>
-                                                    <View style={styles.modalContent}>
-                                                        <View style={styles.horizontalLine}></View>
-                                                        <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
-                                                            Languages you spoken <Text style={commonStyles.headerText3G}> (upto 5)</Text>
-                                                        </Text>
-                                                        <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
-                                                            Note: Type services like Root Canal, Aligners, Oral Surgery,  etc to show specialisation you provide.
-                                                        </Text>
-                                                        <View style={styles.servicesContainer}>
-                                                            {languagesData.map((languages) => (
-                                                                <TouchableOpacity
-                                                                    key={languages}
-                                                                    style={[
-                                                                        styles.serviceButton,
-                                                                        selectedLanguages.includes(languages) && styles.selectedServiceButton,
-                                                                    ]}
-                                                                    onPress={() => toggleLanguages(languages)}
-                                                                >
-                                                                    <Text
-                                                                        style={[
-                                                                            styles.serviceButtonText,
-                                                                            selectedLanguages.includes(languages) && styles.selectedServiceButtonText,
-                                                                        ]}
-                                                                    >
-                                                                        {languages}
-                                                                    </Text>
-                                                                    {selectedLanguages.includes(languages) && (
-                                                                        <TouchableOpacity
-                                                                            style={styles.closeButton}
-                                                                            onPress={() => toggleLanguages(languages)}
-                                                                        >
-                                                                            <Image
-                                                                                source={require('../../../assets/img/close.png')}
-                                                                                style={styles.closeImage}
-                                                                            />
-                                                                        </TouchableOpacity>
-                                                                    )}
-                                                                </TouchableOpacity>
-                                                            ))}
-                                                            <TouchableOpacity
-                                                                style={[
-                                                                    styles.serviceButton,
-                                                                    styles.otherButton,
-                                                                    showOtherLanguagesInput && styles.selectedServiceButton,
-                                                                ]}
-                                                                onPress={toggleOtherLanguagesInput}
-                                                            >
-                                                                <Text
-                                                                    style={[
-                                                                        styles.serviceButtonText,
-                                                                        showOtherLanguagesInput && styles.selectedServiceButtonText,
-                                                                    ]}
-                                                                >
-                                                                    Other
-                                                                </Text>
-                                                                {showOtherLanguagesInput && (
-                                                                    <TouchableOpacity
-                                                                        style={styles.closeButton}
-                                                                        onPress={toggleOtherLanguagesInput}
-                                                                    >
-                                                                        <Image
-                                                                            source={require('../../../assets/img/close.png')}
-                                                                            style={styles.closeImage}
-                                                                        />
-                                                                    </TouchableOpacity>
-                                                                )}
-                                                            </TouchableOpacity>
-                                                        </View>
-                                                        {showOtherLanguagesInput && (
-                                                            <View style={styles.inputContainer1}>
-                                                                <TextInput
-                                                                    style={styles.inputs}
-                                                                    placeholder="Other Languages"
-                                                                    placeholderTextColor="#979797"
-                                                                    value={otherLanguages}
-                                                                    onChangeText={(text) => setOtherLanguages(text)}
-                                                                    underlineColorAndroid="transparent"
-                                                                />
-                                                            </View>
-                                                        )}
-                                                        <TouchableOpacity style={[commonStyles.button]} onPress={handleLanguagesModalSubmit}>
-                                                            <Text style={commonStyles.buttonText}>Submit</Text>
-                                                        </TouchableOpacity>
-                                                    </View>
-                                                </TouchableWithoutFeedback>
-                                            </View>
-                                        </TouchableWithoutFeedback>
-                                    </Modal> */}
                                 <Modal
                                     visible={languagesModalVisible}
                                     transparent
@@ -353,7 +340,9 @@ const NDProfileCompletion5 = ({ navigation }) => {
                                         style={styles.modalContainer}
                                         onPress={() => setLanguagesModalVisible(false)} // Close the modal when clicking on the background
                                     >
-                                        <ScrollView style={styles.modalContent}>
+                                        <TouchableOpacity style={styles.modalContent}
+                                            activeOpacity={1}
+                                            onPress={() => { }}>
                                             <View style={styles.horizontalLine}></View>
                                             <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
                                                 Languages you spoken <Text style={commonStyles.headerText3G}> (upto 5)</Text>
@@ -361,54 +350,53 @@ const NDProfileCompletion5 = ({ navigation }) => {
                                             <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
                                                 Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
                                             </Text>
-                                            <View style={styles.servicesContainer11}>
-
-                                                {languagesData.map((languages) => (
+                                            <FlatList
+                                                style={{ paddingBottom: showOtherLanguagesInput ? 0 : 46 }}
+                                                data={[...languagesData, { id: 'other', language: 'Other' }]} // Add 'Other' as an additional item
+                                                renderItem={({ item }) => (
                                                     <TouchableOpacity
                                                         activeOpacity={0.8}
-                                                        key={languages}
-                                                        onPress={() => toggleLanguages(languages)}
-                                                        onMouseEnter={() => setHoveredItem(languages)}
+                                                        onPress={() => {
+                                                            if (item.id === 'other') {
+                                                                toggleOtherLanguagesInput();
+                                                            } else {
+                                                                toggleLanguages(item.id, item.language);
+                                                            }
+                                                        }}
+                                                        onMouseEnter={() => setHoveredItem(item.language)}
                                                         onMouseLeave={() => setHoveredItem(null)}
                                                     >
                                                         <View
                                                             style={[
                                                                 styles.checkboxContainer,
-                                                                selectedLanguages.includes(languages) && styles.selectedCheckboxContainer,
-                                                                hoveredItem === languages && styles.hoveredCheckboxContainer,
+                                                                selectedLanguages.includes(item.language) && styles.selectedCheckboxContainer,
+                                                                hoveredItem === item.language && styles.hoveredCheckboxContainer,
                                                             ]}
                                                         >
                                                             <Image
-                                                                source={selectedLanguages.includes(languages) ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
+                                                                source={
+                                                                    selectedLanguages.includes(item.id) || (showOtherLanguagesInput && item.id === 'other')
+                                                                        ? require('../../../assets/img/Rect1.png')
+                                                                        : require('../../../assets/img/Rect.png')
+                                                                }
                                                                 style={styles.checkboxImage}
                                                             />
-                                                            <Text style={selectedLanguages.includes(languages) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
-                                                                {languages}
+                                                            {/* <Image
+                                                                    source={
+                                                                        selectedLanguages.includes(item.language) || (showOtherLanguagesInput && item.id === 'other')
+                                                                            ? require('../../../assets/img/Rect1.png')
+                                                                            : require('../../../assets/img/Rect.png')
+                                                                    }
+                                                                    style={styles.checkboxImage}
+                                                                /> */}
+                                                            <Text style={selectedLanguages.includes(item.language) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
+                                                                {item.language}
                                                             </Text>
                                                         </View>
                                                     </TouchableOpacity>
-                                                ))}
-                                                <TouchableOpacity
-                                                    activeOpacity={0.8}
-                                                    onPress={toggleOtherLanguagesInput}
-                                                    onMouseEnter={() => setHoveredItem('Other')}
-                                                    onMouseLeave={() => setHoveredItem(null)}
-                                                >
-                                                    <View
-                                                        style={[
-                                                            styles.checkboxContainer,
-                                                            showOtherLanguagesInput && styles.selectedCheckboxContainer,
-                                                            hoveredItem === 'Other' && styles.hoveredCheckboxContainer,
-                                                        ]}
-                                                    >
-                                                        <Image
-                                                            source={showOtherLanguagesInput ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
-                                                            style={styles.checkboxImage}
-                                                        />
-                                                        <Text style={showOtherLanguagesInput ? commonStyles.headerText4B : commonStyles.headerText4BL}>Other</Text>
-                                                    </View>
-                                                </TouchableOpacity>
-                                            </View>
+                                                )}
+                                                keyExtractor={item => item.id}
+                                            />
                                             {showOtherLanguagesInput && (
                                                 <View style={styles.inputContainer1}>
                                                     <TextInput
@@ -421,10 +409,18 @@ const NDProfileCompletion5 = ({ navigation }) => {
                                                     />
                                                 </View>
                                             )}
-                                            <TouchableOpacity style={[commonStyles.button, { marginBottom: 20 }]} activeOpacity={0.8} onPress={handleLanguagesModalSubmit}>
-                                                <Text style={commonStyles.buttonText}>Submit</Text>
-                                            </TouchableOpacity>
-                                        </ScrollView>
+
+                                            {showOtherLanguagesInput && (
+                                                <TouchableOpacity style={[commonStyles.button, {}]} activeOpacity={0.8} onPress={handleLanguagesModalSubmit}>
+                                                    <Text style={commonStyles.buttonText}>Submit</Text>
+                                                </TouchableOpacity>
+                                            )}
+
+
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: 20, }]} activeOpacity={0.8} onPress={handleLanguagesModalSubmit}>
+                                            <Text style={commonStyles.buttonText}>Submit</Text>
+                                        </TouchableOpacity>
                                     </TouchableOpacity>
                                 </Modal>
                             </View>
@@ -434,84 +430,77 @@ const NDProfileCompletion5 = ({ navigation }) => {
                                     Experiences <Text style={styles.requiredIndicator}>*</Text>
                                 </Text>
 
-                                <TouchableOpacity onPress={handleExperienceModal} style={[styles.inputContainer1]} activeOpacity={0.8}>
-                                    <TextInput
-                                        style={styles.inputs}
-                                        placeholder="Experiences"
-                                        placeholderTextColor="#979797"
-                                        value={selectedExperience}
-                                        underlineColorAndroid="transparent"
-                                        editable={false}
-                                    />
-                                    {!selectedExperience && <Image source={require('../../../assets/img/Add.png')} style={styles.closeP} />}
-                                </TouchableOpacity>
-
+                                    <TouchableOpacity onPress={handleExperienceModal} style={[styles.inputContainer1]} activeOpacity={0.8}>
+                                        <TextInput
+                                            style={styles.inputs}
+                                            placeholder="Experiences"
+                                            placeholderTextColor="#979797"
+                                            value={selectedExperienceName}
+                                            underlineColorAndroid="transparent"
+                                            editable={false}
+                                        />
+                                        {selectedExperienceName === '' && <Image source={require('../../../assets/img/Add.png')} style={styles.closeP} />}
+                                    </TouchableOpacity>
 
                                 <Modal
                                     visible={experienceModalVisible}
                                     transparent
-                                    onRequestClose={handleCloseExperienceModal}
+                                    onRequestClose={() => setExperienceModalVisible(false)}// To handle Android back button
                                 >
                                     <TouchableOpacity
                                         activeOpacity={0.8}
                                         style={styles.modalContainer}
-                                        onPress={handleCloseExperienceModal}
+                                        onPress={() => setExperienceModalVisible(false)} // Close the modal when clicking on the background
                                     >
-                                        <ScrollView style={styles.modalContent}>
+                                        <TouchableOpacity style={styles.modalContent}
+                                            activeOpacity={1}
+                                            onPress={() => { }}>
                                             <View style={styles.horizontalLine}></View>
                                             <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
-                                                Tell us your experience <Text style={commonStyles.headerText3G}> (select one)</Text>
+                                                Tell us your services <Text style={commonStyles.headerText3G}> (upto 5)</Text>
                                             </Text>
                                             <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
-                                                Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
+                                                Note: Type services like Root Canal, Aligners, Oral Surgery,  etc to show specialisation you provide.
                                             </Text>
-                                            <View style={styles.servicesContainer11}>
-                                                {experienceData.map((experience) => (
+                                            <FlatList
+                                                style={{ paddingBottom: showOtherExperienceInput ? 0 : 46 }}
+                                                data={[...experienceData]} // Add 'Other' as an additional item
+                                                renderItem={({ item }) => (
                                                     <TouchableOpacity
                                                         activeOpacity={0.8}
-                                                        key={experience}
-                                                        onPress={() => toggleExperience(experience)}
-                                                        onMouseEnter={() => setHoveredItem(experience)}
+                                                        onPress={() => {
+                                                            if (item.id === 'other') {
+                                                                toggleOtherExperienceInput();
+                                                            } else {
+                                                                toggleExperience(item.id, item.experience);
+                                                            }
+                                                        }}
+                                                        onMouseEnter={() => setHoveredItem(item.experience)}
                                                         onMouseLeave={() => setHoveredItem(null)}
                                                     >
                                                         <View
                                                             style={[
                                                                 styles.checkboxContainer,
-                                                                selectedExperience.includes(experience) && styles.selectedCheckboxContainer,
-                                                                hoveredItem === experience && styles.hoveredCheckboxContainer,
+                                                                selectedExperience.includes(item.experience) && styles.selectedCheckboxContainer,
+                                                                hoveredItem === item.experience && styles.hoveredCheckboxContainer,
                                                             ]}
                                                         >
                                                             <Image
-                                                                source={selectedExperience.includes(experience) ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
+                                                                source={
+                                                                    selectedExperience.includes(item.id) || (showOtherExperienceInput && item.id === 'other')
+                                                                        ? require('../../../assets/img/Rect1.png')
+                                                                        : require('../../../assets/img/Rect.png')
+                                                                }
                                                                 style={styles.checkboxImage}
                                                             />
-                                                            <Text style={selectedExperience.includes(experience) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
-                                                                {experience}
+                                                            <Text style={selectedExperience.includes(item.experience) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
+                                                                {item.experience}
                                                             </Text>
                                                         </View>
                                                     </TouchableOpacity>
-                                                ))}
-                                                {/* <TouchableOpacity
-                                                        activeOpacity={0.8}
-                                                        onPress={toggleOtherExperienceInput}
-                                                        onMouseEnter={() => setHoveredItem('Other')}
-                                                        onMouseLeave={() => setHoveredItem(null)}
-                                                    >
-                                                        <View
-                                                            style={[
-                                                                styles.checkboxContainer,
-                                                                showOtherExperienceInput && styles.selectedCheckboxContainer,
-                                                                hoveredItem === 'Other' && styles.hoveredCheckboxContainer,
-                                                            ]}
-                                                        >
-                                                            <Image
-                                                                source={showOtherExperienceInput ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
-                                                                style={styles.checkboxImage}
-                                                            />
-                                                            <Text style={showOtherExperienceInput ? commonStyles.headerText4B : commonStyles.headerText4BL}>Other</Text>
-                                                        </View>
-                                                    </TouchableOpacity> */}
-                                            </View>
+                                                )}
+                                                keyExtractor={item => item.id}
+                                            />
                                             {/* {showOtherExperienceInput && (
                                                     <View style={styles.inputContainer1}>
                                                         <TextInput
@@ -523,14 +512,38 @@ const NDProfileCompletion5 = ({ navigation }) => {
                                                             underlineColorAndroid="transparent"
                                                         />
                                                     </View>
+                                                )}
+
+                                                {showOtherExperienceInput && (
+                                                    <TouchableOpacity style={[commonStyles.button, {}]} activeOpacity={0.8} onPress={handleExperienceModalSubmit}>
+                                                        <Text style={commonStyles.buttonText}>Submit</Text>
+                                                    </TouchableOpacity>
                                                 )} */}
-                                            <TouchableOpacity style={[commonStyles.button, { marginBottom: 20 }]} activeOpacity={0.8} onPress={handleExperienceModalSubmit}>
-                                                <Text style={commonStyles.buttonText}>Submit</Text>
-                                            </TouchableOpacity>
-                                        </ScrollView>
+
+
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: 20, }]} activeOpacity={0.8} onPress={handleExperienceModalSubmit}>
+                                            <Text style={commonStyles.buttonText}>Submit</Text>
+                                        </TouchableOpacity>
                                     </TouchableOpacity>
                                 </Modal>
 
+                            </View>
+
+                            <View style={styles.inputContainerWithLabel}>
+                                <Text style={[commonStyles.headerText4BL, { marginBottom: moderateScale(8), }]}>
+                                    Registration Number <Text style={styles.requiredIndicator}>*</Text>
+                                </Text>
+                                <View style={styles.inputContainer1}>
+                                    <TextInput
+                                        style={styles.inputs}
+                                        placeholder="Registration Number"
+                                        placeholderTextColor="#979797"
+                                        value={registerNumber}
+                                        onChangeText={(text) => setRegisterNumber(text)}
+                                        underlineColorAndroid="transparent"
+                                    />
+                                </View>
                             </View>
 
                             <View style={styles.inputContainerWithLabel}>
@@ -542,30 +555,31 @@ const NDProfileCompletion5 = ({ navigation }) => {
                                         style={styles.inputs}
                                         placeholder="upi@okicici"
                                         placeholderTextColor="#979797"
-                                        //value={selectedEmail}
-                                        //onChangeText={(text) => setSelectedEmail(text)}
+                                        value={paymentLink}
+                                        onChangeText={(text) => setPaymentLink(text)}
                                         underlineColorAndroid="transparent"
                                     />
                                 </View>
                             </View>
-
+                            {/* Continue Button */}
+                            <TouchableOpacity
+                                style={[commonStyles.button]}
+                                // onPress={() => {
+                                //     navigation.navigate('ProfileCompletion6');
+                                //     console.log('ProfileCompletion21');
+                                // }}
+                                onPress={handleNext}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={commonStyles.buttonText}>Continue</Text>
+                            </TouchableOpacity>
 
 
 
 
                         </View>
                     </ScrollView>
-                    {/* Continue Button */}
-                    <TouchableOpacity
-                        style={[commonStyles.button, styles.continueButton]}
-                        onPress={() => {
-                            navigation.navigate('NDProfileCompletion6');
-                            console.log('ProfileCompletion21');
-                        }}
-                        activeOpacity={0.8}
-                    >
-                        <Text style={commonStyles.buttonText}>Continue</Text>
-                    </TouchableOpacity>
+
                 </View>
             )}
         </SafeAreaView>
@@ -598,10 +612,13 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         backgroundColor: '#FEFCFC',
-        padding: 20,
+        paddingVertical: 20,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        maxHeight: '90%', // Maximum height of 50%
+        paddingHorizontal: moderateScale(16),
+        maxHeight: '95%',
+        minHeight: 100,
+        paddingBottom: 30,
     },
     modalInput: {
         borderWidth: 1,
@@ -634,7 +651,7 @@ const styles = StyleSheet.create({
     headerTextContainer: {
         width: '100%',
         alignItems: 'center',
-        //zIndex: 1,
+        marginBottom: 20,
     },
     headerText1: {
         fontSize: 24,

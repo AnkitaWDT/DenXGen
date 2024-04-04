@@ -13,6 +13,7 @@ import {
     TouchableWithoutFeedback,
     FlatList,
     Picker,
+    ToastAndroid,
     PixelRatio
 } from 'react-native';
 import CustomYearPicker from '../../components/CustomYearPicker';
@@ -22,6 +23,8 @@ import Animation from '../../components/Loader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale } from 'react-native-size-matters';
 import { ProgressBar } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const { width, height } = Dimensions.get('window');
 
@@ -35,12 +38,12 @@ const responsiveFontSize = (size) => {
 const NDProfileCompletion6 = ({ navigation }) => {
 
 
-    const [isYearPickerVisible, setYearPickerVisible] = useState(false);
-    const [yearPickerType, setYearPickerType] = useState(null);
+    // const [isYearPickerVisible, setYearPickerVisible] = useState(false);
+    // const [yearPickerType, setYearPickerType] = useState(null);
 
 
-    const [isMonthPickerVisible, setMonthPickerVisible] = useState(false);
-    const [monthPickerType, setMonthPickerType] = useState(null);
+    // const [isMonthPickerVisible, setMonthPickerVisible] = useState(false);
+    // const [monthPickerType, setMonthPickerType] = useState(null);
 
     const [selectedSinceYears, setSelectedSinceYears] = useState({});
     const [selectedUptoYears, setSelectedUptoYears] = useState({});
@@ -53,91 +56,105 @@ const NDProfileCompletion6 = ({ navigation }) => {
     const [sinceMonthPickerType, setSinceMonthPickerType] = useState(null);
 
     const [EduInputs, setEduInputs] = useState([]);
-    const [EducationInputs, setEducationInputs] = useState([]);
-    const [ExpInputs, setExpInputs] = useState([]);
-    const [EduModalVisible, setEduModalVisible] = useState(false);
-    const [ExpModalVisible, setExpModalVisible] = useState(false);
-    const [EducationModalVisible, setEducationModalVisible] = useState(false);
-    const [newInputValue, setNewInputValue] = useState('');
-    const [newInputValue1, setNewInputValue1] = useState('');
+    // const [EducationInputs, setEducationInputs] = useState([]);
+    // const [ExpInputs, setExpInputs] = useState([]);
+    // const [EduModalVisible, setEduModalVisible] = useState(false);
+    // const [ExpModalVisible, setExpModalVisible] = useState(false);
+    // const [EducationModalVisible, setEducationModalVisible] = useState(false);
+    // const [newInputValue, setNewInputValue] = useState('');
+    // const [newInputValue1, setNewInputValue1] = useState('');
 
-    const [selectedFromYear, setSelectedFromYear] = useState(null);
-    const [selectedFromMonth, setSelectedFromMonth] = useState(null);
+    // const [selectedFromYear, setSelectedFromYear] = useState(null);
+    // const [selectedFromMonth, setSelectedFromMonth] = useState(null);
 
-    const [selectedToYear, setSelectedToYear] = useState(null);
-    const [selectedToMonth, setSelectedToMonth] = useState(null);
-
-
-    const handleFromYearSelect = (year) => {
-        setSelectedFromYear(year);
-    };
-
-    const handleFromMonthSelect = (month) => {
-        setSelectedFromMonth(month);
-    };
-
-    const handleToYearSelect = (year) => {
-        setSelectedToYear(year);
-    };
-
-    const handleToMonthSelect = (month) => {
-        setSelectedToMonth(month);
-    };
+    // const [selectedToYear, setSelectedToYear] = useState(null);
+    // const [selectedToMonth, setSelectedToMonth] = useState(null);
 
 
+    // const handleFromYearSelect = (year) => {
+    //   setSelectedFromYear(year);
+    // };
+
+    // const handleFromMonthSelect = (month) => {
+    //   setSelectedFromMonth(month);
+    // };
+
+    // const handleToYearSelect = (year) => {
+    //   setSelectedToYear(year);
+    // };
+
+    // const handleToMonthSelect = (month) => {
+    //   setSelectedToMonth(month);
+    // };
 
 
-    const handleRemoveEducationInput = (indexToRemove) => {
-        const updatedEducation = EducationInputs.filter((_, index) => index !== indexToRemove);
-        setEducationInputs(updatedEducation);
-    };
 
 
-    const handleRemoveExpInput = (indexToRemove) => {
-        const updatedExp = ExpInputs.filter((_, index) => index !== indexToRemove);
-        setExpInputs(updatedExp);
-    };
+    // const handleRemoveEducationInput = (indexToRemove) => {
+    //   const updatedEducationInputs = EducationInputs.filter((_, index) => index !== indexToRemove);
+    //   setEducationInputs(updatedEducationInputs);
+    // };
 
 
-    const handleAddEducationInput = () => {
-        if (EducationInputs.length < 5) {
-            setEducationModalVisible(true);
-        }
-    };
-
-    const handleAddExpInput = () => {
-        if (ExpInputs.length < 5) {
-            setExpModalVisible(true);
-        }
-    };
+    // const handleRemoveExpInput = (indexToRemove) => {
+    //   const updatedExp = ExpInputs.filter((_, index) => index !== indexToRemove);
+    //   setExpInputs(updatedExp);
+    // };
 
 
-    const handleEducationModalSubmit = () => {
-        if (EducationInputs.length < 5) {
-            const newInputs = [...EducationInputs, newInputValue];
-            setEducationInputs(newInputs);
-        }
-        setEducationModalVisible(false);
-        setNewInputValue('');
-    };
+    // const handleAddEducationInput = () => {
+    //   setEducationModalVisible(true);
+    // };
 
-    const handleExpModalSubmit = () => {
-        if (ExpInputs.length < 5) {
-            const newInputs = [...ExpInputs, newInputValue];
-            setExpInputs(newInputs);
-        }
-        setExpModalVisible(false);
-        setNewInputValue('');
-    };
+    // const handleEducationModalSubmit = () => {
+    //   setEducationInputs([...EducationInputs, { Institute: newInputValue, Degree: newInputValue1 }]);
+    //   setNewInputValue('');
+    //   setNewInputValue1('');
+    //   setEducationModalVisible(false);
+    // };
 
-    const handleEduModalSubmit = (e) => {
-        if (EduInputs.length < 5) {
-            const newInputs = [...EduInputs, newInputValue]; // <-- Changed newInputValue to newInputValue1
-            setEduInputs(newInputs);
-        }
-        setEduModalVisible(false);
-        setNewInputValue1(''); // <-- Reset newInputValue1
-    };
+    // const handleAddExpInput = () => {
+    //   if (ExpInputs.length < 5) {
+    //     setExpModalVisible(true);
+    //   }
+    // };
+
+    // const handleEducationModalSubmit = () => {
+    //   if (EducationInputs.length < 5 && newInputValue1 && newInputValue && selectedFromYear && selectedFromMonth && selectedToYear && selectedToMonth) {
+    //     const newInputs = [
+    //       ...EducationInputs,
+    //       {
+    //         Degree: newInputValue1,
+    //         InstituteName: newInputValue,
+    //         StartDate: { year: selectedFromYear, month: selectedFromMonth },
+    //         EndDate: { year: selectedToYear, month: selectedToMonth }
+    //       }
+    //     ];
+    //     setEducationInputs(newInputs);
+    //   }
+    //   setEducationModalVisible(false);
+    //   setNewInputValue('');
+    //   setNewInputValue1('');
+    // };
+
+
+    // const handleExpModalSubmit = () => {
+    //   if (ExpInputs.length < 5) {
+    //     const newInputs = [...ExpInputs, newInputValue];
+    //     setExpInputs(newInputs);
+    //   }
+    //   setExpModalVisible(false);
+    //   setNewInputValue('');
+    // };
+
+    // const handleEduModalSubmit = () => {
+    //   if (EduInputs.length < 5) {
+    //     const newInputs = [...EduInputs, newInputValue1];
+    //     setEduInputs(newInputs);
+    //   }
+    //   setEduModalVisible(false); // Close the modal
+    //   setNewInputValue1(''); // Reset newInputValue1
+    // };
 
 
     const [isLoading, setIsLoading] = useState(true);
@@ -171,25 +188,29 @@ const NDProfileCompletion6 = ({ navigation }) => {
 
 
     const toggleYearPicker = () => {
-        setYearPickerVisible(!isYearPickerVisible);
+        setIsYearPickerVisible(!isYearPickerVisible);
     };
 
-    const toggleFromYearPicker = (sectionId) => {
-        setYearPickerVisible(!isYearPickerVisible);
-        //setActiveSection(sectionId);
-        setYearPickerType('from');
-    };
+    // const toggleFromYearPicker = (sectionId) => {
+    //   setYearPickerVisible(!isYearPickerVisible);
+    //   //setActiveSection(sectionId);
+    //   setYearPickerType('from');
+    // };
 
-    const toggleToYearPicker = (sectionId) => {
-        setYearPickerVisible(!isYearPickerVisible);
-        //setActiveSection(sectionId);
-        setYearPickerType('to');
-    };
+    // const toggleToYearPicker = (sectionId) => {
+    //   setYearPickerVisible(!isYearPickerVisible);
+    //   //setActiveSection(sectionId);
+    //   setYearPickerType('to');
+    // };
 
 
 
     const toggleMonthPicker = () => {
-        setMonthPickerVisible(!isMonthPickerVisible);
+        setIsExpMonthPickerVisible(!isExpMonthPickerVisible);
+    };
+
+    const toggleExpMonthPicker = () => {
+        setIsExpMonthPickerVisible(!isExpMonthPickerVisible);
     };
 
     const toggleSinceMonthPicker = (sectionId) => {
@@ -200,33 +221,293 @@ const NDProfileCompletion6 = ({ navigation }) => {
 
 
 
-    const toggleFromMonthPicker = (sectionId) => {
-        setMonthPickerVisible(!isMonthPickerVisible);
-        ///setActiveSection(sectionId);
+    // const toggleFromMonthPicker = (sectionId) => {
+    //   setMonthPickerVisible(!isMonthPickerVisible);
+    //   ///setActiveSection(sectionId);
+    //   setMonthPickerType('from');
+    // };
+
+    // const toggleToMonthPicker = (sectionId) => {
+    //   setMonthPickerVisible(!isMonthPickerVisible);
+    //   //setActiveSection(sectionId);
+    //   setMonthPickerType('to');
+    // };
+
+    // const handleCurrentlyWorkingToggle = () => {
+    //   setCurrentlyWorking(!currentlyWorking);
+    // };
+
+    const [userData, setUserData] = useState(null);
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                const id = parseInt(pr_id);
+
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getvic-ax.php?prid=${id}`);
+                const data = await response.json();
+                setUserData(data.data);
+                setEducationInputs(data.data.eduList);
+                setExpInputs(data.data.woexpList);
+                setIsLoading(false);
+            } catch (error) {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData(); // Call the function immediately
+
+    }, []);
+
+
+    const [newInputValue, setNewInputValue] = useState('');
+    const [newInputValue1, setNewInputValue1] = useState('');
+    const [instituteName, setInstituteName] = useState('');
+    const [EducationInputs, setEducationInputs] = useState([]);
+    const [EducationModalVisible, setEducationModalVisible] = useState(false);
+    const [selectedFromYear, setSelectedFromYear] = useState(null);
+    const [selectedFromMonth, setSelectedFromMonth] = useState(null);
+    const [selectedToYear, setSelectedToYear] = useState(null);
+    const [selectedToMonth, setSelectedToMonth] = useState(null);
+    const [isYearPickerVisible, setIsYearPickerVisible] = useState(false);
+    const [isMonthPickerVisible, setIsMonthPickerVisible] = useState(false);
+    const [yearPickerType, setYearPickerType] = useState('');
+    const [monthPickerType, setMonthPickerType] = useState('');
+
+    const handleAddEducationInput = () => {
+        // Reset state variables for date pickers
+        setSelectedFromYear(null);
+        setSelectedFromMonth(null);
+        setSelectedToYear(null);
+        setSelectedToMonth(null);
+        setIsYearPickerVisible(false);
+        setIsMonthPickerVisible(false);
+        setYearPickerType('');
+        setMonthPickerType('');
+        setEducationModalVisible(true);
+    };
+
+    const handleRemoveEducationInput = (indexToRemove) => {
+        const updatedEducationInputs = EducationInputs.filter((_, index) => index !== indexToRemove);
+        setEducationInputs(updatedEducationInputs);
+    };
+
+    const handleEducationModalSubmit = () => {
+        setEducationInputs(prevInputs => [
+            ...prevInputs,
+            {
+                institute: newInputValue,
+                Degree: newInputValue1,
+                StartMonth: selectedFromMonth,
+                StartYear: selectedFromYear,
+                EndMonth: selectedToMonth,
+                EndYear: selectedToYear, // Combine selected month and year for end date
+            }
+        ]);
+        setNewInputValue('');
+        setNewInputValue1('');
+        setSelectedFromYear(null);
+        setSelectedFromMonth(null);
+        setSelectedToYear(null);
+        setSelectedToMonth(null);
+        setEducationModalVisible(false);
+    };
+
+
+
+    const toggleFromYearPicker = () => {
+        setIsYearPickerVisible(!isYearPickerVisible);
+        setYearPickerType('from');
+    };
+
+    const handleFromYearSelect = (year) => {
+        setSelectedFromYear(year);
+        setIsYearPickerVisible(false);
+    };
+
+    const toggleFromMonthPicker = () => {
+        setIsMonthPickerVisible(!isMonthPickerVisible);
         setMonthPickerType('from');
     };
 
-    const toggleToMonthPicker = (sectionId) => {
-        setMonthPickerVisible(!isMonthPickerVisible);
-        //setActiveSection(sectionId);
+    const handleFromMonthSelect = (month) => {
+        setSelectedFromMonth(month);
+        setIsMonthPickerVisible(false);
+    };
+
+    const toggleToYearPicker = () => {
+        setIsYearPickerVisible(!isYearPickerVisible);
+        setYearPickerType('to');
+    };
+
+    const handleToYearSelect = (year) => {
+        setSelectedToYear(year);
+        setIsYearPickerVisible(false);
+    };
+
+    const toggleToMonthPicker = () => {
+        setIsMonthPickerVisible(!isMonthPickerVisible);
         setMonthPickerType('to');
     };
 
+    const handleToMonthSelect = (month) => {
+        setSelectedToMonth(month);
+        setIsMonthPickerVisible(false);
+    };
 
 
-    const [currentlyWorking, setCurrentlyWorking] = useState(false)
+    const [newInputValue2, setNewInputValue2] = useState('');
+    const [newInputValue3, setNewInputValue3] = useState('');
+    const [ExpInputs, setExpInputs] = useState([]);
+    const [ExpModalVisible, setExpModalVisible] = useState(false);
+    const [selectedExpFromYear, setSelectedExpFromYear] = useState(null);
+    const [selectedExpFromMonth, setSelectedExpFromMonth] = useState(null);
+    const [selectedExpToYear, setSelectedExpToYear] = useState(null);
+    const [selectedExpToMonth, setSelectedExpToMonth] = useState(null);
+    const [isExpYearPickerVisible, setIsExpYearPickerVisible] = useState(false);
+    const [isExpMonthPickerVisible, setIsExpMonthPickerVisible] = useState(false);
+    const [expYearPickerType, setExpYearPickerType] = useState('');
+    const [expMonthPickerType, setExpMonthPickerType] = useState('');
+    const [currentlyWorking, setCurrentlyWorking] = useState(false);
 
 
+    const handleAddExpInput = () => {
+        setSelectedExpFromYear(null);
+        setSelectedExpFromMonth(null);
+        setSelectedExpToYear(null);
+        setSelectedExpToMonth(null);
+        setIsExpYearPickerVisible(false);
+        setIsExpMonthPickerVisible(false);
+        setExpYearPickerType('');
+        setExpMonthPickerType('');
+        setExpModalVisible(true);
+    };
+
+    const handleRemoveExpInput = (indexToRemove) => {
+        const updatedExpInputs = ExpInputs.filter((_, index) => index !== indexToRemove);
+        setExpInputs(updatedExpInputs);
+    };
+
+
+    const handleExpModalSubmit = () => {
+        setExpInputs(prevInputs => [
+            ...prevInputs,
+            {
+                company: newInputValue2,
+                Designation: newInputValue3,
+                StartMonth: selectedExpFromMonth,
+                StartYear: selectedExpFromYear,
+                EndMonth: selectedExpToMonth,
+                EndYear: selectedExpToYear,
+                // StartDate: selectedExpFromMonth + ' ' + selectedExpFromYear,
+                // EndDate: currentlyWorking ? 'null' : (selectedExpToMonth + ' ' + selectedExpToYear),
+            }
+        ]);
+        setNewInputValue2('');
+        setNewInputValue3('');
+        setSelectedExpFromYear(null);
+        setSelectedExpFromMonth(null);
+        setSelectedExpToYear(null);
+        setSelectedExpToMonth(null);
+        setExpModalVisible(false);
+    };
+
+    const toggleExpFromYearPicker = () => {
+        setIsExpYearPickerVisible(!isExpYearPickerVisible);
+        setExpYearPickerType('from');
+    };
+
+    const handleExpFromYearSelect = (year) => {
+        setSelectedExpFromYear(year);
+        setIsExpYearPickerVisible(false);
+    };
+
+    const toggleExpFromMonthPicker = () => {
+        setIsExpMonthPickerVisible(!isExpMonthPickerVisible);
+        setExpMonthPickerType('from');
+    };
+
+    const handleExpFromMonthSelect = (month) => {
+        setSelectedExpFromMonth(month);
+        setIsExpMonthPickerVisible(false);
+    };
+
+    const toggleExpToYearPicker = () => {
+        setIsExpYearPickerVisible(!isExpYearPickerVisible);
+        setExpYearPickerType('to');
+    };
+
+    const handleExpToYearSelect = (year) => {
+        setSelectedExpToYear(year);
+        setIsExpYearPickerVisible(false);
+    };
+
+    const toggleExpToMonthPicker = () => {
+        setIsExpMonthPickerVisible(!isExpMonthPickerVisible);
+        setExpMonthPickerType('to');
+    };
+
+    const handleExpToMonthSelect = (month) => {
+        setSelectedExpToMonth(month);
+        setIsExpMonthPickerVisible(false);
+    };
 
     const handleCurrentlyWorkingToggle = () => {
         setCurrentlyWorking(!currentlyWorking);
     };
 
+
+    const handleNext = async () => {
+        const pr_id = await AsyncStorage.getItem('pr_id');
+        const id = parseInt(pr_id);
+
+        const edu_id = EducationInputs.map(edu => ({
+            institute: edu.institute,
+            degree: edu.Degree,
+            start_month: edu.StartMonth,
+            start_year: edu.StartYear,
+            end_month: edu.EndMonth,
+            end_year: edu.EndYear,
+        }));
+
+        // Map over WorkExperience array and transform each item
+        const wo_exp_id = ExpInputs.map(exp => ({
+            company: exp.company,
+            designation: exp.Designation,
+            start_month: exp.StartMonth,
+            start_year: exp.StartYear,
+            end_month: exp.EndMonth,
+            end_year: exp.EndYear,
+        }));
+
+        const userData = {
+            pr_id: id,
+            edu_id,
+            wo_exp_id,
+        };
+
+        console.log('User Data:', userData);
+
+        try {
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls6-ax.php`, userData);
+
+            console.log('dataresponse', response.data);
+            ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
+            navigation.navigate('EditProfile')
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+        
+    };
+
+
+
     const currentStep = 6; // For example, current step is 4
     const totalSteps = 9; // Total number of steps
-
     const progressPercentage = (currentStep / totalSteps) * 100; // Calculate progress percentage
-    console.log("Progress Percentage:", progressPercentage);
+    //console.log("Progress Percentage:", progressPercentage);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -243,160 +524,155 @@ const NDProfileCompletion6 = ({ navigation }) => {
                             <View style={styles.headerTextContainer}>
                                 <Text style={[commonStyles.headerText1BL, {
                                     marginBottom: moderateScale(6), textAlign: 'center'
-                                }]}>Step 6 - Career Details</Text>
+                                }]}>Career Details</Text>
                                 <Text style={[commonStyles.headerText2BL, {
                                     textAlign: 'center', paddingHorizontal: width * 0.02
                                 }]}>Choose your career category and unlock endless possibilities.</Text>
-                                {/* <Image source={require('../../../assets/img/Prog2.png')} style={commonStyles.progImage} /> */}
-                                <ProgressBar
-                                    progress={progressPercentage / 100}
-                                    color="#00B0FF"
-                                    style={commonStyles.progImage}
-                                />
+
                             </View>
 
-
                             <View style={styles.inputContainerWithLabel}>
-                                <Text style={[commonStyles.headerText4BL, { marginBottom: height * 0.005 }]}>
+                                <Text style={[commonStyles.headerText4BL, { marginBottom: 8 }]}>
                                     Educational Qualification <Text style={styles.requiredIndicator}>*</Text>
                                 </Text>
-                                {EducationInputs.map((value, index) => (
-                                    <View key={index} style={styles.educationInputContainer}>
-                                        <TextInput
-                                            style={styles.inputs}
-                                            placeholder="Educational Qualification"
-                                            placeholderTextColor="#979797"
-                                            value={value}
-                                            underlineColorAndroid="transparent"
-                                        />
-                                        <TouchableOpacity onPress={() => handleRemoveEducationInput(index)} style={styles.closeContainer} activeOpacity={0.8}>
-                                            <Image
-                                                source={require('../../../assets/img/close.png')}
-                                                style={styles.closeImage}
+                                    {EducationInputs.map((value, index) => (
+                                        <View key={index} style={[styles.inputContainer1, index !== EducationInputs.length - 1 && { marginHorizontal: 10 }]}>
+                                            <TextInput
+                                                style={styles.inputs}
+                                                placeholder="Enter Institute Name"
+                                                placeholderTextColor="#979797"
+                                                value={value.institute}
+                                                underlineColorAndroid="transparent"
+                                                editable={false}
                                             />
-                                        </TouchableOpacity>
-                                    </View>
-                                ))}
-                                {EducationInputs.length < 5 && (
-                                    <TouchableOpacity onPress={handleAddEducationInput} style={styles.inputContainer1} activeOpacity={0.8}>
-                                        <Text style={[styles.inputsP, { textAlignVertical: 'center' }]}>Add Educational Qualification</Text>
-                                    </TouchableOpacity>
-                                )}
-                                <Modal visible={EducationModalVisible} transparent>
-                                    <TouchableWithoutFeedback
-                                        onPress={() => setEducationModalVisible(false)}
-
-                                    >
-                                        <View style={styles.modalContainer}>
-                                            <TouchableWithoutFeedback>
-                                                <ScrollView style={styles.modalContent}>
-                                                    <View style={styles.horizontalLine}></View>
-                                                    <Text style={[commonStyles.headerText11BL, { marginVertical: height * 0.02 }]}>Educational Qualification
-                                                        <Text style={commonStyles.headerText3G}> (up to 5)</Text>
-                                                    </Text>
-                                                    <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
-                                                        Note: Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum
-                                                    </Text>
-                                                    <View style={[styles.inputContainer1]}>
-                                                        <TextInput
-                                                            style={styles.inputs}
-                                                            placeholder="Enter Institute Name"
-                                                            placeholderTextColor="#979797"
-                                                            value={newInputValue}
-                                                            onChangeText={setNewInputValue}
-                                                        />
-                                                    </View>
-                                                    <View style={[styles.inputContainer1]}>
-                                                        <TextInput
-                                                            style={styles.inputs}
-                                                            placeholder="Enter Degree"
-                                                            placeholderTextColor="#979797"
-                                                            value={newInputValue1}
-                                                            onChangeText={setNewInputValue1}
-                                                        />
-                                                    </View>
-                                                    <View style={styles.dropdownContainer}>
-                                                        <Text style={[commonStyles.headerText2BL, { marginBottom: height * 0.02, textDecorationLine: 'underline' }]}>Start Date</Text>
-                                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-
-                                                            <View style={{ flexDirection: 'row' }}>
-                                                                <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Year:</Text>
-                                                                <TouchableOpacity
-                                                                    onPress={() => toggleFromYearPicker()}
-                                                                    style={styles.yearDropdown}
-                                                                >
-                                                                    <Text style={{ color: '#000', alignSelf: 'center' }}>{selectedFromYear ? selectedFromYear.toString() : 'Year'}</Text>
-                                                                </TouchableOpacity>
-                                                            </View>
-
-                                                            {/* Custom Year Picker Modal */}
-                                                            {isYearPickerVisible && yearPickerType === 'from' && (
-                                                                <CustomYearPicker onSelectYear={handleFromYearSelect} onClose={toggleYearPicker} initialSelectedYear={selectedFromYear} />
-                                                            )}
-
-                                                            <View style={{ flexDirection: 'row' }}>
-                                                                <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Month:</Text>
-                                                                <TouchableOpacity
-                                                                    onPress={() => toggleFromMonthPicker()}
-                                                                    style={styles.yearDropdown}
-                                                                >
-                                                                    <Text style={{ color: '#000' }}>{selectedFromMonth ? selectedFromMonth.toString() : 'Month'}</Text>
-                                                                </TouchableOpacity>
-                                                            </View>
-
-                                                            {isMonthPickerVisible && monthPickerType === 'from' && (
-                                                                <CustomMonthPicker onSelectMonth={handleFromMonthSelect} onClose={toggleMonthPicker} />
-                                                            )}
-
-                                                        </View>
-                                                    </View>
-
-                                                    <View>
-                                                        <Text style={[commonStyles.headerText2BL, { marginVertical: height * 0.02, textDecorationLine: 'underline' }]}>End Date (or expected)</Text>
-                                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-
-                                                            <View style={{ flexDirection: 'row' }}>
-                                                                <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Year:</Text>
-                                                                <TouchableOpacity
-                                                                    onPress={() => toggleToYearPicker()}
-                                                                    style={styles.yearDropdown}
-                                                                >
-                                                                    <Text style={{ color: '#000' }}>{selectedToYear ? selectedToYear.toString() : 'Year'}</Text>
-                                                                </TouchableOpacity>
-                                                            </View>
-
-                                                            {/* Custom Year Picker Modal */}
-                                                            {isYearPickerVisible && yearPickerType === 'to' && (
-                                                                <CustomYearPicker onSelectYear={handleToYearSelect} onClose={toggleYearPicker} initialSelectedYear={selectedToYear} />
-                                                            )}
-
-                                                            <View style={{ flexDirection: 'row' }}>
-                                                                <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Month:</Text>
-                                                                <TouchableOpacity
-                                                                    onPress={() => toggleToMonthPicker()}
-                                                                    style={styles.yearDropdown}
-                                                                >
-                                                                    <Text style={{ color: '#000' }}>{selectedToMonth ? selectedToMonth.toString() : 'Month'}</Text>
-                                                                </TouchableOpacity>
-                                                            </View>
-
-                                                            {isMonthPickerVisible && monthPickerType === 'to' && (
-                                                                <CustomMonthPicker onSelectMonth={handleToMonthSelect} onClose={toggleMonthPicker} />
-                                                            )}
-
-                                                        </View>
-                                                    </View>
-                                                    <TouchableOpacity
-                                                        style={[commonStyles.button]}
-                                                        onPress={handleEduModalSubmit}
-                                                        activeOpacity={0.8}
-                                                    >
-                                                        <Text style={commonStyles.buttonText}>Submit</Text>
-                                                    </TouchableOpacity>
-                                                </ScrollView>
-                                            </TouchableWithoutFeedback>
+                                            <TouchableOpacity onPress={() => handleRemoveEducationInput(index)} style={styles.closeContainer} activeOpacity={0.8}>
+                                                <Image
+                                                    source={require('../../../assets/img/close.png')}
+                                                    style={styles.closeImage}
+                                                />
+                                            </TouchableOpacity>
                                         </View>
-                                    </TouchableWithoutFeedback>
+                                    ))}
+                                    {/* Add new Education input */}
+                                    {EducationInputs.length < 5 && (
+                                        <TouchableOpacity onPress={handleAddEducationInput} style={[styles.inputContainer1, { marginHorizontal: 10 }]} activeOpacity={0.8}>
+                                            <Text style={[styles.inputsP, { textAlignVertical: 'center' }]}>Add Educational Qualification</Text>
+                                        </TouchableOpacity>
+                                    )}
+
+                                <Modal visible={EducationModalVisible} transparent onRequestClose={() => setEducationModalVisible(false)}>
+                                    <TouchableOpacity activeOpacity={0.8} style={styles.modalContainer} onPress={() => setEducationModalVisible(false)}>
+                                        <TouchableOpacity style={styles.modalContent} activeOpacity={1} onPress={() => { }}>
+                                            <ScrollView>
+                                                <View style={styles.horizontalLine}></View>
+                                                <Text style={[commonStyles.headerText2BL, { marginVertical: height * 0.02 }]}>Educational Qualification
+                                                    <Text style={commonStyles.headerText3G}> (up to 5)</Text>
+                                                </Text>
+                                                <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
+                                                    Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
+                                                </Text>
+                                                <View style={[styles.inputContainer1]}>
+                                                    <TextInput
+                                                        style={styles.inputs}
+                                                        placeholder="Enter Institute Name"
+                                                        placeholderTextColor="#979797"
+                                                        value={newInputValue}
+                                                        onChangeText={setNewInputValue}
+                                                    />
+                                                </View>
+                                                <View style={[styles.inputContainer1]}>
+                                                    <TextInput
+                                                        style={styles.inputs}
+                                                        placeholder="Enter Degree"
+                                                        placeholderTextColor="#979797"
+                                                        value={newInputValue1}
+                                                        onChangeText={setNewInputValue1}
+                                                    />
+                                                </View>
+                                                <View style={styles.dropdownContainer}>
+                                                    <Text style={[commonStyles.headerText2BL, { marginBottom: height * 0.02, textDecorationLine: 'underline' }]}>Start Date</Text>
+                                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+
+
+                                                        <View style={{ flexDirection: 'row' }}>
+                                                            <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Month  :</Text>
+                                                            <TouchableOpacity
+                                                                onPress={() => toggleFromMonthPicker()}
+                                                                style={styles.yearDropdown}
+                                                            >
+                                                                <Text style={[commonStyles.headerText3BL, { color: '#000', fontSize: 15 }]}>{selectedFromMonth ? selectedFromMonth.toString() : 'Month'}</Text>
+                                                            </TouchableOpacity>
+                                                        </View>
+
+                                                        {isMonthPickerVisible && monthPickerType === 'from' && (
+                                                            <CustomMonthPicker onSelectMonth={handleFromMonthSelect} onClose={toggleFromMonthPicker} />
+                                                        )}
+
+
+                                                        <View style={{ flexDirection: 'row' }}>
+                                                            <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Year  :</Text>
+                                                            <TouchableOpacity
+                                                                onPress={() => toggleFromYearPicker()}
+                                                                style={styles.yearDropdown}
+                                                            >
+                                                                <Text style={[commonStyles.headerText3BL, { color: '#000', fontSize: 15 }]}>{selectedFromYear ? selectedFromYear.toString() : 'Year'}</Text>
+                                                            </TouchableOpacity>
+                                                        </View>
+
+                                                        {isYearPickerVisible && yearPickerType === 'from' && (
+                                                            <CustomYearPicker onSelectYear={handleFromYearSelect} onClose={toggleFromYearPicker} initialSelectedYear={selectedFromYear} />
+                                                        )}
+
+                                                    </View>
+                                                </View>
+
+                                                <View>
+                                                    <Text style={[commonStyles.headerText2BL, { marginVertical: height * 0.02, textDecorationLine: 'underline' }]}>End Date (or expected)</Text>
+                                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+
+
+                                                        <View style={{ flexDirection: 'row' }}>
+                                                            <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Month  :</Text>
+                                                            <TouchableOpacity
+                                                                onPress={() => toggleToMonthPicker()}
+                                                                style={styles.yearDropdown}
+                                                            >
+                                                                <Text style={[commonStyles.headerText3BL, { color: '#000', fontSize: 15 }]}>{selectedToMonth ? selectedToMonth.toString() : 'Month'}</Text>
+                                                            </TouchableOpacity>
+                                                        </View>
+
+                                                        {isMonthPickerVisible && monthPickerType === 'to' && (
+                                                            <CustomMonthPicker onSelectMonth={handleToMonthSelect} onClose={toggleToMonthPicker} />
+                                                        )}
+
+
+                                                        <View style={{ flexDirection: 'row' }}>
+                                                            <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Year  :</Text>
+                                                            <TouchableOpacity
+                                                                onPress={() => toggleToYearPicker()}
+                                                                style={styles.yearDropdown}
+                                                            >
+                                                                <Text style={[commonStyles.headerText3BL, { color: '#000', fontSize: 15 }]}>{selectedToYear ? selectedToYear.toString() : 'Year'}</Text>
+                                                            </TouchableOpacity>
+                                                        </View>
+
+                                                        {isYearPickerVisible && yearPickerType === 'to' && (
+                                                            <CustomYearPicker onSelectYear={handleToYearSelect} onClose={toggleToYearPicker} initialSelectedYear={selectedToYear} />
+                                                        )}
+
+                                                    </View>
+                                                </View>
+                                                <TouchableOpacity
+                                                    style={[commonStyles.button]}
+                                                    onPress={handleEducationModalSubmit}
+                                                    activeOpacity={0.8}
+                                                >
+                                                    <Text style={commonStyles.buttonText}>Submit</Text>
+                                                </TouchableOpacity>
+                                            </ScrollView>
+
+                                        </TouchableOpacity>
+                                    </TouchableOpacity>
                                 </Modal>
                             </View>
 
@@ -404,105 +680,100 @@ const NDProfileCompletion6 = ({ navigation }) => {
                                 <Text style={[commonStyles.headerText4BL, { marginBottom: height * 0.005 }]}>
                                     Work Experience <Text style={styles.requiredIndicator}>*</Text>
                                 </Text>
-                                {ExpInputs.map((value, index) => (
-                                    <View style={[styles.inputContainer1]}>
-                                        <TextInput
-                                            style={styles.inputs}
-                                            placeholder="Work Experience *"
-                                            placeholderTextColor="#979797"
-                                            value={value}
-                                            underlineColorAndroid="transparent"
-                                        />
-                                        <TouchableOpacity onPress={() => handleRemoveExpInput(index)} style={styles.closeContainer} activeOpacity={0.8}>
-                                            <Image
-                                                source={require('../../../assets/img/close.png')} // Close image for removing key forte
-                                                style={styles.closeImage}
+                                    {ExpInputs.map((value, index) => (
+                                        <View key={index} style={[styles.inputContainer1, index !== ExpInputs.length - 1 && { marginHorizontal: 10 }]}>
+                                            <TextInput
+                                                style={styles.inputs}
+                                                placeholder="Enter Company"
+                                                placeholderTextColor="#979797"
+                                                value={value.company}
+                                                underlineColorAndroid="transparent"
+                                                editable={false}
                                             />
+                                            <TouchableOpacity onPress={() => handleRemoveExpInput(index)} style={styles.closeContainer} activeOpacity={0.8}>
+                                                <Image
+                                                    source={require('../../../assets/img/close.png')}
+                                                    style={styles.closeImage}
+                                                />
+                                            </TouchableOpacity>
+                                        </View>
+                                    ))}
+                                    {/* Add new Experience input */}
+                                    {ExpInputs.length < 5 && (
+                                        <TouchableOpacity onPress={handleAddExpInput} style={[styles.inputContainer1, { marginHorizontal: 10 }]} activeOpacity={0.8}>
+                                            <Text style={[styles.inputsP, { textAlignVertical: 'center' }]}>Add Work Experience</Text>
                                         </TouchableOpacity>
-                                    </View>
-                                ))}
-                                {ExpInputs.length < 5 && (
-                                    <TouchableOpacity onPress={handleAddExpInput} style={styles.inputContainer1} activeOpacity={0.8}>
-                                        <Text style={[styles.inputsP, { textAlignVertical: 'center' }]}>Add Work Experience</Text>
-                                    </TouchableOpacity>
-                                )}
+                                    )}
 
-                                {/* Modal for adding new input */}
-                                <Modal visible={ExpModalVisible} animationType="slide" transparent>
-                                    <TouchableOpacity
-                                        style={styles.modalContainer}
-                                        onPress={() => setExpModalVisible(false)}
-                                        activeOpacity={1} // Prevents the touchable opacity from immediately closing the modal
-                                    >
-                                        <ScrollView style={styles.modalContent}>
-                                            <View style={styles.horizontalLine}></View>
-                                            <Text style={[commonStyles.headerText11BL, { marginVertical: height * 0.02 }]}>Working Experience
-                                                <Text style={commonStyles.headerText3G}> (up to 5)</Text>
-                                            </Text>
-                                            <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
-                                                Note: Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum
-                                            </Text>
-                                            <View style={[styles.inputContainer1]}>
-                                                <TextInput
-                                                    style={styles.inputs}
-                                                    placeholder="Enter Company"
-                                                    placeholderTextColor="#979797"
-                                                    value={newInputValue}
-                                                    onChangeText={setNewInputValue}
-                                                />
-                                            </View>
-                                            <View style={[styles.inputContainer1]}>
-                                                <TextInput
-                                                    style={styles.inputs}
-                                                    placeholder="Enter Designation"
-                                                    placeholderTextColor="#979797"
-                                                    value={newInputValue1}
-                                                    onChangeText={setNewInputValue1}
-                                                />
-                                            </View>
-
-                                            <View>
-
+                                <Modal visible={ExpModalVisible} transparent onRequestClose={() => setExpModalVisible(false)}>
+                                    <TouchableOpacity activeOpacity={0.8} style={styles.modalContainer} onPress={() => setExpModalVisible(false)}>
+                                        <TouchableOpacity style={styles.modalContent} activeOpacity={1} onPress={() => { }}>
+                                            <ScrollView>
+                                                <View style={styles.horizontalLine}></View>
+                                                <Text style={[commonStyles.headerText11BL, { marginVertical: height * 0.02 }]}>Working Experience
+                                                    <Text style={commonStyles.headerText3G}> (up to 5)</Text>
+                                                </Text>
+                                                <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
+                                                    Note: Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum
+                                                </Text>
+                                                <View style={[styles.inputContainer1]}>
+                                                    <TextInput
+                                                        style={styles.inputs}
+                                                        placeholder="Enter Company"
+                                                        placeholderTextColor="#979797"
+                                                        value={newInputValue2}
+                                                        onChangeText={setNewInputValue2}
+                                                    />
+                                                </View>
+                                                <View style={[styles.inputContainer1]}>
+                                                    <TextInput
+                                                        style={styles.inputs}
+                                                        placeholder="Enter Designation"
+                                                        placeholderTextColor="#979797"
+                                                        value={newInputValue3}
+                                                        onChangeText={setNewInputValue3}
+                                                    />
+                                                </View>
                                                 <View style={styles.dropdownContainer}>
                                                     <Text style={[commonStyles.headerText2BL, { marginBottom: height * 0.02, textDecorationLine: 'underline' }]}>Start Date</Text>
-                                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
 
                                                         <View style={{ flexDirection: 'row' }}>
-                                                            <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Year:</Text>
+                                                            <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Month  :</Text>
                                                             <TouchableOpacity
-                                                                onPress={() => toggleFromYearPicker()}
+                                                                onPress={() => toggleExpFromMonthPicker()}
                                                                 style={styles.yearDropdown}
                                                             >
-                                                                <Text style={{ color: '#000' }}>{selectedFromYear ? selectedFromYear.toString() : 'Year'}</Text>
+                                                                <Text style={[commonStyles.headerText3BL, { color: '#000', fontSize: 15 }]}>{selectedExpFromMonth ? selectedExpFromMonth.toString() : 'Month'}</Text>
                                                             </TouchableOpacity>
                                                         </View>
 
-                                                        {/* Custom Year Picker Modal */}
-                                                        {isYearPickerVisible && yearPickerType === 'from' && (
-                                                            <CustomYearPicker onSelectYear={handleFromYearSelect} onClose={toggleYearPicker} initialSelectedYear={selectedFromYear} />
+                                                        {isExpMonthPickerVisible && expMonthPickerType === 'from' && (
+                                                            <CustomMonthPicker onSelectMonth={handleExpFromMonthSelect} onClose={toggleExpFromMonthPicker} />
                                                         )}
 
                                                         <View style={{ flexDirection: 'row' }}>
-                                                            <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Month:</Text>
+                                                            <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Year  :</Text>
                                                             <TouchableOpacity
-                                                                onPress={() => toggleFromMonthPicker()}
+                                                                onPress={() => toggleExpFromYearPicker()}
                                                                 style={styles.yearDropdown}
                                                             >
-                                                                <Text style={{ color: '#000' }}>{selectedFromMonth ? selectedFromMonth.toString() : 'Month'}</Text>
+                                                                <Text style={[commonStyles.headerText3BL, { color: '#000', fontSize: 15 }]}>{selectedExpFromYear ? selectedExpFromYear.toString() : 'Year'}</Text>
                                                             </TouchableOpacity>
                                                         </View>
 
-                                                        {isMonthPickerVisible && monthPickerType === 'from' && (
-                                                            <CustomMonthPicker onSelectMonth={handleFromMonthSelect} onClose={toggleMonthPicker} />
+                                                        {isExpYearPickerVisible && expYearPickerType === 'from' && (
+                                                            <CustomYearPicker onSelectYear={handleExpFromYearSelect} onClose={toggleExpFromYearPicker} initialSelectedYear={selectedExpFromYear} />
                                                         )}
+
+
+
 
                                                     </View>
                                                 </View>
 
-
-
-                                                {/* Currently Working Toggle Row */}
                                                 <TouchableOpacity style={styles.toggleRow}
+                                                    activeOpacity={0.8}
                                                     onPress={() =>
                                                         handleCurrentlyWorkingToggle()
                                                     }>
@@ -522,69 +793,68 @@ const NDProfileCompletion6 = ({ navigation }) => {
                                                 </TouchableOpacity>
 
                                                 {!currentlyWorking && (
-                                                    <View>
-                                                        <Text style={[commonStyles.headerText2BL, { marginBottom: height * 0.02, textDecorationLine: 'underline' }]}>End Date (or expected)</Text>
+                                                    <View style={styles.dropdownContainer}>
+                                                        <Text style={[commonStyles.headerText2BL, { marginVertical: height * 0.02, textDecorationLine: 'underline' }]}>End Date (or expected)</Text>
                                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
 
                                                             <View style={{ flexDirection: 'row' }}>
-                                                                <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Year:</Text>
+                                                                <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Month  :</Text>
                                                                 <TouchableOpacity
-                                                                    onPress={() => toggleToYearPicker()}
+                                                                    onPress={() => toggleExpToMonthPicker()}
                                                                     style={styles.yearDropdown}
                                                                 >
-                                                                    <Text style={{ color: '#000' }}>{selectedToYear ? selectedToYear.toString() : 'Year'}</Text>
+                                                                    <Text style={[commonStyles.headerText3BL, { color: '#000', fontSize: 15 }]}>{selectedExpToMonth ? selectedExpToMonth.toString() : 'Month'}</Text>
                                                                 </TouchableOpacity>
                                                             </View>
 
-                                                            {/* Custom Year Picker Modal */}
-                                                            {isYearPickerVisible && yearPickerType === 'to' && (
-                                                                <CustomYearPicker onSelectYear={handleToYearSelect} onClose={toggleYearPicker} initialSelectedYear={selectedToYear} />
+                                                            {isExpMonthPickerVisible && expMonthPickerType === 'to' && (
+                                                                <CustomMonthPicker onSelectMonth={handleExpToMonthSelect} onClose={toggleExpToMonthPicker} />
                                                             )}
 
                                                             <View style={{ flexDirection: 'row' }}>
-                                                                <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Month:</Text>
+                                                                <Text style={[commonStyles.headerText3BL, { alignSelf: 'center', marginRight: 10 }]}>Year  :</Text>
                                                                 <TouchableOpacity
-                                                                    onPress={() => toggleToMonthPicker()}
+                                                                    onPress={() => toggleExpToYearPicker()}
                                                                     style={styles.yearDropdown}
                                                                 >
-                                                                    <Text style={{ color: '#000' }}>{selectedToMonth ? selectedToMonth.toString() : 'Month'}</Text>
+                                                                    <Text style={[commonStyles.headerText3BL, { color: '#000', fontSize: 15 }]}>{selectedExpToYear ? selectedExpToYear.toString() : 'Year'}</Text>
                                                                 </TouchableOpacity>
                                                             </View>
 
-                                                            {isMonthPickerVisible && monthPickerType === 'to' && (
-                                                                <CustomMonthPicker onSelectMonth={handleToMonthSelect} onClose={toggleMonthPicker} />
+                                                            {isExpYearPickerVisible && expYearPickerType === 'to' && (
+                                                                <CustomYearPicker onSelectYear={handleExpToYearSelect} onClose={toggleExpToYearPicker} initialSelectedYear={selectedExpToYear} />
                                                             )}
+
+
 
                                                         </View>
                                                     </View>
                                                 )}
 
-                                            </View>
-
-
-                                            <TouchableOpacity
-                                                style={[commonStyles.button, { marginTop: height * 0.03, marginBottom: height * 0.05 }]}
-                                                onPress={handleExpModalSubmit}
-                                                activeOpacity={0.8}
-                                            >
-                                                <Text style={commonStyles.buttonText}>Submit</Text>
-                                            </TouchableOpacity>
-                                        </ScrollView>
+                                                <TouchableOpacity
+                                                    style={[commonStyles.button]}
+                                                    onPress={handleExpModalSubmit}
+                                                    activeOpacity={0.8}
+                                                >
+                                                    <Text style={commonStyles.buttonText}>Submit</Text>
+                                                </TouchableOpacity>
+                                            </ScrollView>
+                                        </TouchableOpacity>
                                     </TouchableOpacity>
                                 </Modal>
+
                             </View>
+
+                            <TouchableOpacity
+                                style={[commonStyles.button]}
+                                onPress={handleNext}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={commonStyles.buttonText}>Continue</Text>
+                            </TouchableOpacity>
                         </View>
                     </ScrollView>
-                    <TouchableOpacity
-                        style={[commonStyles.button, styles.continueButton]}
-                        onPress={() => {
-                            navigation.navigate('NDProfileCompletion7');
-                            console.log('ProfileCompletion21');
-                        }}
-                        activeOpacity={0.8}
-                    >
-                        <Text style={commonStyles.buttonText}>Continue</Text>
-                    </TouchableOpacity>
+
                 </View>
 
             )}
@@ -618,10 +888,13 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         backgroundColor: '#FEFCFC',
-        padding: 20,
+        paddingVertical: 20,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        maxHeight: '90%', // Maximum height of 50%
+        paddingHorizontal: moderateScale(16),
+        maxHeight: '95%',
+        minHeight: 100,
+        paddingBottom: 30,
     },
     modalInput: {
         borderWidth: 1,
@@ -654,7 +927,7 @@ const styles = StyleSheet.create({
     headerTextContainer: {
         width: '100%',
         alignItems: 'center',
-        //zIndex: 1,
+        marginBottom: 20,
     },
     headerText1: {
         fontSize: 24,
@@ -927,7 +1200,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginVertical: 15,
+        marginVertical: 5,
         borderBottomWidth: 1,
         borderTopWidth: 1,
         borderBottomColor: '#979797',
@@ -942,5 +1215,6 @@ const styles = StyleSheet.create({
         height: 24,
     },
 });
+
 
 export default NDProfileCompletion6;

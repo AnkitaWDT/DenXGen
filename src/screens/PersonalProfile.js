@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
     PixelRatio, RefreshControl, View, Image, ImageBackground, StyleSheet, SafeAreaView, TouchableOpacity, Text, TouchableWithoutFeedback, Modal, Dimensions, FlatList
 } from 'react-native';
@@ -9,6 +9,10 @@ import Popover, { PopoverPlacement } from 'react-native-popover-view';
 import Video from 'react-native-video';
 import SocialLink from '../components/SocialLinks';
 import { moderateScale } from 'react-native-size-matters';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { useFocusEffect } from '@react-navigation/native';
+import Animation from '../components/Loader';
 
 const { width, height } = Dimensions.get('window');
 
@@ -76,6 +80,12 @@ const PersonalProfile = ({ navigation, route }) => {
 
     const [selectedImageIndex, setSelectedImageIndex] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+
+
+    const toggleModalB = () => {
+        setModalVisible(!modalVisible);
+    };
 
     const toggleModal = (index) => {
         setSelectedImageIndex(index);
@@ -86,70 +96,72 @@ const PersonalProfile = ({ navigation, route }) => {
         setIsModalVisible(false);
     };
 
-    const [servicesData, setServicesData] = useState([
-        'Dental implant',
-        'Root canal',
-        'Teeth Whitening',
-        'Root canal treatment',
-        'Dentures',
-        'Teeth cleaning',
-        'Dental braces',
-    ]);
+    // const [servicesData, setServicesData] = useState([
+    //     'Dental implant',
+    //     'Root canal',
+    //     'Teeth Whitening',
+    //     'Root canal treatment',
+    //     'Dentures',
+    //     'Teeth cleaning',
+    //     'Dental braces',
+    // ]);
 
-    const educationData = [
-        {
-            licNo: 'D.Y. Patil College Of Dental Institute',
-            licText: 'BDS, Oral pathology, Dentistry',
-            fromYear: '2022',
-            fromMonth: 'Jun'
-        },
-        {
-            licNo: 'D.Y. Patil College Of Dental Institute',
-            licText: 'BDS, Oral pathology, Dentistry',
-            fromYear: '2022',
-            fromMonth: 'June',
-            toYear: '2023',
-            toMonth: 'Aug'
-        },
-        {
-            licNo: 'D.Y. Patil College Of Dental Institute',
-            licText: 'BDS, Oral pathology, Dentistry',
-            fromYear: '2022',
-            fromMonth: 'July'
-        },
-        // Add more education entries as needed
-    ];
-    const experienceData = [
-        {
-            licNo: 'D.Y. Patil College Of Dental Institute',
-            licText: 'BDS, Oral pathology, Dentistry',
-            fromYear: '2022',
-            fromMonth: 'Jun'
-        },
-        {
-            licNo: 'D.Y. Patil College Of Dental Institute',
-            licText: 'BDS, Oral pathology, Dentistry',
-            fromYear: '2022',
-            fromMonth: 'June',
-            toYear: '2023',
-            toMonth: 'Aug'
-        },
-        {
-            licNo: 'D.Y. Patil College Of Dental Institute',
-            licText: 'BDS, Oral pathology, Dentistry',
-            fromYear: '2022',
-            fromMonth: 'July'
-        },
-        {
-            licNo: 'D.Y. Patil College Of Dental Institute',
-            licText: 'BDS, Oral pathology, Dentistry',
-            fromYear: '2022',
-            fromMonth: 'June',
-            toYear: '2023',
-            toMonth: 'Aug'
-        },
-        // Add more education entries as needed
-    ];
+  
+    // const educationData = [
+    //     {
+    //         licNo: 'D.Y. Patil College Of Dental Institute',
+    //         licText: 'BDS, Oral pathology, Dentistry',
+    //         fromYear: '2022',
+    //         fromMonth: 'Jun'
+    //     },
+    //     {
+    //         licNo: 'D.Y. Patil College Of Dental Institute',
+    //         licText: 'BDS, Oral pathology, Dentistry',
+    //         fromYear: '2022',
+    //         fromMonth: 'June',
+    //         toYear: '2023',
+    //         toMonth: 'Aug'
+    //     },
+    //     {
+    //         licNo: 'D.Y. Patil College Of Dental Institute',
+    //         licText: 'BDS, Oral pathology, Dentistry',
+    //         fromYear: '2022',
+    //         fromMonth: 'July'
+    //     },
+    //     // Add more education entries as needed
+    // ];
+    // const experienceData = [
+    //     {
+    //         licNo: 'D.Y. Patil College Of Dental Institute',
+    //         licText: 'BDS, Oral pathology, Dentistry',
+    //         fromYear: '2022',
+    //         fromMonth: 'Jun'
+    //     },
+    //     {
+    //         licNo: 'D.Y. Patil College Of Dental Institute',
+    //         licText: 'BDS, Oral pathology, Dentistry',
+    //         fromYear: '2022',
+    //         fromMonth: 'June',
+    //         toYear: '2023',
+    //         toMonth: 'Aug'
+    //     },
+    //     {
+    //         licNo: 'D.Y. Patil College Of Dental Institute',
+    //         licText: 'BDS, Oral pathology, Dentistry',
+    //         fromYear: '2022',
+    //         fromMonth: 'July'
+    //     },
+    //     {
+    //         licNo: 'D.Y. Patil College Of Dental Institute',
+    //         licText: 'BDS, Oral pathology, Dentistry',
+    //         fromYear: '2022',
+    //         fromMonth: 'June',
+    //         toYear: '2023',
+    //         toMonth: 'Aug'
+    //     },
+    //     // Add more education entries as needed
+    // ];
+
 
     const [showAllVid, setShowAllVid] = useState(false);
     const videos = [
@@ -157,7 +169,8 @@ const PersonalProfile = ({ navigation, route }) => {
         { id: 2, link: 'https://www.youtube.com/watch?v=video2' },
         { id: 3, link: 'https://www.youtube.com/watch?v=video3' },
     ];
-    const initialVideosToShow = showAllVid ? videos.length : 2;
+   // const initialVideosToShow = showAllVid ? videos.length : 2;
+    const initialVideosToShow = showAllVid ? profileData.vidList.length : 2;
 
     const handleToggleShowAllVid = () => {
         setShowAllVid(!showAllVid);
@@ -169,7 +182,8 @@ const PersonalProfile = ({ navigation, route }) => {
         { id: 2, link: 'https://www.youtube.com/watch?v=video2' },
         { id: 3, link: 'https://www.youtube.com/watch?v=video3' },
     ];
-    const initialAwardsToShow = showAllAwards ? awards.length : 2;
+    //const initialAwardsToShow = showAllAwards ? awards.length : 2;
+    const initialAwardsToShow = showAllAwards ? profileData.awaList.length : 2;
 
     const handleToggleShowAllAwards = () => {
         setShowAllAwards(!showAllAwards);
@@ -181,7 +195,8 @@ const PersonalProfile = ({ navigation, route }) => {
         { id: 2, link: 'https://www.youtube.com/watch?v=video2' },
         { id: 3, link: 'https://www.youtube.com/watch?v=video3' },
     ];
-    const initialBlogToShow = showAllBlog ? blog.length : 2;
+    //const initialBlogToShow = showAllBlog ? blog.length : 2;
+    const initialBlogToShow = showAllBlog ? profileData.pubList.length : 2;
 
     const handleToggleShowAllBlog = () => {
         setShowAllBlog(!showAllBlog);
@@ -203,6 +218,75 @@ const PersonalProfile = ({ navigation, route }) => {
     const [showPlayButton, setShowPlayButton] = useState(false);
 
     const [modalConnectVisible, setModalConnectVisible] = useState(false);
+
+    const [profileData, setProfileData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const fetchData = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getvic-ax.php?prid=${id}`);
+            const data = await response.json();
+            setProfileData(data.data);
+            setLoading(false);
+        } catch (error) {
+            setError(error);
+            setLoading(false);
+        }
+    };
+
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchData();
+        }, [])
+    );
+
+    useEffect(() => {
+        console.log('profileData', JSON.stringify(profileData));
+    }, [profileData]);
+
+    if (loading) {
+        return (
+            <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Animation />
+            </SafeAreaView>
+        );
+    }
+    
+    const servicesData = profileData ? profileData.servList.map(item => item.service) : [];
+    const specialityData = profileData ? profileData.specList.map(item => item.speciality) : [];
+    const keyForteData = profileData ? profileData.keyfList.map(item => item.keyforte) : [];
+    const languages = profileData ? profileData.langList.map(lang => lang.language).join(', '): null;
+
+    const educationData = profileData ? profileData.eduList.map(edu => {
+        const fromMonth = edu.start_month; // Assuming you have a function to get month name
+        const fromYear = edu.start_year;
+        const toMonth = edu.end_month ? edu.end_month : '';
+        const toYear = edu.end_year;
+        const degree = edu.degree;
+        const institute = edu.institute;
+
+        // Format the educational details as needed
+        const licNo = `${institute}`;
+        const licText = `${degree}`;
+        return { licNo, licText, fromYear, fromMonth, toYear, toMonth };
+    }): null;
+
+    const experienceData = profileData ? profileData.woexpList.map(exp => {
+        const fromMonth = exp.start_month; // Assuming you have a function to get month name
+        const fromYear = exp.start_year;
+        const toMonth = exp.end_month ? exp.end_month : '';
+        const toYear = exp.end_year;
+        const company = exp.company;
+        const designation = exp.designation;
+
+        // Format the experience details as needed
+        return { company, designation, fromYear, fromMonth, toYear, toMonth };
+    }) : null;
+
 
     const renderTabContent = () => {
         switch (selectedTab) {
@@ -304,21 +388,58 @@ const PersonalProfile = ({ navigation, route }) => {
             case 2:
                 return (
                     <View>
+                        <FlatList
+                            data={specialityData}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={({ item }) => (
+                                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                                    <Image
+                                        source={require('../../assets/img/services.png')}
+                                        style={{ width: 20, height: 25, marginRight: 10, }}
+                                    />
+                                    <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>
+                                </View>
+                            )}
+                        // renderItem={({ item }) => <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>}
+                        />
+                    </View>
+                );
+            case 3:
+                return (
+                    <View>
+                        <FlatList
+                            data={keyForteData}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={({ item }) => (
+                                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                                    <Image
+                                        source={require('../../assets/img/services.png')}
+                                        style={{ width: 20, height: 25, marginRight: 10, }}
+                                    />
+                                    <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>
+                                </View>
+                            )}
+                        // renderItem={({ item }) => <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>}
+                        />
+                    </View>
+                );
+            case 4:
+                return (
+                    <View style={{ marginBottom: 20 }}>
                         <View>
                             <Text style={[commonStyles.headerText11BL, {
                                 //marginVertical: height * 0.01,
                             }]}>Video Links</Text>
-                            {videos.slice(0, initialVideosToShow).map((video) => (
-
-                                <View key={video.id} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                            {profileData.vidList.slice(0, initialVideosToShow).map((video, index) => (
+                                <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                                     <Image
                                         source={require('../../assets/img/videoL.png')}
                                         style={{ width: 22, height: 22, marginRight: 10 }}
                                     />
-                                    <Text style={[commonStyles.headerText3BL, { marginRight: 10 }]}>{video.link}</Text>
+                                    <Text style={[commonStyles.headerText3BL, { marginRight: 10 }]}>{video.links}</Text>
                                 </View>
                             ))}
-                            {!showAllVid && (
+                            {!showAllVid && profileData.vidList.length > 2 && (
                                 <TouchableOpacity onPress={handleToggleShowAllVid}>
                                     <Text style={[commonStyles.headerText3B, { marginVertical: 10 }]}>View More</Text>
                                 </TouchableOpacity>
@@ -335,17 +456,16 @@ const PersonalProfile = ({ navigation, route }) => {
                             <Text style={[commonStyles.headerText11BL, {
                                 //marginVertical: height * 0.01,
                             }]}>Awards</Text>
-                            {awards.slice(0, initialAwardsToShow).map((awards) => (
-
-                                <View key={awards.id} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                            {profileData.awaList.slice(0, initialAwardsToShow).map((awards, index) => (
+                                <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                                     <Image
                                         source={require('../../assets/img/videoL.png')}
                                         style={{ width: 22, height: 22, marginRight: 10 }}
                                     />
-                                    <Text style={[commonStyles.headerText3BL, { marginRight: 10 }]}>{awards.link}</Text>
+                                    <Text style={[commonStyles.headerText3BL, { marginRight: 10 }]}>{awards.links}</Text>
                                 </View>
                             ))}
-                            {!showAllAwards && (
+                            {!showAllAwards && profileData.awaList.length > 2 && (
                                 <TouchableOpacity onPress={handleToggleShowAllAwards}>
                                     <Text style={[commonStyles.headerText3B, { marginVertical: 10 }]}>View More</Text>
                                 </TouchableOpacity>
@@ -362,17 +482,17 @@ const PersonalProfile = ({ navigation, route }) => {
                             <Text style={[commonStyles.headerText11BL, {
                                 //marginVertical: height * 0.01,
                             }]}>Blog Links</Text>
-                            {blog.slice(0, initialBlogToShow).map((blog) => (
+                            {profileData.pubList.slice(0, initialBlogToShow).map((blog, index) => (
 
-                                <View key={blog.id} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                                <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                                     <Image
                                         source={require('../../assets/img/videoL.png')}
                                         style={{ width: 22, height: 22, marginRight: 10 }}
                                     />
-                                    <Text style={[commonStyles.headerText3BL, { marginRight: 10 }]}>{blog.link}</Text>
+                                    <Text style={[commonStyles.headerText3BL, { marginRight: 10 }]}>{blog.links}</Text>
                                 </View>
                             ))}
-                            {!showAllBlog && (
+                            {!showAllBlog && profileData.pubList.length > 2 && (
                                 <TouchableOpacity onPress={handleToggleShowAllBlog}>
                                     <Text style={[commonStyles.headerText3B, { marginVertical: 10 }]}>View More</Text>
                                 </TouchableOpacity>
@@ -383,18 +503,6 @@ const PersonalProfile = ({ navigation, route }) => {
                                 </TouchableOpacity>
                             )}
                         </View>
-                    </View>
-                );
-            case 3:
-                return (
-                    <View>
-                        <Text>Content for Tab 6</Text>
-                    </View>
-                );
-            case 4:
-                return (
-                    <View>
-                        <Text>Content for Tab 6</Text>
                     </View>
                 );
             case 5:
@@ -408,12 +516,6 @@ const PersonalProfile = ({ navigation, route }) => {
         }
     };
 
-  const [modalVisible, setModalVisible] = useState(false);
-
-    // Function to toggle the modal visibility
-    const toggleModalB = () => {
-        setModalVisible(!modalVisible);
-    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -527,10 +629,13 @@ const PersonalProfile = ({ navigation, route }) => {
                 </ImageBackground>
                 <View style={styles.subContainer1}>
                     <View style={styles.aboutContainer}>
-                        <Text style={[commonStyles.headerText1BL, {}]} adjustsFontSizeToFit numberOfLines={1} ellipsizeMode="tail">Naina Swaroop</Text>
+                        <Text style={[commonStyles.headerText1BL, {}]} adjustsFontSizeToFit numberOfLines={1} ellipsizeMode="tail">
+                            {profileData ? profileData.name : null}
+                        </Text>
+
                         <Text style={[commonStyles.headerText2BL, {
                             marginVertical: 3,
-                        }]} numberOfLines={1} ellipsizeMode="tail">MDS,BDS ┃ Prosthodontics ┃ 10+ years exp</Text>
+                        }]} numberOfLines={1} ellipsizeMode="tail">{profileData ? profileData.profession : null} ┃ {profileData && profileData.specList.length > 0 ? profileData.specList[0].speciality : null} ┃ {profileData ? profileData.experience : null}</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}>
                             <Image source={require('../../assets/img/LocationHome.png')} style={{ width: 15, height: 15, }} />
                             <Text style={[commonStyles.headerText5BL, {
@@ -545,7 +650,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                 paddingHorizontal: 8,
                                 lineHeight: 15
 
-                            }]}>English, Hindi, Marathi</Text>
+                            }]}>{languages}</Text>
                         </View>
                         <View>
 
@@ -669,34 +774,67 @@ const PersonalProfile = ({ navigation, route }) => {
                             {/* <Image source={require('../../assets/img/Option.png')} style={{ width: 20, height: 20, marginLeft: width * 0.02 }} /> */}
                         </View>
                     </View>
-                    <Modal visible={modalConnectVisible} transparent>
-                        <TouchableWithoutFeedback onPress={() => setModalConnectVisible(false)}>
-                            <View style={styles.modalContainer}>
-                                <TouchableWithoutFeedback>
-                                    <ScrollView style={styles.modalContent}>
-                                        <View style={styles.horizontalLineM}></View>
-                                        <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
-                                            Contact Information
-                                        </Text>
-                                        <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
-                                            Note: Type services like Root Canal, Aligners, Oral Surgery,  etc to show specialisation you provide.
-                                        </Text>
-                                        <View>
-                                            <SocialLink platform="contact" username="9876543210" />
-                                            <SocialLink platform="email" username="wedeveloptech@gmail.com" />
-                                            <SocialLink platform="instagram" username="_wedeveloptech_" />
-                                            <SocialLink platform="whatsapp" username="9876543210" />
-                                            <SocialLink platform="linkedin" username="wedeveloptech" />
-                                            <SocialLink platform="facebook" username="wedeveloptech" />
-                                            <SocialLink platform="website" username="https://www.wedeveloptech.com/" />
-                                        </View>
-                                    </ScrollView>
-                                </TouchableWithoutFeedback>
-                            </View>
-                        </TouchableWithoutFeedback>
+                    {/* <Modal visible={modalConnectVisible} transparent 
+                        onRequestClose={() => setModalConnectVisible(false)}>
+                        <TouchableOpacity style={styles.modalContainer} onPress={() => setModalConnectVisible(false)}>
+                            <TouchableOpacity style={styles.modalContent} activeOpacity={1} onPress={() => { }}>
+                                <ScrollView>
+                                    <View style={styles.horizontalLineM}></View>
+                                    <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
+                                        Contact Information
+                                    </Text>
+                                    <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
+                                        Note: Type services like Root Canal, Aligners, Oral Surgery,  etc to show specialisation you provide.
+                                    </Text>
+                                    <View>
+                                        <SocialLink platform="contact" username="9876543210" />
+                                        <SocialLink platform="email" username="wedeveloptech@gmail.com" />
+                                        <SocialLink platform="instagram" username="_wedeveloptech_" />
+                                        <SocialLink platform="whatsapp" username="9876543210" />
+                                        <SocialLink platform="linkedin" username="wedeveloptech" />
+                                        <SocialLink platform="facebook" username="wedeveloptech" />
+                                        <SocialLink platform="website" username="https://www.wedeveloptech.com/" />
+                                    </View>
+                                </ScrollView>
+                            </TouchableOpacity>
+                        </TouchableOpacity>
+                    </Modal> */}
+                    <Modal
+                        visible={modalConnectVisible}
+                        transparent
+                        onRequestClose={() => setModalConnectVisible(false)}
+                    >
+                        <TouchableOpacity
+                            style={styles.modalContainer}
+                            onPress={() => setModalConnectVisible(false)}
+                        >
+                            <TouchableOpacity
+                                style={styles.modalContent}
+                                activeOpacity={1}
+                                onPress={() => { }}
+                            >
+                                <ScrollView>
+                                    <View style={styles.horizontalLineM}></View>
+                                    <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
+                                        Contact Information
+                                    </Text>
+                                    <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
+                                        Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
+                                    </Text>
+                                    <SocialLink platform="email" username={profileData?.email} />
+                                    <SocialLink platform="contact" username={profileData?.phoneno} />
+                                    <SocialLink platform="contact" username={profileData?.alternate} />
+                                    {profileData?.socialList?.map((social, index) => (
+                                        Object.entries(social).map(([platform, username]) => (
+                                            // Exclude pr_id field and empty usernames
+                                            platform !== 'pr_id' && username.trim() !== '' &&
+                                            <SocialLink key={platform} platform={platform} username={username} />
+                                        ))
+                                    ))}
+                                </ScrollView>
+                            </TouchableOpacity>
+                        </TouchableOpacity>
                     </Modal>
-
-                    
 
                     <View style={styles.horizontalLine}></View>
 
@@ -843,10 +981,14 @@ const PersonalProfile = ({ navigation, route }) => {
               }]}>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</Text>
             </View> */}
                         <View style={{ flex: 1, justifyContent: 'center' }}>
-                            <ReadMoreText
-                                text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-                                initialLimit={120}
-                            />
+                            {profileData ? (
+                                <ReadMoreText
+                                    text={profileData.about}
+                                    initialLimit={120}
+                                />
+                            ) : (
+                               null
+                            )}
                         </View>
                     </View>
                     {/* <View style={styles.horizontalLine}></View> */}
@@ -887,19 +1029,39 @@ const PersonalProfile = ({ navigation, route }) => {
                         <View style={{ flexDirection: 'row', marginTop: 10 }}>
                            
                             <View style={{  alignSelf: 'center' }}>
-                                <Text style={[commonStyles.headerText2BL]}>200/05/2318</Text>
+                              
+                                <Text style={[commonStyles.headerText2BL]}>
+                                    {profileData ? profileData.license : null}
+                                    </Text>
                                 {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
                             </View>
                         </View>
                     </View>
-                    <View style={[styles.aboutContainer, {}]}>
+                    <View style={[styles.aboutContainer, { marginBottom: 10 }]}>
                         <Text style={[commonStyles.headerText11BL, {
                             //marginVertical: height * 0.01,
                         }]}>Registration Number</Text>
                         <View style={{ flexDirection: 'row', marginTop: 10 }}>
                            
                             <View style={{  alignSelf: 'center' }}>
-                                <Text style={[commonStyles.headerText2BL]}>A19965</Text>
+                                <Text style={[commonStyles.headerText2BL]}>
+                                    {profileData ? profileData.reg_no : null}
+                                </Text>
+                                {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
+                            </View>
+                        </View>
+                    </View>
+
+                    <View style={[styles.aboutContainer, {}]}>
+                        <Text style={[commonStyles.headerText11BL, {
+                            //marginVertical: height * 0.01,
+                        }]}>Payment Link</Text>
+                        <View style={{ flexDirection: 'row', marginTop: 10 }}>
+
+                            <View style={{ alignSelf: 'center' }}>
+                                <Text style={[commonStyles.headerText2BL]}>
+                                    {profileData ? profileData.payment : null}
+                                </Text>
                                 {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
                             </View>
                         </View>
@@ -907,13 +1069,11 @@ const PersonalProfile = ({ navigation, route }) => {
                     <View style={styles.horizontalLine}></View>
                     <View style={styles.aboutContainer}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text style={[commonStyles.headerText11BL, {
-                                //marginVertical: height * 0.01,
-                            }]}>Educational Details</Text>
+                            <Text style={[commonStyles.headerText11BL, {}]}>Educational Details</Text>
                         </View>
 
-                        {educationData.slice(0, showAll ? educationData.length : 2).map((education, index) => (
-                            <View key={index} style={{ flexDirection: 'row', marginVertical: 10 }}>
+                        {educationData && educationData.slice(0, showAll ? educationData.length : 2).map((education, index) => (
+                            <View key={index} style={{ flexDirection: 'row', marginVertical: 8 }}>
                                 <View style={styles.licenceContainer}>
                                     <Image
                                         source={require('../../assets/img/Education11.png')}
@@ -927,15 +1087,14 @@ const PersonalProfile = ({ navigation, route }) => {
                             </View>
                         ))}
 
-                        {!showAll && educationData.length > 2 && (
+                        {!showAll && educationData && educationData.length > 2 && (
                             <View>
                                 {/* <View style={styles.horizontalLine}></View> */}
                                 <TouchableOpacity style={styles.uploadButtonS} onPress={toggleShowAll} activeOpacity={0.8}>
-                                    <Text style={commonStyles.buttonText1}>Show all {educationData.length} educations </Text>
+                                    <Text style={commonStyles.buttonText1}>Show all {educationData.length} educations</Text>
                                     <Image source={require('../../assets/img/RightArrow.png')} style={styles.imageStyle} />
                                 </TouchableOpacity>
                             </View>
-
                         )}
                         {showAll && (
                             <TouchableOpacity style={styles.uploadButtonS} onPress={toggleShowAll} activeOpacity={0.8}>
@@ -944,6 +1103,8 @@ const PersonalProfile = ({ navigation, route }) => {
                             </TouchableOpacity>
                         )}
                     </View>
+
+             
                     <View style={styles.horizontalLine}></View>
                     <View>
                         <View style={styles.aboutContainer}>
@@ -953,22 +1114,22 @@ const PersonalProfile = ({ navigation, route }) => {
                                 }]}>Experience</Text>
                             </View>
 
-                            {experienceData.slice(0, showAllExp ? experienceData.length : 2).map((experiences, index) => (
-                                <View key={index} style={{ flexDirection: 'row', marginVertical: 10 }}>
-                                    <View style={styles.licenceContainer1}>
+                            {experienceData && experienceData.slice(0, showAll ? experienceData.length : 2).map((experience, index) => (
+                                <View key={index} style={{ flexDirection: 'row', marginVertical: 8 }}>
+                                    <View style={styles.licenceContainer}>
                                         <Image
                                             source={require('../../assets/img/Experience11.png')}
                                             style={commonStyles.icon}
                                         />
                                     </View>
                                     <View style={{ marginLeft: 20, alignSelf: 'center' }}>
-                                        <Text style={[commonStyles.headerText4BL]}>{experiences.licNo}</Text>
-                                        <Text style={[commonStyles.headerText5G]}>{experiences.licText}</Text>
+                                        <Text style={[commonStyles.headerText4BL]} adjustsFontSizeToFit>{experience.company}</Text>
+                                        <Text style={[commonStyles.headerText5G]}>{experience.designation}</Text>
                                     </View>
                                 </View>
                             ))}
 
-                            {!showAllExp && experienceData.length > 2 && (
+                            {!showAllExp && experienceData && experienceData.length > 2 && (
                                 <View>
                                     {/* <View style={styles.horizontalLine}></View> */}
                                     <TouchableOpacity style={styles.uploadButtonS} onPress={toggleShowAllExp} activeOpacity={0.8}>
@@ -988,7 +1149,7 @@ const PersonalProfile = ({ navigation, route }) => {
 
                     </View>
                     <View style={styles.horizontalLine}></View>
-                    <View style={styles.staticButtonsContainer}>
+                    {/* <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.staticButtonsContainer}>
                         <TouchableOpacity
                             style={[styles.tabItem, selectedTab === 0 && styles.selectedTabItem]}
                             onPress={() => setSelectedTab(0)}
@@ -1010,7 +1171,63 @@ const PersonalProfile = ({ navigation, route }) => {
                         >
                             <Text style={[styles.tabText, selectedTab === 2 && styles.selectedTabText]}>Publications</Text>
                         </TouchableOpacity>
-                    </View>
+                    </ScrollView> */}
+
+                    <ScrollView style={styles.tabContainer} horizontal showsHorizontalScrollIndicator={false} >
+                        <TouchableOpacity
+                            style={[styles.tabItem, selectedTab === 0 && styles.selectedTabItem]}
+                            onPress={() => setSelectedTab(0)}
+                            activeOpacity={0.8}
+                        >
+
+                            <Text style={[styles.tabText, selectedTab === 0 && styles.selectedTabText]}>Gallery</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.tabItem, selectedTab === 1 && styles.selectedTabItem]}
+                            onPress={() => setSelectedTab(1)}
+                            activeOpacity={0.8}
+                        >
+
+                            <Text style={[styles.tabText, selectedTab === 1 && styles.selectedTabText]}>Services</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.tabItem, selectedTab === 2 && styles.selectedTabItem]}
+                            onPress={() => setSelectedTab(2)}
+                            activeOpacity={0.8}
+                        >
+
+                            <Text style={[styles.tabText, selectedTab === 2 && styles.selectedTabText]}>Specialities</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.tabItem, selectedTab === 3 && styles.selectedTabItem]}
+                            onPress={() => setSelectedTab(3)}
+                            activeOpacity={0.8}
+                        >
+
+                            <Text style={[styles.tabText, selectedTab === 3 && styles.selectedTabText]}>Key Forte</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.tabItem, selectedTab === 4 && styles.selectedTabItem]}
+                            onPress={() => setSelectedTab(4)}
+                            activeOpacity={0.8}
+                        >
+                           
+                            <Text style={[styles.tabText, selectedTab === 4 && styles.selectedTabText]}>Publications</Text>
+                        </TouchableOpacity>
+
+                        {/* <TouchableOpacity
+              style={[styles.tabItem, selectedTab === 4 && styles.selectedTabItem]}
+              onPress={() => setSelectedTab(4)}
+            >
+              <Text style={[styles.tabText, selectedTab === 4 && styles.selectedTabText]}>Tab 5</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tabItem, selectedTab === 5 && styles.selectedTabItem]}
+              onPress={() => setSelectedTab(5)}
+            >
+              <Text style={[styles.tabText, selectedTab === 5 && styles.selectedTabText]}>Tab 6</Text>
+            </TouchableOpacity> */}
+                    </ScrollView>
 
                     {/* Bottom section to show selected tab content */}
                     <View style={styles.selectedTabContent}>
@@ -1133,7 +1350,7 @@ const styles = StyleSheet.create({
         lineHeight: height * 0.028 //28
     },
     selectedTabItem: {
-        height: height * 0.04,
+        height: 30,
         flexDirection: 'row',
         backgroundColor: '#289EF5',
         opacity: 1,
@@ -1143,24 +1360,24 @@ const styles = StyleSheet.create({
         marginVertical: height * 0.005,
         marginRight: 12,  // Adjust this value
         paddingHorizontal: height * 0.01,
-        paddingVertical: 1,
-        //marginBottom: height * 0.03,
+        marginBottom: height * 0.03,
     },
     tabItem: {
-        height: height * 0.04,
+        height: 30,
         flexDirection: 'row',
-        //backgroundColor: '#E8F8FF',
+        backgroundColor: '#E8F8FF',
         opacity: 1,
         borderRadius: 6,
         justifyContent: "center",
         alignItems: "center",
         marginVertical: height * 0.005,
+        marginRight: 12,  // Adjust this value
         paddingHorizontal: height * 0.01,
-        //marginBottom: height * 0.03,
+        marginBottom: height * 0.03,
     },
     tabContainer: {
         flexDirection: 'row',
-        marginTop: 10,
+        marginVertical: 10,
     },
     imageStyle: {
         width: 17,
@@ -1619,10 +1836,13 @@ containerButton:{
     },
     modalContent: {
         backgroundColor: '#FEFCFC',
-        padding: 20,
+        paddingVertical: 20,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        maxHeight: '70%', // Maximum height of 50%
+        paddingHorizontal: moderateScale(16),
+        maxHeight: '95%',
+        minHeight: 100,
+        paddingBottom: 30,
     },
     horizontalLineM: {
         width: '20%',

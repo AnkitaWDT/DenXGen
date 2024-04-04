@@ -5,6 +5,7 @@ import commonStyles from '../../components/CommonStyles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-gesture-handler';
 import AlertPopup from '../../components/AlertPopup';
+import Animation from '../../components/Loader';
 
 const { width, height } = Dimensions.get('window');
 
@@ -159,7 +160,7 @@ const EditProfile = ({ navigation }) => {
                     noLabel="No"
                     onYesPress={() => {
                         setShowPopup0(false);
-                        navigation.navigate('ProfileCompletion1');
+                        navigation.navigate('NDProfileCompletion1');
                     }}
                 />
 
@@ -275,7 +276,7 @@ const EditProfile = ({ navigation }) => {
                     noLabel="No"
                     onYesPress={() => {
                         setShowPopup1(false);
-                        navigation.navigate('ProfileCompletion2');
+                        navigation.navigate('NDProfileCompletion2');
                     }}
                 />
 
@@ -343,7 +344,7 @@ const EditProfile = ({ navigation }) => {
                     noLabel="No"
                     onYesPress={() => {
                         setShowPopup2(false);
-                        navigation.navigate('ProfileCompletion6');
+                        navigation.navigate('NDProfileCompletion6');
                     }}
                 />
 
@@ -449,7 +450,7 @@ const EditProfile = ({ navigation }) => {
                     noLabel="No"
                     onYesPress={() => {
                         setShowPopup3(false);
-                        navigation.navigate('ProfileCompletion5');
+                        navigation.navigate('NDProfileCompletion5');
                     }}
                 />
 

@@ -11,6 +11,8 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from 'moment';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { ProgressBar } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const { width, height } = Dimensions.get('window');
 
@@ -40,6 +42,7 @@ const ClinicProfileCompletion1 = ({ navigation }) => {
     const [isAltCFocused, setIsAltCFocused] = useState(false);
     const [isWappCFocused, setIsWappCFocused] = useState(false);
     const [isDateOfBirthFocused, setIsDateOfBirthFocused] = useState(false);
+    const [eyear, setEyear] = useState('');
 
     const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -109,7 +112,7 @@ const ClinicProfileCompletion1 = ({ navigation }) => {
     };
 
 
-    const handleNext = () => {
+    const handleNext = async () => {
         // if (!selectedName) {
         //     ToastAndroid.show('Name is Required', ToastAndroid.SHORT);
         // } else if (selectedName.length > 5) {
@@ -139,21 +142,36 @@ const ClinicProfileCompletion1 = ({ navigation }) => {
         // } else if (!selectedProfession) {
         //     ToastAndroid.show('Profession is Required', ToastAndroid.SHORT);
         // } else {
-        //     const userData = {
-        //         name: selectedName,
-        //         email: selectedEmail,
-        //         contactNumber: selectedContactNumber,
-        //         alternateContactNumber: selectedAlternateContactNumber,
-        //         wappNumber: selectedWappNumber,
-        //         gender: selectedGender,
-        //         profession: selectedProfession,
-        //     };
 
-        //     console.log('User Data:', userData);
+        const acc_ty_id = await AsyncStorage.getItem('acc_ty_id');
+        const pr_id = await AsyncStorage.getItem('pr_id');
+        const id = parseInt(pr_id);
+            const userData = {
+                acc_ty_id: parseInt(acc_ty_id),
+                pr_id: id,
+                name: selectedName,
+                email: selectedEmail,
+                phoneno: selectedContactNumber,
+                alternate: selectedAlternateContactNumber,
+                wp_number: selectedWappNumber,
+                about: textareaValues['aboutYourself'],
+                est_year: eyear, 
+            };
 
-        //     navigation.navigate('LoginScreen');
-        // }
-        navigation.navigate('ClinicProfileCompletion2');
+            console.log('User Data:', userData);
+
+        try {
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqbusinessdtls1-ax.php`, userData);
+
+            console.log('dataresponse', response.data);
+            ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
+            console.log('Data Added to database');
+            //navigation.navigate('EditProfile')
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+
+       // navigation.navigate('ClinicProfileCompletion2');
     };
 
     const toggleRectVisibility = () => {
@@ -401,8 +419,8 @@ const ClinicProfileCompletion1 = ({ navigation }) => {
                                             style={styles.inputs}
                                             placeholder="Establishment Year"
                                             placeholderTextColor="#979797"
-                                            //value={selectedEmail}
-                                            //onChangeText={(text) => setSelectedEmail(text)}
+                                            value={eyear}
+                                            onChangeText={(text) => setEyear(text)}
                                             underlineColorAndroid="transparent"
                                         />
                                     </View>

@@ -22,7 +22,7 @@ const SocialLink = ({ platform, username }) => {
             case 'facebook':
                 url = `https://www.facebook.com/${username}`;
                 break;
-            case 'website':
+            case 'other':
                 url = username.startsWith('http') ? username : `https://${username}`;
                 break;
             case 'contact':
@@ -63,7 +63,7 @@ const getImageSource = (platform) => {
             return require('../../assets/img/linkedinP.png');
         case 'facebook':
             return require('../../assets/img/facebookP.png');
-        case 'website':
+        case 'other':
             return require('../../assets/img/websiteP.png');
         case 'contact':
             return require('../../assets/img/conP.png');

@@ -10,6 +10,9 @@ import { Calendar, LocaleConfig } from 'react-native-calendars';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from 'moment';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { API_CONFIG } from '../../API/APIConfig';
 
 
 const { width, height } = Dimensions.get('window');
@@ -30,8 +33,110 @@ const NDProfileCompletion1 = ({ navigation }) => {
     const [selectedAlternateContactNumber, setSelectedAlternateContactNumber] = useState('');
     const [selectedWappNumber, setSelectedWappNumber] = useState('');
     const [selectedGender, setSelectedGender] = useState('');
+    const [selectedGenderID, setSelectedGenderID] = useState();
     const [selectedProfession, setSelectedProfession] = useState('');
+    const [selectedProfessionID, setSelectedProfessionID] = useState('');
     const [selectedDateOfBirth, setSelectedDateOfBirth] = useState('');
+
+    const [userData, setUserData] = useState(null);
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                const id = parseInt(pr_id);
+
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getvic-ax.php?prid=${id}`);
+                const data = await response.json();
+                setUserData(data.data);
+                setSelectedName(data.data.name);
+                setSelectedEmail(data.data.email);
+                setSelectedContactNumber(data.data.phoneno);
+                setSelectedAlternateContactNumber(data.data.alternate);
+                setSelectedWappNumber(data.data.wp_number);
+                setSelectedDateOfBirth(data.data.dob);
+                setIsLoading(false);
+            } catch (error) {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData(); // Call the function immediately
+
+    }, []);
+
+
+    const [optionsPro, setOptionsPro] = useState([]);
+    const [gender, setGender] = useState([]);
+
+    useEffect(() => {
+        if (userData) {
+            setSelectedGender(userData.genList.gender);
+            setSelectedGenderID(userData.genList.gen_id);
+            setSelectedProfession(userData.profession);
+            setSelectedProfessionID(userData.proff_id);
+        }
+    }, [userData]);
+
+    useEffect(() => {
+        const fetchProfessionList = async () => {
+            try {
+                const response = await axios.get(`${API_CONFIG.API_DOMAIN}${API_CONFIG.professionListUrl}`);
+                const data = response.data;
+                console.log("Fetched data:", data); // Log fetched data
+
+                if (data.code === 1) {
+                    // Get the stored pr_ty_id from AsyncStorage
+                    const storedId = await AsyncStorage.getItem('pr_ty_id');
+                    console.log("Stored pr_ty_id:", storedId); // Log stored pr_ty_id
+
+                    const filteredData = data.data.filter(item => item.pr_ty_id === storedId);
+                    console.log("Filtered data:", filteredData); // Log filtered data
+
+                    const professionOptions = filteredData.map(item => ({
+                        label: item.profession,
+                        value: item.profession,
+                        id: parseInt(item.id) // Parse the id as an integer
+                    }));
+
+                    console.log("Dropdown options:", professionOptions); // Log dropdown options
+
+                    setOptionsPro(professionOptions);
+                } else {
+                    console.error('Error fetching profession options');
+                }
+            } catch (error) {
+                console.error('Error fetching profession options:', error);
+            }
+        };
+
+        fetchProfessionList();
+    }, []);
+
+
+    useEffect(() => {
+        const fetchGenderList = async () => {
+            try {
+                const response = await axios.get(`${API_CONFIG.API_DOMAIN}${API_CONFIG.genderListUrl}`);
+                const data = response.data;
+                if (data.code === 1) {
+                    const genderOptions = data.data.map(item => ({
+                        label: item.gender,
+                        value: item.gender,
+                        id: parseInt(item.id)
+                    }));
+                    setGender(genderOptions);
+                } else {
+                    console.error('Error fetching gender options');
+                }
+            } catch (error) {
+                console.error('Error fetching gender options:', error);
+            }
+        };
+
+        fetchGenderList();
+    }, []);
 
     const [isFocused, setIsFocused] = useState(false);
     const [isNameFocused, setIsNameFocused] = useState(false);
@@ -48,12 +153,13 @@ const NDProfileCompletion1 = ({ navigation }) => {
             // User dismissed the picker
             setIsDateOfBirthFocused(false);
         } else {
-            setSelectedDate(date);
+            setSelectedDate(date); // Update the selected date
             const formattedDate = moment(date).format('DD MMMM, YYYY');
-            setSelectedDateOfBirth(formattedDate);
+            setSelectedDateOfBirth(formattedDate); // Update the displayed date of birth
             setIsDateOfBirthFocused(false); // Set isDateOfBirthFocused to false after selecting a date
         }
     };
+
 
 
     const showDatePicker = () => {
@@ -87,51 +193,38 @@ const NDProfileCompletion1 = ({ navigation }) => {
 
 
 
-    const handleNext = () => {
-        // if (!selectedName) {
-        //     ToastAndroid.show('Name is Required', ToastAndroid.SHORT);
-        // } else if (selectedName.length > 5) {
-        //     ToastAndroid.show('Name should be maximum 5 characters long', ToastAndroid.SHORT);
-        // } 
-        // else if (!selectedEmail) {
-        //     ToastAndroid.show('Email is Required', ToastAndroid.SHORT);
-        // } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(selectedEmail)) {
-        //     ToastAndroid.show('Invalid Email Address', ToastAndroid.SHORT);
-        // } 
-        // else if (!selectedContactNumber) {
-        //     ToastAndroid.show('Contact Number is Required', ToastAndroid.SHORT);
-        // } else if (!/^\d{10}$/.test(selectedContactNumber)) {
-        //     ToastAndroid.show('Invalid Contact Number', ToastAndroid.SHORT);
-        // } 
+    const handleNext = async () => {
+        const pr_id = await AsyncStorage.getItem('pr_id');
+        const id = parseInt(pr_id);
+        const pr_ty_id = await AsyncStorage.getItem('pr_ty_id');
 
-        // else if (!selectedAlternateContactNumber) {
-        //     ToastAndroid.show('Alternate Contact Number is Required', ToastAndroid.SHORT);
-        // } else if (!/^\d{10}$/.test(selectedAlternateContactNumber)) {
-        //     ToastAndroid.show('Invalid Alternate Contact Number', ToastAndroid.SHORT);
-        // } else if (!selectedGender) {
-        //     ToastAndroid.show('Gender is Required', ToastAndroid.SHORT);
-        // } else if (!selectedWappNumber) {
-        //     ToastAndroid.show('WhatsApp Number is Required', ToastAndroid.SHORT);
-        // } else if (!/^\d{10}$/.test(selectedWappNumber)) {
-        //     ToastAndroid.show('Invalid WhatsApp Number', ToastAndroid.SHORT);
-        // } else if (!selectedProfession) {
-        //     ToastAndroid.show('Profession is Required', ToastAndroid.SHORT);
-        // } else {
-        //     const userData = {
-        //         name: selectedName,
-        //         email: selectedEmail,
-        //         contactNumber: selectedContactNumber,
-        //         alternateContactNumber: selectedAlternateContactNumber,
-        //         wappNumber: selectedWappNumber,
-        //         gender: selectedGender,
-        //         profession: selectedProfession,
-        //     };
+        const userData = {
+            pr_ty_id: parseInt(pr_ty_id),
+            pr_id: id,
+            name: selectedName,
+            email: selectedEmail,
+            phoneno: selectedContactNumber,
+            alternate: selectedAlternateContactNumber,
+            wp_number: selectedWappNumber,
+            gen_id: selectedGenderID,
+            proff_id: selectedProfessionID,
+            dob: selectedDateOfBirth
+        };
 
-        //     console.log('User Data:', userData);
+        console.log('User Data:', userData);
 
-        //     navigation.navigate('LoginScreen');
-        // }
-        navigation.navigate('LocationScreen');
+        try {
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls1-ax.php`, userData);
+
+            console.log('dataresponse', response.data);
+            ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
+            console.log('Data Added to database');
+            navigation.navigate('EditProfile')
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+
+
     };
 
     const toggleRectVisibility = () => {
@@ -149,21 +242,20 @@ const NDProfileCompletion1 = ({ navigation }) => {
                 </View>
 
             ) : (
+                    <View style={{ flex: 1 }}>
+                        {userData && (
                 <ScrollView contentContainerStyle={styles.container}>
-                    {/* Header */}
-                    <View style={styles.headerContainer}>
-                        <Image source={require('../../../assets/img/LS.png')} style={styles.headerImageBackground} />
-                        <View style={styles.headerTextContainer}>
-                            <Text style={[commonStyles.headerText1W, {
-                                marginBottom: moderateScale(8),
-
-                            }]}>Personal Details</Text>
-                            <Text style={[commonStyles.headerText2W, {
-                                paddingHorizontal: moderateScale(16), textAlign: 'center',
-                            }]}>Please provide your personal details for better user experience.</Text>
-                        </View>
-                    </View>
                         <View style={styles.contentContainer}>
+
+                            <View style={styles.headerTextContainer}>
+                                <Text style={[commonStyles.headerText1BL, { marginBottom: moderateScale(6), textAlign: 'center' }]}>
+                                            Personal Details
+                                </Text>
+                                <Text style={[commonStyles.headerText2BL, { textAlign: 'center', paddingHorizontal: width * 0.02 }]}>
+                                    Choose your career category and unlock endless possibilities.
+                                </Text>
+
+                            </View>
 
                             <View style={styles.inputContainerWithLabel}>
                                 <Text style={[commonStyles.headerText4BL, {
@@ -175,19 +267,11 @@ const NDProfileCompletion1 = ({ navigation }) => {
                                         style={styles.inputs}
                                         placeholder="Enter your name"
                                         placeholderTextColor={'#979797'}
-                                        value={selectedName}
+                                                value={selectedName}
                                         onChangeText={(text) => setSelectedName(text)}
                                         underlineColorAndroid='transparent'
-                                        onFocus={() => setIsNameFocused(true)}
-                                        onBlur={() => setIsNameFocused(false)}
                                         autoFocus={true} // Set autoFocus to true
                                     />
-                                    {selectedName.length > 0 && (
-                                        <Image
-                                            source={require('../../../assets/img/checked.png')}
-                                            style={styles.image}
-                                        />
-                                    )}
                                 </View>
                             </View>
 
@@ -200,19 +284,13 @@ const NDProfileCompletion1 = ({ navigation }) => {
                                         style={styles.inputs}
                                         placeholder="Enter your email address"
                                         placeholderTextColor={'#979797'}
-                                        value={selectedEmail}
+                                                value={selectedEmail}
                                         onChangeText={(text) => setSelectedEmail(text)}
                                         underlineColorAndroid='transparent'
                                         onFocus={() => setIsEmailFocused(true)}
                                         onBlur={() => setIsEmailFocused(false)}
                                         autoFocus={true} // Set autoFocus to true
                                     />
-                                    {selectedEmail.length > 0 && (
-                                        <Image
-                                            source={require('../../../assets/img/checked.png')}
-                                            style={styles.image}
-                                        />
-                                    )}
                                 </View>
                             </View>
 
@@ -227,19 +305,11 @@ const NDProfileCompletion1 = ({ navigation }) => {
                                         placeholderTextColor="#979797"
                                         maxLength={10}
                                         keyboardType="phone-pad"
-                                        value={selectedContactNumber}
+                                                value={selectedContactNumber}
                                         onChangeText={(text) => setSelectedContactNumber(text)}
                                         underlineColorAndroid="transparent"
-                                        onFocus={() => setIsContactFocused(true)}
-                                        onBlur={() => setIsContactFocused(false)}
+                                        editable={false}
                                     />
-
-                                    {selectedContactNumber.length > 9 && (
-                                        <Image
-                                            source={require('../../../assets/img/checked.png')}
-                                            style={styles.image}
-                                        />
-                                    )}
                                 </View>
                             </View>
 
@@ -254,37 +324,35 @@ const NDProfileCompletion1 = ({ navigation }) => {
                                         maxLength={10}
                                         placeholderTextColor={'#979797'}
                                         keyboardType="phone-pad"
-                                        value={selectedAlternateContactNumber}
+                                                value={selectedAlternateContactNumber}
                                         onChangeText={(text) => setSelectedAlternateContactNumber(text)}
                                         underlineColorAndroid='transparent'
                                         onFocus={() => setIsAltCFocused(true)}
                                         onBlur={() => setIsAltCFocused(false)}
                                         autoFocus={true} // Set autoFocus to true
                                     />
-                                    {selectedAlternateContactNumber.length > 9 && (
-                                        <Image
-                                            source={require('../../../assets/img/checked.png')}
-                                            style={styles.image}
-                                        />
-                                    )}
                                 </View>
                             </View>
 
-                            <View style={styles.dropdownContainer}>
-                                <Text style={[commonStyles.headerText4BL, {
-                                    marginBottom: height * 0.005,
-                                }]}>Specify your gender <Text style={styles.requiredIndicator}>*</Text></Text>
-                                <CustomDropdown
-                                    options={[
-                                        { label: 'Male', value: 'Male' },
-                                        { label: 'Female', value: 'Female' },
-                                        { label: 'Other', value: 'Other' },
-                                    ]}
-                                    onSelect={(value) => setSelectedGender(value)}
-                                    selectedValue={selectedGender}
-                                    placeholder="Select Option"
-                                />
-                            </View>
+                                    <View style={styles.dropdownContainer}>
+                                        <Text style={[commonStyles.headerText4BL, {
+                                            marginBottom: height * 0.005,
+                                        }]}>Specify your gender <Text style={styles.requiredIndicator}>*</Text></Text>
+
+
+                                        <CustomDropdown
+                                            options={gender}
+                                            onSelect={(value, id) => {
+                                                console.log('Selected Profession:', value);
+                                                console.log('Selected ProfessionID:', id);
+                                                setSelectedGender(value);
+                                                setSelectedGenderID(id);
+                                            }}
+                                            selectedValue={selectedGender}
+                                            placeholder="Select Option"
+                                        />
+
+                                    </View>
 
                             <View style={styles.inputContainerWithLabel}>
                                 <Text style={[commonStyles.headerText2BL, { marginBottom: height * 0.005 }]}>
@@ -294,61 +362,23 @@ const NDProfileCompletion1 = ({ navigation }) => {
                                     onPress={showDatePicker}
                                     style={[styles.inputContainer1, isDateOfBirthFocused && styles.inputFocused]}
                                 >
-                                    <TextInput
-                                        style={styles.inputs}
-                                        placeholder="Enter your Date of Birth"
-                                        placeholderTextColor="#979797"
-                                        value={selectedDateOfBirth}
-                                        editable={false}
-                                    />
-                                    {selectedDateOfBirth.length > 0 && (
-                                        <Image source={require('../../../assets/img/checked.png')} style={styles.image} />
-                                    )}
+                                            <TextInput
+                                                style={styles.inputs}
+                                                placeholder="Enter your Date of Birth"
+                                                placeholderTextColor="#979797"
+                                                value={selectedDateOfBirth}
+                                                editable={false}
+                                            />
                                 </TouchableOpacity>
-
-                                {isDateOfBirthFocused && (
-                                    <DateTimePicker
-                                        value={selectedDate}
-                                        mode="date"
-                                        display="default"
-                                        onChange={handleDateChange}
-                                    />
-                                )}
+                                        {isDateOfBirthFocused && (
+                                            <DateTimePicker
+                                                value={selectedDate}
+                                                mode="date"
+                                                display="default"
+                                                onChange={handleDateChange}
+                                            />
+                                        )}
                             </View>
-
-                            {/* <View style={styles.inputContainerWithLabel}>
-                                <Text style={[commonStyles.headerText2BL, {
-                                    marginBottom: height * 0.005,
-                                }]}>Date of Birth <Text style={styles.requiredIndicator}>*</Text></Text>
-                                <TouchableOpacity onPress={showDatePicker} style={[styles.inputContainer1, isDateOfBirthFocused && styles.inputFocused]}>
-                                    <TextInput
-                                        style={styles.inputs}
-                                        placeholder="Date of Birth"
-                                        placeholderTextColor="#979797"
-                                        value={moment(birthDate).format('DD MMMM, YYYY')}
-                                        onChangeText={(text) => setSelectedDateOfBirth(text)}
-                                        underlineColorAndroid="transparent"
-                                        onFocus={() => setIsDateOfBirthFocused(true)}
-                                        onBlur={() => setIsDateOfBirthFocused(false)}
-                                        editable={false}
-                                    />
-                                    <DateTimePickerModal
-                                        isVisible={isDatePickerVisible}
-                                        mode="date"
-                                        date={birthDate} // Pass the birthDate as the date prop
-                                        onConfirm={handleConfirm}
-                                        onCancel={hideDatePicker}
-                                    />
-                                    {selectedDateOfBirth.length > 0 && (
-                                        <Image
-                                            source={require('../../../assets/img/checked.png')}
-                                            style={styles.image}
-                                        />
-                                    )}
-                                </TouchableOpacity>
-
-                            </View> */}
-
 
                             <View style={styles.inputContainerWithLabel}>
                                 <Text style={[commonStyles.headerText4BL, {
@@ -361,37 +391,32 @@ const NDProfileCompletion1 = ({ navigation }) => {
                                         maxLength={10}
                                         placeholderTextColor={'#979797'}
                                         keyboardType="phone-pad"
-                                        value={selectedWappNumber}
+                                                value={selectedWappNumber}
                                         onChangeText={(text) => setSelectedWappNumber(text)}
                                         underlineColorAndroid='transparent'
-                                        onFocus={() => setIsWappCFocused(true)}
-                                        onBlur={() => setIsWappCFocused(false)}
-                                        autoFocus={true} // Set autoFocus to true
                                     />
-                                    {selectedWappNumber.length > 9 && (
-                                        <Image
-                                            source={require('../../../assets/img/checked.png')}
-                                            style={styles.image}
-                                        />
-                                    )}
                                 </View>
                             </View>
+                                    <View style={styles.dropdownContainer}>
+                                        <Text style={[commonStyles.headerText4BL, {
+                                            marginBottom: height * 0.005,
+                                        }]}>Specify your profession <Text style={styles.requiredIndicator}>*</Text></Text>
+                                  
+                                        <CustomDropdown
+                                            options={optionsPro}
+                                            onSelect={(value, id) => {
+                                                console.log('Selected Profession:', value);
+                                                console.log('Selected ProfessionID:', id);
+                                                setSelectedProfession(value);
+                                                setSelectedProfessionID(id);
+                                            }}
+                                            selectedValue={selectedProfession}
+                                            placeholder="Select Option"
+                                        />
 
-                            <View style={styles.dropdownContainer}>
-                                <Text style={[commonStyles.headerText4BL, {
-                                    marginBottom: height * 0.005,
-                                }]}>Specify your profession <Text style={styles.requiredIndicator}>*</Text></Text>
-                                <CustomDropdown
-                                    options={[
-                                        { label: 'A Dental Professional', value: 'Dental' },
-                                        { label: 'An Intern', value: 'An Intern' },
-                                        { label: 'Student', value: 'BDS' },
-                                    ]}
-                                    onSelect={(value) => setSelectedProfession(value)}
-                                    selectedValue={selectedProfession}
-                                    placeholder="Select Option"
-                                />
-                            </View>
+
+                                    </View>
+
 
                         </View>
 
@@ -404,6 +429,8 @@ const NDProfileCompletion1 = ({ navigation }) => {
                     </TouchableOpacity>
 
                 </ScrollView>
+                        )}
+                </View>
             )}
         </SafeAreaView>
     );
@@ -413,34 +440,38 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         backgroundColor: '#FEFCFC',
-
+        paddingHorizontal: moderateScale(16),
+        paddingBottom: moderateScale(100),
     },
     headerContainer: {
         position: 'relative',
         alignItems: 'center',
+        marginBottom: height * 0.22,
 
     },
-    headerImageBackground: {
-        position: 'absolute',
-        bottom: height > 650 ? (-moderateScale(height * 0.22)) : (-moderateScale(height * 0.26)),
-        height: height * 0.4,
-        resizeMode: 'contain',
-    },
-    //height > 230 ? (height > 250 ? -moderateScale(height * 0.25) : -moderateScale(250 * 0.25)) : -moderateScale(230 * 0.25),
     headerTextContainer: {
-        position: 'absolute',
-        marginTop: moderateScale(35),
-        // marginLeft: width * 0.08,
         width: '100%',
-        //height: height * 0.05,
         alignItems: 'center',
-        zIndex: 1,
+        marginBottom: 20,
     },
-
+    headerText1: {
+        fontSize: 24,
+        fontFamily: 'Mukta-Bold',
+        color: '#121212',
+        marginBottom: 17,
+    },
+    headerText2: {
+        fontSize: 18,
+        color: '#121212',
+        fontFamily: 'Mukta-Regular',
+        lineHeight: 25,
+        textAlign: 'center',
+    },
     contentContainer: {
-        //paddingHorizontal: width * 0.02,
-        marginTop: height > 650 ? (moderateScale(195)) : (moderateScale(170)),
-        paddingHorizontal: moderateScale(16),
+        marginTop: moderateScale(32),
+        //justifyContent: 'center',
+        alignItems: 'center',
+        //marginTop: height * 0.00,
     },
 
     dropdownContainer: {

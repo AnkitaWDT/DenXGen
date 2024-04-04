@@ -9,6 +9,7 @@ import Animation from '../../components/Loader';
 import Geolocation from '@react-native-community/geolocation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { moderateScale } from 'react-native-size-matters';
+import AlertPopup from '../../components/AlertPopup';
 
 const { width, height } = Dimensions.get('window');
 
@@ -189,6 +190,9 @@ const HomePage = ({ navigation, route }) => {
   const [locationName, setLocationName] = useState('Mumbai, Maharashtra');
 
   const [isLoading, setIsLoading] = useState(true);
+
+  const [showPopup1, setShowPopup1] = useState(false);
+  const [showPopup2, setShowPopup2] = useState(false);
 
   useEffect(() => {
     // Simulate an asynchronous operation (e.g., fetching data) before rendering the profile screen
@@ -576,8 +580,9 @@ const HomePage = ({ navigation, route }) => {
                     style={{ flexDirection: 'row', alignItems: 'center', marginVertical: height * 0.02 }}
                     activeOpacity={0.8}
                     onPress={() => {
-                      setModalVisible(false);
-                      navigation.navigate('ClinicProfileCompletion1'); // Navigate to the desired screen
+                     
+                      setShowPopup1(true);
+                      AsyncStorage.setItem('acc_ty_id', '1');
                     }}
                   >
                     <Image
@@ -587,10 +592,28 @@ const HomePage = ({ navigation, route }) => {
                     <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>Create Clinic Profile</Text>
                   </TouchableOpacity>
 
+                  <AlertPopup
+                    visible={showPopup1}
+                    onRequestClose={() => setShowPopup1(false)}
+                    title="Do you want to save changes?"
+                    message="Do you want to confirm saving this changes to your account?"
+                    yesLabel="Yes"
+                    noLabel="No"
+                    onYesPress={() => {
+                    
+                      setShowPopup1(false);
+                      AsyncStorage.setItem('acc_ty_id', '1');
+                      navigation.navigate('ClinicProfileCompletion1'); 
+                      setModalVisible(false);
+                    }}
+                  />
+                  
+
                   <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginBottom: height * 0.02 }}
                     activeOpacity={0.8}
                     onPress={() => {
                       setModalVisible(false);
+                      AsyncStorage.setItem('acc_ty_id', '2');
                       navigation.navigate('OfficeProfileCompletion1'); // Navigate to the desired screen
                     }}>
                     <Image

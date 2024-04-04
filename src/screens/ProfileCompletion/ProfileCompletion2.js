@@ -483,7 +483,7 @@ const ProfileCompletion2 = ({ navigation }) => {
             about: textareaValues.aboutYourself,
             serv_id: selectedServices,
             spec_id: selectedSpecialties,
-            kef_id: selectedKeyForte,
+            keyf_id: selectedKeyForte,
             qual_id: selectedQualifications,
             license: licenseNumber,
         };
@@ -500,7 +500,7 @@ const ProfileCompletion2 = ({ navigation }) => {
             console.error('An error occurred:', error);
         }
 
-        navigation.navigate('NDProfileCompletion3');
+        navigation.navigate('ProfileCompletion3');
     };
 
 
@@ -520,16 +520,12 @@ const ProfileCompletion2 = ({ navigation }) => {
                             <View style={styles.headerTextContainer}>
                                 <Text style={[commonStyles.headerText1BL, {
                                     marginBottom: moderateScale(6), textAlign: 'center'
-                                }]}>Step 2- Professional Details</Text>
+                                }]}>Professional Details</Text>
                                 <Text style={[commonStyles.headerText2BL, {
                                     textAlign: 'center', paddingHorizontal: width * 0.02
                                 }]}>Choose your career category and unlock endless possibilities.</Text>
                                 {/* <Image source={require('../../../assets/img/Prog2.png')} style={commonStyles.progImage} /> */}
-                                    <ProgressBar
-                                        progress={progressPercentage / 100}
-                                        color="#00B0FF"
-                                        style={commonStyles.progImage}
-                                    />
+                                    
                             </View>
                     
 
