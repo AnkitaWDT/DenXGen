@@ -524,63 +524,80 @@
 import React, { useState } from 'react';
 import { View, Button, Image } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
-
+import Video from 'react-native-video';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProfileCompletion3 = () => {
-    const [pickedImage, setPickedImage] = useState(null);
+    const [pickedVideo, setPickedVideo] = useState(null);
+    const [isSending, setIsSending] = useState(false);
 
-    const pickImage = async () => {
+    const pickVideo = async () => {
         try {
-            const image = await ImagePicker.openPicker({
-                width: 400,
-                height: 400,
-                cropping: true,
+            const video = await ImagePicker.openPicker({
+                mediaType: 'video',
+                //cropping: true,
             });
 
-            setPickedImage(image);
-
-            // Prepare the image data to send to the backend
-            const formData = new FormData();
-            formData.append('image', {
-                uri: image.path,
-                type: image.mime,
-                name: 'image.jpg',
-            });
-
-            // Send formData to your backend using fetch or any other network library
-            // Replace 'YOUR_BACKEND_URL' with your actual backend endpoint
-            fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqimagedata-temp-ax.php', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    // Add any additional headers if required
-                },
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Image uploaded successfully:', data);
-                    // Handle response from the backend
-                })
-                .catch(error => {
-                    console.error('Error uploading image:', error);
-                    // Handle error
-                });
-
+            setPickedVideo(video);
+            sendVideo(video); // Call sendVideo function immediately after picking the video
         } catch (error) {
             console.log(error);
         }
     };
 
+    const sendVideo = async (profile_video) => {
+        setIsSending(true);
+
+        let formData = new FormData();
+        if (profile_video) {
+            formData.append('profile_video', {
+                uri: profile_video.path,
+                type: profile_video.mime,
+                name: 'video.mp4',
+            });
+
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+            console.log(id);
+            console.log(pr_id);
+            if (id) {
+                console.log(id);
+                formData.append('pr_id', id);
+            }
+            console.log(formData);
+
+            fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls33-ax.php', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+                .then(response => response.text()) // Get the response text directly
+                .then(data => {
+                    console.log('Video upload response:', data); // Log the response text
+                })
+                .catch(error => {
+                    console.error('Error uploading video:', error);
+                })
+                .finally(() => {
+                    setIsSending(false);
+                });
+        }
+    };
+
+
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            {pickedImage && (
-                <Image source={{ uri: pickedImage.path }} style={{ width: 200, height: 200 }} />
+            {pickedVideo && (
+                <Video source={{ uri: pickedVideo.path }} style={{ width: 200, height: 200 }} />
             )}
-            <Button title="Pick Image" onPress={pickImage} />
+            <Button title="Select Video" onPress={pickVideo} />
+            
         </View>
     );
 };
+
 
 
 export default ProfileCompletion3;

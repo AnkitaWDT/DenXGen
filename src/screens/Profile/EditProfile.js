@@ -608,7 +608,7 @@ const EditProfile = ({ navigation }) => {
                     noLabel="No"
                     onYesPress={() => {
                         setShowPopup5(false);
-                        navigation.navigate('ProfileCompletion3');
+                        navigation.navigate('NDProfileCompletion3');
                     }}
                 />
 

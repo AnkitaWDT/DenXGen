@@ -143,11 +143,12 @@ const ClinicProfileCompletion1 = ({ navigation }) => {
         //     ToastAndroid.show('Profession is Required', ToastAndroid.SHORT);
         // } else {
 
+        const cl_id = await AsyncStorage.getItem('cl_id');
         const acc_ty_id = await AsyncStorage.getItem('acc_ty_id');
         const pr_id = await AsyncStorage.getItem('pr_id');
         const id = parseInt(pr_id);
             const userData = {
-                acc_ty_id: parseInt(acc_ty_id),
+                cl_id: parseInt(cl_id),
                 pr_id: id,
                 name: selectedName,
                 email: selectedEmail,
@@ -161,17 +162,17 @@ const ClinicProfileCompletion1 = ({ navigation }) => {
             console.log('User Data:', userData);
 
         try {
-            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqbusinessdtls1-ax.php`, userData);
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqclinicdtls1-ax.php`, userData);
 
             console.log('dataresponse', response.data);
             ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
             console.log('Data Added to database');
-            //navigation.navigate('EditProfile')
+            navigation.navigate('ClinicProfileCompletion2');
         } catch (error) {
             console.error('An error occurred:', error);
         }
 
-       // navigation.navigate('ClinicProfileCompletion2');
+       //
     };
 
     const toggleRectVisibility = () => {
@@ -183,7 +184,7 @@ const ClinicProfileCompletion1 = ({ navigation }) => {
     const totalSteps = 9; // Total number of steps
 
     const progressPercentage = (currentStep / totalSteps) * 100; // Calculate progress percentage
-    console.log("Progress Percentage:", progressPercentage);
+    //console.log("Progress Percentage:", progressPercentage);
 
 
     return (

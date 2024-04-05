@@ -162,6 +162,49 @@ const HomePage = ({ navigation, route }) => {
     },
 ];
 
+
+
+  const [clinicData1, setClinicData1] = useState([]);
+  const [clStatus, setClStatus] = useState(null);
+
+  useEffect(() => {
+    // Fetch cl_status from AsyncStorage
+    const fetchClStatus = async () => {
+      try {
+        const status = await AsyncStorage.getItem('cl_status');
+        if (status !== null) {
+          setClStatus(status);
+        }
+      } catch (error) {
+        console.error('Error fetching cl_status:', error);
+      }
+    };
+
+    const fetchClinicData = async () => {
+      try {
+        // Fetch clinic data
+        // Example: const response = await fetch('your-api-endpoint');
+        // const data = await response.json();
+        // setClinicData(data.clinics);
+
+        // Example with mock data
+        const data = [
+          { id: 1, name: 'Clinic A',  },
+          { id: 2, name: 'Clinic B',  },
+          // Add more clinic objects as needed
+        ];
+        setClinicData1(data);
+      } catch (error) {
+        console.error('Error fetching clinic data:', error);
+      }
+    };
+
+
+    fetchClStatus();
+    fetchClinicData();
+  }, []);
+
+
   const getModalHeight = () => {
     const buttonHeight = 50; // Height of each button
     const headingHeight = 30; // Height of each heading
@@ -575,6 +618,73 @@ const HomePage = ({ navigation, route }) => {
                     </>
                   )}
 
+                  {clinicData1.length > 0 && (
+                    <>
+                      <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.005 }]}>Clinic Account</Text>
+                      {clinicData1.map((clinic, index) => (
+                        <TouchableOpacity key={index}
+                          activeOpacity={0.8}
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            height: height * 0.075,
+                          }}
+                          onPress={() => {
+                            // Handle onPress
+                          }}
+                        >
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            {/* Conditionally render image and name based on cl_status */}
+                            {clStatus === '0' ? (
+                              <>
+                                <Image
+                                  source={require('../../../assets/img/DotActive.png')}
+                                  style={styles.accountImage}
+                                />
+                                <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>Clinic(Drafts) - {clinic.cl_id}</Text>
+                              </>
+                            ) : clStatus === '1' ? (
+                              <>
+                                <Image
+                                    source={require('../../../assets/img/DotActive.png')}
+                                  style={styles.accountImage}
+                                />
+                                <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>Clinic(Name) - {clinic.cl_id}</Text>
+                              </>
+                            ) : (
+                              // Render a default image and name if cl_status is neither 0 nor 1
+                              <>
+                                <Image
+                                      source={require('../../../assets/img/DotActive.png')}
+                                  style={styles.accountImage}
+                                />
+                                <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>Clinic - {clinic.cl_id}</Text>
+                              </>
+                            )}
+                          </View>
+                          {/* Check if this is the active item, and display DotActive accordingly */}
+                          {activeItem === clinic.name ? (
+                            <View style={commonStyles.activeIcon}>
+                              <Image
+                                source={require('../../../assets/img/DotActive.png')}
+                                style={commonStyles.icon}
+                              />
+                            </View>
+                          ) : (
+                            <View style={commonStyles.activeIcon}>
+                              <Image
+                                source={require('../../../assets/img/Active.png')}
+                                style={commonStyles.icon}
+                              />
+                            </View>
+                          )}
+                        </TouchableOpacity>
+                      ))}
+                      {clinicData1.length > 0 && <View style={{ height: 1, backgroundColor: '#ccc', marginBottom: 10, marginTop: 5 }} />}
+                    </>
+                  )}
+
                   {/* Buttons */}
                   <TouchableOpacity
                     style={{ flexDirection: 'row', alignItems: 'center', marginVertical: height * 0.02 }}
@@ -599,12 +709,30 @@ const HomePage = ({ navigation, route }) => {
                     message="Do you want to confirm saving this changes to your account?"
                     yesLabel="Yes"
                     noLabel="No"
-                    onYesPress={() => {
+                    onYesPress={async () => {
+                      try {
+                        // Make API call to fetch cl_id
+                        const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqcreateclinic-ax.php');
+                        const data = await response.json();
+                        console.log(data);
+
+                        if (data && data.data && data.data.cl_id) {
+                          // Store cl_id in AsyncStorage
+                          await AsyncStorage.setItem('cl_id', String(data.data.cl_id));
+                          await AsyncStorage.setItem('cl_status', String(data.data.status));
+                        }
+
+                        setShowPopup1(false);
+                        navigation.navigate('ClinicProfileCompletion1');
+                      } catch (error) {
+                        console.error('Error fetching cl_id:', error);
+                        // Handle error
+                      }
                     
-                      setShowPopup1(false);
-                      AsyncStorage.setItem('acc_ty_id', '1');
-                      navigation.navigate('ClinicProfileCompletion1'); 
-                      setModalVisible(false);
+                      // setShowPopup1(false);
+                      // AsyncStorage.setItem('acc_ty_id', '1');
+                      // navigation.navigate('ClinicProfileCompletion4'); 
+                      // setModalVisible(false);
                     }}
                   />
                   
@@ -665,7 +793,7 @@ const HomePage = ({ navigation, route }) => {
                         right: width * 0.02,
                       //width: width * 0.25,
                     }}
-                     onPress={() => navigation.navigate('ProfileCompletion2')}
+                     onPress={() => navigation.navigate('ProfileCompletion3')}
                   >
                     <Text style={{
                       fontSize: responsiveFontSize(14),

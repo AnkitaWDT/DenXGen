@@ -23,6 +23,8 @@ import { moderateScale } from 'react-native-size-matters';
 import { ProgressBar } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const { width, height } = Dimensions.get('window');
 
@@ -34,100 +36,114 @@ const responsiveFontSize = (size) => {
 
 
 const ClinicProfileCompletion2 = ({ navigation }) => {
-
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Simulate an asynchronous operation (e.g., fetching data) before rendering the profile screen
         const fakeAsyncOperation = async () => {
-            // Add any asynchronous logic here if needed
-            // For now, just simulate a delay
             await new Promise(resolve => setTimeout(resolve, 1000));
-
-            // Set loading state to false after the delay
             setIsLoading(false);
         };
-
-        // Execute the fakeAsyncOperation
         fakeAsyncOperation();
     }, []);
 
-    const currentStep = 2; // For example, current step is 4
-    const totalSteps = 9; // Total number of steps
+    const currentStep = 2;
+    const totalSteps = 9;
+    const progressPercentage = (currentStep / totalSteps) * 100;
 
-    const progressPercentage = (currentStep / totalSteps) * 100; // Calculate progress percentage
-    console.log("Progress Percentage:", progressPercentage);
+    // const [selectedTimes, setSelectedTimes] = useState({
+    //     Monday: [{ from: '', to: '' }],
+    //     Tuesday: [{ from: '', to: '' }],
+    //     Wednesday: [{ from: '', to: '' }],
+    //     Thursday: [{ from: '', to: '' }],
+    //     Friday: [{ from: '', to: '' }],
+    //     Saturday: [{ from: '', to: '' }],
+    //     Sunday: [{ from: '', to: '' }],
+    // });
 
-    const [selectedTimes, setSelectedTimes] = useState({
-        Monday: { from: '', to: '' },
-        Tuesday: { from: '', to: '' },
-        Wednesday: { from: '', to: '' },
-        Thursday: { from: '', to: '' },
-        Friday: { from: '', to: '' },
-        Saturday: { from: '', to: '' },
-        Sunday: { from: '', to: '' },
-    });
-    const [additionalInputs, setAdditionalInputs] = useState({
-        Monday: [],
-        Tuesday: [],
-        Wednesday: [],
-        Thursday: [],
-        Friday: [],
-        Saturday: [],
-        Sunday: [],
-    });
-    const [isTimePickerVisible, setIsTimePickerVisible] = useState(false);
-    const [selectedDay, setSelectedDay] = useState('');
-    const [selectedType, setSelectedType] = useState('from');
+    const [days, setDays] = useState([]);
+    const [dayIdMap, setDayIdMap] = useState({});
+    const [selectedTimes, setSelectedTimes] = useState({});
 
+    // Fetch days and their IDs from the API
     useEffect(() => {
-        const fakeAsyncOperation = async () => {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            setIsLoading(false);
+        const fetchDays = async () => {
+            try {
+                const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getdayofweek-ax.php');
+                const data = await response.json();
+                if (data && data.data) {
+                    // Set the days fetched from the API
+                    setDays(data.data);
+                    // Construct the dayIdMap object with the fetched days
+                    const initialDayIdMap = {};
+                    data.data.forEach(day => {
+                        initialDayIdMap[day.day] = day.id; // Map day name to its ID
+                    });
+                    setDayIdMap(initialDayIdMap);
+                    // Initialize selectedTimes object with the fetched days
+                    const initialSelectedTimes = {};
+                    data.data.forEach(day => {
+                        initialSelectedTimes[day.day] = [{ from: '', to: '' }]; // Initialize with an empty array
+                    });
+                    setSelectedTimes(initialSelectedTimes);
+                }
+            } catch (error) {
+                console.error('Error fetching days:', error);
+            } finally {
+                setIsLoading(false);
+            }
         };
-        fakeAsyncOperation();
+
+        fetchDays();
     }, []);
-
-    // const showTimePicker = (day, type) => {
-    //     setSelectedDay(day);
-    //     setSelectedType(type);
-    //     setIsTimePickerVisible(true);
-    // };
-
-    const showTimePicker = (day, type, index) => {
-        setSelectedDay(day);
-        setSelectedType(type);
-        setIsTimePickerVisible(true);
-        setSelectedAdditionalIndex(index); // Update to use setSelectedAdditionalIndex
-        setSelectedDayFromIndex(index); // Assuming setSelectedDayFromIndex and setSelectedDayToIndex are defined elsewhere
-        setSelectedDayToIndex(index); // Assuming setSelectedDayFromIndex and setSelectedDayToIndex are defined elsewhere
-    };
-
-
-    const [selectedDayFromIndex, setSelectedDayFromIndex] = useState(null);
-    const [selectedDayToIndex, setSelectedDayToIndex] = useState(null);
-    const [selectedAdditionalIndex, setSelectedAdditionalIndex] = useState(null);
-
-
 
     const handleTimeChange = (event, time) => {
         if (time !== undefined) {
             const formattedTime = moment(time).format('h:mm A');
-            setSelectedTimes(prevState => ({
-                ...prevState,
-                [selectedDay]: {
-                    ...prevState[selectedDay],
-                    [selectedType]: formattedTime,
-                },
-            }));
-            setIsTimePickerVisible(false);
-        } else {
-            setIsTimePickerVisible(false);
+            const updatedTimes = { ...selectedTimes }; // Create a copy of selectedTimes
+            updatedTimes[selectedDay][selectedInputIndex][selectedType] = formattedTime; // Update the specific time value
+            setSelectedTimes(updatedTimes); // Update the state
         }
+        setIsTimePickerVisible(false); // Close the time picker regardless of whether a time was selected
     };
 
-    const addTimeInput = (day) => {
-        if (selectedTimes[day].length < 5) {
+
+    const [isTimePickerVisible, setIsTimePickerVisible] = useState(false);
+    const [selectedDay, setSelectedDay] = useState('');
+    const [selectedType, setSelectedType] = useState('from');
+    const [selectedInputIndex, setSelectedInputIndex] = useState(null);
+
+    const showTimePicker = (day, type, index) => {
+        setSelectedDay(day);
+        setSelectedType(type);
+        setSelectedInputIndex(index);
+        setIsTimePickerVisible(true);
+    };
+
+    // const handleTimeChange = (event, time) => {
+    //     if (time !== undefined) {
+    //         const formattedTime = moment(time).format('h:mm A');
+    //         const updatedTimes = [...selectedTimes[selectedDay]];
+    //         updatedTimes[selectedInputIndex] = {
+    //             ...updatedTimes[selectedInputIndex],
+    //             [selectedType]: formattedTime,
+    //         };
+    //         setSelectedTimes(prevState => ({
+    //             ...prevState,
+    //             [selectedDay]: updatedTimes,
+    //         }));
+    //         setIsTimePickerVisible(false);
+    //     } else {
+    //         setIsTimePickerVisible(false);
+    //     }
+    // };
+
+    const addAdditionalInput = (day) => {
+        // setSelectedTimes(prevState => ({
+        //     ...prevState,
+        //     [day]: [...prevState[day], { from: '', to: '' }],
+        // }));
+        const existingInputsCount = selectedTimes[day].length;
+        if (existingInputsCount < 5) {
             setSelectedTimes(prevState => ({
                 ...prevState,
                 [day]: [...prevState[day], { from: '', to: '' }],
@@ -135,170 +151,208 @@ const ClinicProfileCompletion2 = ({ navigation }) => {
         }
     };
 
-    const addAdditionalInput = (day) => {
-        const updatedInputs = [...additionalInputs[day], ''];
-        setAdditionalInputs(prevState => ({
-            ...prevState,
-            [day]: updatedInputs,
-        }));
+    const handleNext = async () => {
+        const timingsArray = [];
+        Object.keys(selectedTimes).forEach(day => {
+            selectedTimes[day].forEach(time => {
+                if (time.from && time.to) {
+                    timingsArray.push({
+                        dw_id: parseInt(dayIdMap[day]), // Use day ID instead of name
+                        start_time: time.from,
+                        end_time: time.to
+                    });
+                }
+            });
+        });
+
+        const cl_id = await AsyncStorage.getItem('cl_id');
+        const acc_ty_id = await AsyncStorage.getItem('acc_ty_id');
+        const pr_id = await AsyncStorage.getItem('pr_id');
+        const id = parseInt(pr_id);
+
+        const userData = {
+            cl_id: parseInt(cl_id),
+            //pr_id: id,
+            timings: timingsArray
+        };
+
+        console.log('User Data:', userData);
+
+        try {
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqclinicdtls2-ax.php`, userData);
+
+            console.log('dataresponse', response.data);
+            ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
+            console.log('Data Added to database');
+           // navigation.navigate('ClinicProfileCompletion2');
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+        //navigation.navigate('ClinicProfileCompletion3');
     };
 
-    // Function to handle input change for additional inputs
-    // Function to handle input change for additional inputs
-    const handleAdditionalInputChange = (day, index, text) => {
-        const updatedInputs = [...additionalInputs[day]];
-        updatedInputs[index] = text;
-        const updatedAdditionalInputs = { ...additionalInputs }; // Copy the additionalInputs object
-        updatedAdditionalInputs[day] = updatedInputs; // Update the inputs for the specific day
-        setAdditionalInputs(updatedAdditionalInputs); // Update the state
-    };
 
+    // const handleNext = async () => {
+    //     const timingsObject = {};
+    //     Object.keys(selectedTimes).forEach(day => {
+    //         const timings = selectedTimes[day].map(time => {
+    //             if (time.from && time.to) {
+    //                 return `${time.from} - ${time.to}`;
+    //             } else {
+    //                 return "";
+    //             }
+    //         });
+    //         timingsObject[dayIdMap[day]] = timings; // Use day ID instead of name
+    //     });
+    //     //console.log(JSON.stringify(timingsObject, null, 2)); // Log timingsObject as JSON
 
+    //     const cl_id = await AsyncStorage.getItem('cl_id');
+    //     const acc_ty_id = await AsyncStorage.getItem('acc_ty_id');
+    //     const pr_id = await AsyncStorage.getItem('pr_id');
+    //     const id = parseInt(pr_id);
 
-    const [showAdditionalInput, setShowAdditionalInput] = useState(true);
+    //     const userData = {
+    //         cl_id: parseInt(cl_id),
+    //         pr_id: id,
+    //         timings: timingsObject
+    //     };
 
+    //     console.log('User Data:', userData);
+    //     //navigation.navigate('ClinicProfileCompletion3');
+    // };
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
             {isLoading ? (
                 <View style={{ justifyContent: 'center', alignSelf: 'center' }}>
-                    <Animation />
+                    <Text>Loading...</Text>
                 </View>
-
             ) : (
                 <View style={{ flex: 1 }}>
-                    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-
-                        <View style={styles.contentContainer}>
-
-                            <View style={styles.headerTextContainer}>
-                                <Text style={[commonStyles.headerText1BL, {
-                                    marginBottom: 6, textAlign: 'center'
-                                }]}>Step 2- Timings</Text>
-                                <Text style={[commonStyles.headerText2BL, {
-                                    textAlign: 'center', paddingHorizontal: width * 0.02
-                                }]}>Choose your career category and unlock endless possibilities.</Text>
-                                {/* <Image source={require('../../../assets/img/Prog2.png')} style={commonStyles.progImage} /> */}
-                                <ProgressBar
-                                    progress={progressPercentage / 100}
-                                    color="#00B0FF"
-                                    style={commonStyles.progImage}
-                                />
+                    <ScrollView contentContainerStyle={commonStyles.container} showsVerticalScrollIndicator={false}>
+                        <View style={commonStyles.contentContainer}>
+                            <View style={commonStyles.headerTextContainer}>
+                                <Text style={[commonStyles.headerText1BL, { marginBottom: 6, textAlign: 'center' }]}>Step 2- Timings</Text>
+                                <Text style={[commonStyles.headerText2BL, { textAlign: 'center', paddingHorizontal: width * 0.02 }]}>Choose your career category and unlock endless possibilities.</Text>
+                                <ProgressBar progress={progressPercentage / 100} color="#00B0FF" style={commonStyles.progImage} />
                             </View>
-                            {Object.keys(selectedTimes).map((day, index) => (
+                            {/* {Object.keys(selectedTimes).map((day, index) => (
                                 <View key={day}>
-                                    <View style={styles.dayRow}>
+                                    <View style={[styles.dayRow, { alignItems: 'flex-start' }]}>
                                         <Text style={[commonStyles.headerText4BL, { textAlign: 'center' }]}>{day} :</Text>
-                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                            <TouchableOpacity
-                                                style={styles.inputContainerT}
-                                                activeOpacity={0.8}
-                                                onPress={() => showTimePicker(day, 'from')}
-                                            >
-                                                <TextInput
-                                                    style={styles.inputs}
-                                                    placeholder="00:00 AM"
-                                                    placeholderTextColor="#979797"
-                                                    value={selectedTimes[day].from}
-                                                    underlineColorAndroid="transparent"
-                                                    editable={false}
-                                                />
-                                            </TouchableOpacity>
-
-                                            <TouchableOpacity
-                                                style={styles.inputContainerT}
-                                                activeOpacity={0.8}
-                                                onPress={() => showTimePicker(day, 'to')}
-                                            >
-                                                <TextInput
-                                                    style={styles.inputs}
-                                                    placeholder="00:00 AM"
-                                                    placeholderTextColor="#979797"
-                                                    value={selectedTimes[day].to}
-                                                    underlineColorAndroid="transparent"
-                                                    editable={false}
-                                                />
-                                            </TouchableOpacity>
+                                        <View style={{ flexDirection: 'column' }}>
+                                            {selectedTimes[day].map((time, index) => (
+                                                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }} key={index}>
+                                                    <TouchableOpacity
+                                                        style={styles.inputContainerT}
+                                                        activeOpacity={0.8}
+                                                        onPress={() => showTimePicker(day, 'from', index)}
+                                                    >
+                                                        <TextInput
+                                                            style={styles.inputs}
+                                                            placeholder="00:00 AM"
+                                                            placeholderTextColor="#979797"
+                                                            value={time.from}
+                                                            underlineColorAndroid="transparent"
+                                                            editable={false}
+                                                        />
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity
+                                                        style={styles.inputContainerT}
+                                                        activeOpacity={0.8}
+                                                        onPress={() => showTimePicker(day, 'to', index)}
+                                                    >
+                                                        <TextInput
+                                                            style={styles.inputs}
+                                                            placeholder="00:00 AM"
+                                                            placeholderTextColor="#979797"
+                                                            value={time.to}
+                                                            underlineColorAndroid="transparent"
+                                                            editable={false}
+                                                        />
+                                                    </TouchableOpacity>
+                                                </View>
+                                            ))}
                                         </View>
                                     </View>
-
-                                    {/* {additionalInputs[day].map((time, index) => (
-                                        <View style={styles.dayRow} key={index}>
-                                            <Text style={styles.dayLabel}></Text>
-                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                <TouchableOpacity
-                                                    style={styles.inputContainerT}
-                                                    activeOpacity={0.8}
-                                                    onPress={() => showTimePicker(day, 'from', index)}
-                                                >
-                                                    <TextInput
-                                                        style={styles.inputs}
-                                                        placeholder="00:00 AM"
-                                                        placeholderTextColor="#979797"
-                                                        value={time.from}
-                                                        onChangeText={(text) => handleAdditionalInputChange(day, index, text)}
-                                                        underlineColorAndroid="transparent"
-                                                        editable={false}
-                                                    />
-                                                </TouchableOpacity>
-
-                                                <TouchableOpacity
-                                                    style={styles.inputContainerT}
-                                                    activeOpacity={0.8}
-                                                    onPress={() => showTimePicker(day, 'to', index)}
-                                                >
-                                                    <TextInput
-                                                        style={styles.inputs}
-                                                        placeholder="00:00 AM"
-                                                        placeholderTextColor="#979797"
-                                                        value={time.to}
-                                                        onChangeText={(text) => handleAdditionalInputChange(day, index, text)}
-                                                        underlineColorAndroid="transparent"
-                                                        editable={false}
-                                                    />
-                                                </TouchableOpacity>
-                                            </View>
-                                        </View>
-                                    ))}
-
-                                    {additionalInputs[day].length < 4 && (
-                                        <TouchableOpacity onPress={() => addAdditionalInput(day)} style={styles.addButton}>
-                                            <Text style={styles.addButtonText}>+ Add</Text>
-                                        </TouchableOpacity>
-                                    )} */}
-                                    {index < Object.keys(selectedTimes).length - 1 && <View style={styles.horizontalLineD} />}
+                                    <TouchableOpacity onPress={() => addAdditionalInput(day)} style={existingInputsCount < 5 ? styles.addButton : { display: 'none' }}>
+                                        <Text style={styles.addButtonText}>+ Add</Text>
+                                    </TouchableOpacity>
+                                    {index < Object.keys(selectedTimes).length - 1 && <View style={commonStyles.horizontalLineD} />}
                                 </View>
-                            ))}
+                            ))} */}
+                                {Object.keys(selectedTimes).map((day) => {
+                                    const existingInputsCount = selectedTimes[day].length; // Define existingInputsCount here
+                                    return (
+                                        <View key={day}>
+                                            <View style={[styles.dayRow, { alignItems: 'flex-start' }]}>
+                                                <Text style={[commonStyles.headerText4BL, { textAlign: 'center' }]}>{day} :</Text>
+                                                <View style={{ flexDirection: 'column' }}>
+                                                    {selectedTimes[day].map((time, index) => (
+                                                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }} key={index}>
+                                                            <TouchableOpacity
+                                                                style={styles.inputContainerT}
+                                                                activeOpacity={0.8}
+                                                                onPress={() => showTimePicker(day, 'from', index)}
+                                                            >
+                                                                <TextInput
+                                                                    style={styles.inputs}
+                                                                    placeholder="00:00 AM"
+                                                                    placeholderTextColor="#979797"
+                                                                    value={time.from}
+                                                                    underlineColorAndroid="transparent"
+                                                                    editable={false}
+                                                                />
+                                                            </TouchableOpacity>
+                                                            <TouchableOpacity
+                                                                style={styles.inputContainerT}
+                                                                activeOpacity={0.8}
+                                                                onPress={() => showTimePicker(day, 'to', index)}
+                                                            >
+                                                                <TextInput
+                                                                    style={styles.inputs}
+                                                                    placeholder="00:00 AM"
+                                                                    placeholderTextColor="#979797"
+                                                                    value={time.to}
+                                                                    underlineColorAndroid="transparent"
+                                                                    editable={false}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                    ))}
+                                                </View>
+                                            </View>
+                                            <TouchableOpacity onPress={() => addAdditionalInput(day)} style={existingInputsCount < 5 ? styles.addButton : { display: 'none' }}>
+                                                <Text style={styles.addButtonText}>+ Add</Text>
+                                            </TouchableOpacity>
+                                            <View style={styles.horizontalLineD} />
+                                        </View>
+                                    );
+                                })}
+
                             {isTimePickerVisible && (
                                 <DateTimePicker
-                                    value={selectedTimes[selectedDay][selectedType] ? moment(selectedTimes[selectedDay][selectedType], 'h:mm A').toDate() : new Date()} // Updated line
-                                    mode="time" // Set mode to time
+                                    value={selectedTimes[selectedDay][selectedInputIndex][selectedType] ? moment(selectedTimes[selectedDay][selectedInputIndex][selectedType], 'h:mm A').toDate() : new Date()}
+                                    mode="time"
                                     display="default"
-                                    onChange={(event, time) => handleTimeChange(event, time, selectedType === 'from' ? selectedDayFromIndex : selectedDayToIndex)} // Pass the appropriate index based on selected type
+                                    onChange={(event, time) => handleTimeChange(event, time)}
                                 />
                             )}
-
-
                             <TouchableOpacity
-                                style={[commonStyles.button]}
-                                onPress={() => {
-                                    navigation.navigate('ClinicProfileCompletion3');
-                                    console.log('ProfileCompletion21');
-                                }}
+                                style={commonStyles.button}
+                                onPress={handleNext}
                                 activeOpacity={0.8}
                             >
                                 <Text style={commonStyles.buttonText}>Continue</Text>
                             </TouchableOpacity>
-
                         </View>
                     </ScrollView>
-
                 </View>
-
             )}
         </SafeAreaView>
     );
 };
+
 
 const styles = StyleSheet.create({
     inputsP: {
@@ -543,7 +597,7 @@ const styles = StyleSheet.create({
     },
     addButton: {
         alignSelf: 'flex-end',
-        marginBottom: 10,
+        //`marginBottom: 10,
     },
     addButtonText: {
         fontSize: 14,
@@ -668,7 +722,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row', // Ensure items are laid out horizontally
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 10
+        //marginBottom: 10
     },
 
     dayLabel: {

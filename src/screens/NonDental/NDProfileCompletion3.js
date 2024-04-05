@@ -14,7 +14,8 @@ import {
     PixelRatio,
     Keyboard,
     TouchableWithoutFeedback,
-    ToastAndroid
+    ToastAndroid,
+    Platform
 } from 'react-native';
 import Animation from '../../components/Loader';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,6 +24,8 @@ import { moderateScale } from 'react-native-size-matters';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { ProgressBar } from 'react-native-paper';
 import ImagePicker from 'react-native-image-crop-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const { width, height } = Dimensions.get('window');
 
@@ -41,21 +44,158 @@ const NDProfileCompletion3 = ({ navigation }) => {
     const defaultProfileImage = require('../../../assets/img/DProfile.png');
     const defaultBannerImage = require('../../../assets/img/DBanner.png');
 
-    const handleProfileUpload = () => {
-        pickImage('profile');
+    const handleProfileUpload = async () => {
+        // Call pickImage function with type 'profile'
+        await pickImage('profile');
+        // After selecting the profile image, directly call the image upload function
+        await uploadProfileImage(profileImage);
     };
 
-    const handleBannerUpload = () => {
-        pickImage('banner');
+    const uploadProfileImage = async (profile_pic) => {
+        try {
+            // Check if profile image is selected
+            if (profile_pic) {
+                // Create formData object
+                const formData = new FormData();
+                // Append image data to formData
+                formData.append('profile_pic', {
+                    uri: profile_pic.path,
+                    type: profile_pic.mime,
+                    name: 'image.jpg',
+                });
+
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                const id = parseInt(pr_id);
+                console.log(id);
+                console.log(pr_id);
+                if (id) {
+                    console.log(id);
+                    formData.append('pr_id', id);
+                }
+                console.log(formData);
+                // Send formData to the server for profile image upload
+                const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls31-ax.php', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        // Add any additional headers if required
+                    },
+                });
+                if (!response.ok) {
+                    throw new Error('Profile image upload failed');
+                }
+                // Log the response to debug
+                const responseData = await response.text();
+                console.log('Response from server:', responseData);
+            }
+        } catch (error) {
+            console.error('Error uploading profile image:', error);
+            // Handle error
+        }
     };
+
+    const handleBannerUpload = async () => {
+        // Call pickImage function with type 'banner'
+        await pickImage('banner');
+        // After selecting the banner image, directly call the image upload function
+        await uploadBannerImage(bannerImage);
+    };
+
+    const uploadBannerImage = async (profile_banner) => {
+        try {
+            // Check if banner image is selected
+            if (profile_banner) {
+                // Create formData object
+                const formData = new FormData();
+                // Append image data to formData
+                formData.append('profile_banner', {
+                    uri: profile_banner.path,
+                    type: profile_banner.mime,
+                    name: 'image.jpg',
+                });
+
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                const id = parseInt(pr_id);
+                console.log(id);
+                console.log(pr_id);
+                if (id) {
+                    console.log(id);
+                    formData.append('pr_id', id);
+                }
+                console.log(formData);
+                // Send formData to the server for banner image upload
+                const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls32-ax.php', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        // Add any additional headers if required
+                    },
+                });
+                if (!response.ok) {
+                    throw new Error('Banner image upload failed');
+                }
+                const data = await response.json();
+                console.log('Banner image uploaded successfully:', data);
+            }
+        } catch (error) {
+            console.error('Error uploading banner image:', error);
+            // Handle error
+        }
+    };
+
 
     const pickImage = async (type) => {
         try {
+            // const image = await ImagePicker.openPicker({
+            //     width: 400,
+            //     height: 400,
+            //     cropping: true,
+            // });
+
+            let aspectRatio;
+            if (type === 'profile') {
+                aspectRatio = [1, 1]; // 1:1 aspect ratio for profile images
+            } else if (type === 'banner') {
+                aspectRatio = [16, 9]; // 16:9 aspect ratio for banner images
+            }
+
             const image = await ImagePicker.openPicker({
-                width: 400,
-                height: 400,
+                width: type === 'profile' ? 400 : 1200,
+                height: 'profile' ? 400 : 900,
                 cropping: true,
+                //cropperCircleOverlay: type === 'profile', // Circular cropping overlay for profile images
+                cropperToolbarTitle: type === 'profile' ? 'Crop Profile Image' : 'Crop Banner Image', // Custom title for cropper toolbar
+                cropperActiveWidgetColor: '#FF0000', // Custom color for active cropper widget
+                cropperStatusBarColor: '#000000', // Custom status bar color for cropper
+                cropperToolbarColor: '#FFFFFF', // Custom toolbar color for cropper
+                cropperToolbarWidgetColor: '#000000', // Custom toolbar widget color for cropper
+                cropperToolbarTitleColor: '#000000', // Custom toolbar title color for cropper
+                cropperCircleOverlayColor: 'rgba(0,0,0,0.5)', // Custom circle overlay color for profile images
+                cropperCancelText: 'Cancel', // Custom cancel button text
+                cropperChooseText: 'Choose', // Custom choose button text
+                cropperBackgroundColor: '#FFFFFF', // Custom background color for cropper
+                freeStyleCropEnabled: true, // Enable/disable free style cropping
+                aspectRatio: aspectRatio, // Set aspect ratio for cropping
+                //maxSize: 1024 * 10,
             });
+
+            const sizeInKB = image.size / 1024;
+            if (sizeInKB > 1000) {
+                ToastAndroid.show('Selected image exceeds 1MB limit', ToastAndroid.SHORT);
+                return; // Exit function if image exceeds size limit
+            }
+
+
+            // if (Platform.OS === 'ios') {
+            //     Image.getSize(image.path, (width, height) => {
+            //         console.log('Image dimensions:', { width, height });
+            //     });
+            // } else {
+            //     const { width, height } = await Image.getSize(image.path);
+            //     console.log('Image dimensions:', { width, height });
+            // }
 
             if (type === 'profile') {
                 setProfileImage(image);
@@ -68,65 +208,85 @@ const NDProfileCompletion3 = ({ navigation }) => {
         }
     };
 
-    const handleNext = () => {
+    const handleNext = async () => {
         // Upload profile image
-        if (profileImage) {
-            const profileFormData = new FormData();
-            profileFormData.append('profileImage', {
-                uri: profileImage.path,
-                type: profileImage.mime,
-                name: 'profile_image.jpg',
-            });
+        // if (profileImage) {
+        //     const formData = new FormData();
+        //     formData.append('image', {
+        //         uri: profileImage.path,
+        //         type: profileImage.mime,
+        //         name: 'image.jpg',
+        //     });
 
-            // Send profile image to the backend
-            fetch('YOUR_PROFILE_IMAGE_UPLOAD_URL', {
-                method: 'POST',
-                body: profileFormData,
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Profile image uploaded successfully:', data);
-                    // Handle response from the backend
-                })
-                .catch(error => {
-                    console.error('Error uploading profile image:', error);
-                    // Handle error
-                });
-        }
+        //     const pr_id = await AsyncStorage.getItem('pr_id');
+        //     const id = parseInt(pr_id);
+        //     if (id) {
+        //         formData.append('pr_id', id);
+        //     }
+        //     //console.log(formData);
 
-        // Upload banner image
-        if (bannerImage) {
-            const bannerFormData = new FormData();
-            bannerFormData.append('bannerImage', {
-                uri: bannerImage.path,
-                type: bannerImage.mime,
-                name: 'banner_image.jpg',
-            });
+        //     fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqimagedata-temp-ax.php', {
+        //         method: 'POST',
+        //         body: formData,
+        //         headers: {
+        //             'Content-Type': 'multipart/form-data',
+        //             // Add any additional headers if required
+        //         },
+        //     })
+        //         .then(response => {
+        //             if (!response.ok) {
+        //                 throw new Error('Network response was not ok');
+        //             }
+        //             return response.json();
+        //         })
+        //         .then(data => {
+        //             console.log('Image uploaded successfully:', data);
+        //             //navigation.navigate('ProfileCompletion4');
+        //         })
+        //         .catch(error => {
+        //             console.error('Error uploading image:', error);
+        //             // Handle error
+        //         });
+        // }
 
-            // Send banner image to the backend
-            fetch('YOUR_BANNER_IMAGE_UPLOAD_URL', {
-                method: 'POST',
-                body: bannerFormData,
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Banner image uploaded successfully:', data);
-                    // Handle response from the backend
-                })
-                .catch(error => {
-                    console.error('Error uploading banner image:', error);
-                    // Handle error
-                });
-        }
+        // if (bannerImage) {
+        //     const formData = new FormData();
+        //     formData.append('image', {
+        //         uri: bannerImage.path,
+        //         type: bannerImage.mime,
+        //         name: 'image.jpg',
+        //     });
 
+        //     //console.log(formData);
+
+        //     fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqimagedata-temp-ax.php', {
+        //         method: 'POST',
+        //         body: formData,
+        //         headers: {
+        //             'Content-Type': 'multipart/form-data',
+        //             // Add any additional headers if required
+        //         },
+        //     })
+        //         .then(response => {
+        //             if (!response.ok) {
+        //                 throw new Error('Network response was not ok');
+        //             }
+        //             return response.json();
+        //         })
+        //         .then(data => {
+        //             console.log('Image uploaded successfully:', data);
+        //             //navigation.navigate('ProfileCompletion4');
+        //         })
+        //         .catch(error => {
+        //             console.error('Error uploading image:', error);
+        //             // Handle error
+        //         });
+        // }
+
+        navigation.navigate('ProfileCompletion4');
         console.log('ProfileCompletion4');
     };
+
 
     useEffect(() => {
         // Simulate an asynchronous operation (e.g., fetching data) before rendering the profile screen
@@ -177,7 +337,7 @@ const NDProfileCompletion3 = ({ navigation }) => {
 
                             <View style={styles.defaultContainer}>
                                 {profileImage ? (
-                                    <Image source={{ uri: profileImage.path }} style={styles.profileImage} />
+                                    <Image source={{ uri: profileImage.path }} style={styles.previewImage} />
                                 ) : (
                                     <Image source={defaultProfileImage} style={styles.defaultProfileImage} />
                                 )}
@@ -240,7 +400,9 @@ const styles = StyleSheet.create({
         width: width * 0.45,
         height: width * 0.45,
         marginVertical: 10,
-        borderRadius: 200 / 2,
+        borderRadius: 100,
+        borderWidth: 1,
+        borderColor: '#121212'
     },
 
     defaultImage: {
@@ -253,6 +415,9 @@ const styles = StyleSheet.create({
         width: width * 0.85,
         height: height * 0.2,
         marginVertical: 10,
+        borderWidth: 1,
+        borderColor: '#121212',
+        borderRadius: 10,
     },
     defaultBannerImage: {
         width: width * 0.85,

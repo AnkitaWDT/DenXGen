@@ -22,6 +22,7 @@ import commonStyles from '../../components/CommonStyles';
 import { moderateScale } from 'react-native-size-matters';
 import ImagePicker from 'react-native-image-crop-picker';
 import { ProgressBar } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -54,22 +55,92 @@ const ProfileCompletion7 = ({ navigation }) => {
         });
     };
 
-    const handleImageUpload = () => {
-        ImagePicker.openPicker({
-            mediaType: 'photo',
-            multiple: true,
-        }).then((responses) => {
-            if (responses.length + imagePaths.length > 6) {
-                // If the total number of images would exceed 5, show an alert.
-                //Alert.alert('Limit Exceeded', 'You can upload a maximum of 5 images.');
-                ToastAndroid.show('You can upload a maximum of 5 images.', ToastAndroid.SHORT);
-            } else {
-                // Append the selected images to the existing images, up to a maximum of 5.
-                const paths = responses.map((response) => response.path);
-                setImagePaths([...imagePaths, ...paths.slice(0, 6 - imagePaths.length)]);
+    const handleImageUpload = async () => {
+        try {
+            const responses = await ImagePicker.openPicker({
+                mediaType: 'photo',
+                multiple: true,
+            });
+
+            const remainingSlots = 6 - imagePaths.length;
+
+            // Slice the responses array to fit the remaining slots
+            const selectedImages = responses.slice(0, remainingSlots);
+
+            // Map the selected images to paths
+            const paths = selectedImages.map((response) => response.path);
+
+            // Update image paths state
+            setImagePaths((prevPaths) => [...prevPaths, ...paths]);
+
+            if (responses.length > 6) {
+                // If the total number of images selected exceeds 6, show a message
+                ToastAndroid.show('You can only select up to 6 images.', ToastAndroid.SHORT);
             }
-        });
+
+            const formData = new FormData();
+
+            // Append each image file with its respective index
+            paths.forEach((path, index) => {
+                formData.append(`photos`, {
+                    uri: path,
+                    type: 'image/jpeg',
+                    name: `image_${imagePaths.length + index}.jpg`,
+                });
+            });
+
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+            console.log(id);
+            console.log(pr_id);
+            if (id) {
+                console.log(id);
+                formData.append('pr_id', id);
+            }
+
+            console.log('FormData:', formData); // Log the FormData object
+
+            // Send formData to the server for image upload
+            const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls7-ax.php', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    // Add any additional headers if required
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Upload failed');
+            }
+
+            const responseData = await response.text();
+            console.log('Response from server:', responseData);
+            // Handle successful upload
+            // Optionally, you can navigate to the next screen here
+        } catch (error) {
+            console.error('Error uploading images:', error);
+            // Handle error
+        }
     };
+
+
+    // const handleImageUpload = () => {
+    //     ImagePicker.openPicker({
+    //         mediaType: 'photo',
+    //         multiple: true,
+    //     }).then((responses) => {
+    //         if (responses.length + imagePaths.length > 6) {
+    //             // If the total number of images would exceed 5, show an alert.
+    //             //Alert.alert('Limit Exceeded', 'You can upload a maximum of 5 images.');
+    //             ToastAndroid.show('You can upload a maximum of 5 images.', ToastAndroid.SHORT);
+    //         } else {
+    //             // Append the selected images to the existing images, up to a maximum of 5.
+    //             const paths = responses.map((response) => response.path);
+    //             setImagePaths([...imagePaths, ...paths.slice(0, 6 - imagePaths.length)]);
+    //         }
+    //     });
+    // };
 
 
     const handleRemoveImage = (index) => {
@@ -112,7 +183,7 @@ const ProfileCompletion7 = ({ navigation }) => {
     const totalSteps = 9; // Total number of steps
 
     const progressPercentage = (currentStep / totalSteps) * 100; // Calculate progress percentage
-    console.log("Progress Percentage:", progressPercentage);
+    //console.log("Progress Percentage:", progressPercentage);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>

@@ -523,7 +523,7 @@ const PersonalProfile = ({ navigation, route }) => {
             {/* SubContainer with Banner-like Image */}
             <ScrollView style={styles.subContainer} showsVerticalScrollIndicator={false}>
                 <ImageBackground
-                    source={require('../../assets/img/banner.png')}
+                    source={profileData && profileData.profile_banner ? { uri: profileData.profile_banner } : require('../../assets/img/banner.png')}
                     style={styles.bannerImage}
                 >
                     <View style={styles.container1}>
@@ -592,12 +592,19 @@ const PersonalProfile = ({ navigation, route }) => {
                         </View>
                     </View>
                     <View style={styles.profilePicContainer}>
-
-                        <Image
-                            source={require('../../assets/img/ProfileHome.png')}
-                            style={styles.profilePic}
-                        />
+                        {profileData && profileData.profile_pic ? (
+                            <Image
+                                source={{ uri: profileData.profile_pic }}
+                                style={styles.profilePic}
+                            />
+                        ) : (
+                            <Image
+                                source={require('../../assets/img/ProfileHome.png')}
+                                style={styles.profilePic}
+                            />
+                        )}
                     </View>
+
                     <View></View>
                     {/* <View style={styles.textContainer}>
                         <Text style={[commonStyles.headerText1BL, {}]} adjustsFontSizeToFit numberOfLines={1} ellipsizeMode="tail">Naina Swaroop</Text>
@@ -1422,10 +1429,12 @@ const styles = StyleSheet.create({
     },
     bannerImage: {
         width: '100%',
-        height: 141, // Adjust the height as needed
+        height: 141, // Height adjusted to maintain a 16:9 aspect ratio
+        //aspectRatio: 16 / 9, // Set aspect ratio to maintain 16:9 aspect ratio
         resizeMode: 'cover',
         position: 'relative',
     },
+
     profilePicContainer: {
         position: 'absolute',
         top: '40%', // Adjust this value to control the overlap
