@@ -67,7 +67,16 @@ const ProfileCompletion4 = ({ navigation }) => {
 
     const fetchSavedLocations = async () => {
         try {
-            const response = await axios.get('https://temp.wedeveloptech.in/denxgen/appdata/getpersonaldtls4-ax.php?pr_id=1');
+            // Fetch pr_id from AsyncStorage
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            if (!pr_id) {
+                console.error('pr_id not found in AsyncStorage');
+                return;
+            }
+            const id = parseInt(pr_id);
+
+            // Fetch personal details using pr_id
+            const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getpersonaldtls4-ax.php?pr_id=${id}`);
             const data = response.data;
             if (data && data.data && data.data.length > 0) {
                 setSavedLocations(data.data.map(location => ({
@@ -87,6 +96,7 @@ const ProfileCompletion4 = ({ navigation }) => {
             setIsLoading(false);
         }
     };
+
 
     useEffect(() => {
         // Fetch saved locations when the component mounts
@@ -171,6 +181,7 @@ const ProfileCompletion4 = ({ navigation }) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isModalVisible1, setIsModalVisible1] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState(null);
+    const [locationId, setLocationId] = useState();
 
     const openModal = () => {
         setIsModalVisible(true);
@@ -185,6 +196,7 @@ const ProfileCompletion4 = ({ navigation }) => {
         setState(location.state || '');
         setPincode(location.pincode || '');
         setLandmark(location.landmark || '');
+        setLocationId(location.id || '');
         setIsModalVisible1(true); // Open the modal
     };
 
@@ -292,10 +304,13 @@ const ProfileCompletion4 = ({ navigation }) => {
             landmark: landmark || ''
         };
 
-
+        console.log('Form Data:', updateData);
 
         try {
-            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/requpdatepersonaldtls4-ax.php`, updateData);
+            const locationId = locationId; // Use the id of the selected location
+            console.log('locationId', locationId);
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/requpdatepersonaldtls4-ax.php?id=${locationId}`, updateData);
+            // const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/requpdatepersonaldtls4-ax.php`, updateData);
 
             console.log('dataresponse', response.data);
             ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);

@@ -60,37 +60,49 @@ const SavedLocationContainer = ({ savedLocations }) => {
 };
 
 
+
 const ClinicProfileCompletion4 = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [savedLocations, setSavedLocations] = useState([]);
 
-    // const fetchSavedLocations = async () => {
-    //     try {
-    //         const response = await axios.get('https://temp.wedeveloptech.in/denxgen/appdata/getpersonaldtls4-ax.php?pr_id=1');
-    //         const data = response.data;
-    //         if (data && data.data && data.data.length > 0) {
-    //             setSavedLocations(data.data.map(location => ({
-    //                 loc_one: location.loc_one,
-    //                 loc_two: location.loc_two,
-    //                 city: location.city,
-    //                 state: location.state,
-    //                 pincode: location.pincode,
-    //                 landmark: location.landmark,
-    //                 address: `${location.loc_two}, ${location.city}`,
-    //                 name: location.loc_one,
-    //             })));
-    //         }
-    //         setIsLoading(false);
-    //     } catch (error) {
-    //         console.error('Error fetching saved locations:', error);
-    //         setIsLoading(false);
-    //     }
-    // };
+    const fetchSavedLocations = async () => {
+        try {
+            // Fetch pr_id from AsyncStorage
+            const cl_id = await AsyncStorage.getItem('cl_id');
+            if (!cl_id) {
+                console.error('pr_id not found in AsyncStorage');
+                return;
+            }
+            const id1 = parseInt(cl_id);
 
-    // useEffect(() => {
-    //     // Fetch saved locations when the component mounts
-    //     fetchSavedLocations();
-    // }, []);
+            // Fetch personal details using pr_id
+            const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getcliniclocation-ax.php?cl_id=${id1}`);
+            const data = response.data;
+            if (data && data.data && data.data.length > 0) {
+                setSavedLocations(data.data.map(location => ({
+                    loc_one: location.loc_one,
+                    loc_two: location.loc_two,
+                    city: location.city,
+                    state: location.state,
+                    pincode: location.pincode,
+                    landmark: location.landmark,
+                    address: `${location.loc_two}, ${location.city}`,
+                    name: location.loc_one,
+                })));
+            }
+            console.log(response);
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error fetching saved locations:', error);
+            setIsLoading(false);
+        }
+    };
+
+
+    useEffect(() => {
+        // Fetch saved locations when the component mounts
+        fetchSavedLocations();
+    }, []);
 
     useEffect(() => {
         // Simulate an asynchronous operation (e.g., fetching data) before rendering the profile screen
@@ -239,12 +251,14 @@ const ClinicProfileCompletion4 = ({ navigation }) => {
         }
         const pr_id = await AsyncStorage.getItem('pr_id');
         const id = parseInt(pr_id);
-        const acc_ty_id = await AsyncStorage.getItem('acc_ty_id');
+        const cl_id = await AsyncStorage.getItem('cl_id');
+        const id1 = parseInt(cl_id);
+
 
         // Form data
         const formData = {
-            acc_ty_id: parseInt(acc_ty_id),
             pr_id: id,
+            cl_id: id1,
             loc_one: houseNumber,
             loc_two: area,
             city: city,
@@ -254,7 +268,7 @@ const ClinicProfileCompletion4 = ({ navigation }) => {
         };
 
         try {
-            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqbusinessdtls4-ax.php`, formData);
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqcliniclocation-ax.php`, formData);
 
             console.log('dataresponse', response.data);
             //ToastAndroid.show("Product Added Successfully!", ToastAndroid.SHORT);
@@ -262,7 +276,7 @@ const ClinicProfileCompletion4 = ({ navigation }) => {
         } catch (error) {
             console.error('An error occurred:', error);
         }
-        //await fetchSavedLocations();
+        await fetchSavedLocations();
         // Log the form data
         console.log('Form Data:', formData);
         setIsModalVisible(false);
@@ -295,16 +309,16 @@ const ClinicProfileCompletion4 = ({ navigation }) => {
 
 
 
-        // try {
-        //     const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/requpdatepersonaldtls4-ax.php`, updateData);
+        try {
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/requpdatepersonaldtls4-ax.php`, updateData);
 
-        //     console.log('dataresponse', response.data);
-        //     ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
-        //     console.log('Data Updated to database');
-        // } catch (error) {
-        //     console.error('An error occurred:', error);
-        // }
-        // await fetchSavedLocations();
+            console.log('dataresponse', response.data);
+            ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
+            console.log('Data Updated to database');
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+        await fetchSavedLocations();
         // Log the form data
         console.log('Form Data:', updateData);
         setIsModalVisible1(false);
@@ -811,6 +825,4 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
     },
 });
-
-
 export default ClinicProfileCompletion4;

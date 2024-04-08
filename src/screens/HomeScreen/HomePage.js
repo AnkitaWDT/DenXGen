@@ -10,6 +10,8 @@ import Geolocation from '@react-native-community/geolocation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { moderateScale } from 'react-native-size-matters';
 import AlertPopup from '../../components/AlertPopup';
+import axios from 'axios';
+import { useFocusEffect } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -45,13 +47,14 @@ const HomePage = ({ navigation, route }) => {
   const [initialRegion, setInitialRegion] = useState(null);
   const [markerPosition, setMarkerPosition] = useState(null);
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const [activeItem, setActiveItem] = useState('My Account');
+  // const [modalVisible, setModalVisible] = useState(false);
+  // const [activeItem, setActiveItem] = useState('My Account');
 
   const [showPopup, setShowPopup] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
   const SCROLL_TRIGGER_POINT = 0.2; // 20%
+
 
 
   const [activeIndex, setActiveIndex] = useState(0);
@@ -100,6 +103,31 @@ const HomePage = ({ navigation, route }) => {
     setScrollPosition(scrollPercentage);
   };
 
+  const [activeItem, setActiveItem] = useState('');
+  const [defaultName, setDefaultName] = useState({ name: '', profile_pic: '' });
+  const [profilePic, setProfilePic] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchData();
+    }, [])
+  );
+
+  const fetchData = async () => {
+    try {
+      const pr_id = await AsyncStorage.getItem('pr_id');
+      const id = parseInt(pr_id);
+
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getvic-ax.php?prid=${id}`);
+      const data = await response.json();
+      setDefaultName({ name: data.data.name, profile_pic: data.data.profile_pic });
+    } catch (error) {
+      console.error('Error fetching default name:', error);
+    }
+  };
+  
 
   // useEffect(() => {
   //   // Immediately show the popup when the component mounts
@@ -146,64 +174,45 @@ const HomePage = ({ navigation, route }) => {
     },
     {
       id: 2,
-      name: 'Abhishek',
+      name: 'Mitali',
       image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww',
       // Other properties specific to each office
     },
     // Add more office objects as needed
   ];
 
-  const clinicData = [
-    {
-      id: 1,
-      name: 'Bhaskar Medical Dental',
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww', // URL to the image of the office
-      // Other properties specific to each office
-    },
-];
+//   const clinicData = [
+//     {
+//       id: 1,
+//       name: 'Bhaskar Medical Dental',
+//       image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww', // URL to the image of the office
+//       // Other properties specific to each office
+//     },
+// ];
 
-
-
-  const [clinicData1, setClinicData1] = useState([]);
-  const [clStatus, setClStatus] = useState(null);
+  const [clinicData, setClinicData] = useState([]); // State to hold clinic data
 
   useEffect(() => {
-    // Fetch cl_status from AsyncStorage
-    const fetchClStatus = async () => {
-      try {
-        const status = await AsyncStorage.getItem('cl_status');
-        if (status !== null) {
-          setClStatus(status);
-        }
-      } catch (error) {
-        console.error('Error fetching cl_status:', error);
-      }
-    };
-
+    // Fetch clinic data from API
     const fetchClinicData = async () => {
       try {
-        // Fetch clinic data
-        // Example: const response = await fetch('your-api-endpoint');
-        // const data = await response.json();
-        // setClinicData(data.clinics);
 
-        // Example with mock data
-        const data = [
-          { id: 1, name: 'Clinic A',  },
-          { id: 2, name: 'Clinic B',  },
-          // Add more clinic objects as needed
-        ];
-        setClinicData1(data);
+        const pr_id = await AsyncStorage.getItem('pr_id');
+        // Parse pr_id to an integer
+        const id = parseInt(pr_id);
+        // Make GET request to your API endpoint that returns clinic data
+        const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getcliniclist-ax.php?pr_id=${id}`); // Replace YOUR_API_ENDPOINT with your actual API endpoint
+        // Assuming response.data contains an array of clinic objects
+        setClinicData(response.data.data);
+        //console.log(clinicData);
       } catch (error) {
         console.error('Error fetching clinic data:', error);
       }
     };
 
-
-    fetchClStatus();
+    // Call fetchClinicData when component mounts
     fetchClinicData();
-  }, []);
-
+  }, [clinicData]); // Include clinicData in the dependency array
 
   const getModalHeight = () => {
     const buttonHeight = 50; // Height of each button
@@ -236,6 +245,21 @@ const HomePage = ({ navigation, route }) => {
 
   const [showPopup1, setShowPopup1] = useState(false);
   const [showPopup2, setShowPopup2] = useState(false);
+
+  const handleItemSelection = async (name, profilePic) => {
+    setActiveItem(name);
+    setProfilePic(profilePic);
+    setModalVisible(false);
+    // Save display_id in AsyncStorage
+    await AsyncStorage.setItem('display_id', name); // Assuming display_id is the ID you want to save
+    try {
+      const storedDisplayId = await AsyncStorage.getItem('display_id');
+      console.log('Value stored in display_id:', storedDisplayId);
+    } catch (error) {
+      console.error('Error retrieving value from AsyncStorage:', error);
+    }
+  };
+
 
   useEffect(() => {
     // Simulate an asynchronous operation (e.g., fetching data) before rendering the profile screen
@@ -473,9 +497,9 @@ const HomePage = ({ navigation, route }) => {
           </View>
         </View>
             <Modal
-              animationType="slide"
-              transparent={true}
               visible={modalVisible}
+              transparent
+              activeOpacity={1}
               onRequestClose={() => setModalVisible(false)}
             >
               <TouchableOpacity
@@ -483,7 +507,11 @@ const HomePage = ({ navigation, route }) => {
                 style={styles.modalContainer}
                 onPress={() => setModalVisible(false)}
               >
-                <ScrollView style={styles.modalContent}>
+                <TouchableOpacity style={styles.modalContent}
+                  activeOpacity={1}
+                  onPress={() => { }}>
+
+                  <ScrollView showsVerticalScrollIndicator={false}>
                   <View style={styles.horizontalLine}></View>
 
                   <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.005 }]}>My Account</Text>
@@ -495,18 +523,37 @@ const HomePage = ({ navigation, route }) => {
                       justifyContent: 'space-between',
                       height: height * 0.075,
                     }}
-                    onPress={() => {
-                      setActiveItem('My Account');
-                      setModalVisible(false); // Close the modal after selecting
-                    }}
+                      onPress={() => handleItemSelection(defaultName.name, defaultName.profile_pic)}
+                    // onPress={() => {
+                    //   setActiveItem('My Account');
+                    //   setModalVisible(false); // Close the modal after selecting
+                    // }}
                   >
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <Image
-                        source={{ uri: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww' }} // Assuming image is a URI
-                        style={styles.accountImage}
-                      />
-                      <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>Dr. Mridula Ramankrishna</Text>
-                    </View>
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        {defaultName.profile_pic ? (
+                          <Image
+                            source={{ uri: defaultName.profile_pic }}
+                            style={styles.accountImage}
+                          />
+                        ) : (
+                          <View style={[styles.accountImage, {
+                            width: 42,
+                            height: 42,
+                            borderRadius: 36,
+                            backgroundColor: '#E8F8FF',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }]}>
+                            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>
+                              {defaultName.name.charAt(0).toUpperCase()}
+                            </Text>
+                          </View>
+                        )}
+                        <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>
+                          {defaultName.name}
+                        </Text>
+                      </View>
+
                     {/* Check if this is the active item, and display DotActive accordingly */}
                     {activeItem === 'My Account' ? (
                       <View style={commonStyles.activeIcon}>
@@ -538,10 +585,11 @@ const HomePage = ({ navigation, route }) => {
                             justifyContent: 'space-between',
                             height: height * 0.075,
                           }}
-                          onPress={() => {
-                            setActiveItem(office.name);
-                            setModalVisible(false); // Close the modal after selecting
-                          }}
+                          onPress={() => handleItemSelection(office.name, office.image)}
+                          // onPress={() => {
+                          //   setActiveItem(office.name);
+                          //   setModalVisible(false); // Close the modal after selecting
+                          // }}
                         >
                           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <Image
@@ -576,7 +624,8 @@ const HomePage = ({ navigation, route }) => {
                     <>
                       <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.005 }]}>Clinic Account</Text>
                       {clinicData.map((clinic, index) => (
-                        <TouchableOpacity key={index}
+                        <TouchableOpacity
+                          key={index}
                           activeOpacity={0.8}
                           style={{
                             flexDirection: 'row',
@@ -585,16 +634,50 @@ const HomePage = ({ navigation, route }) => {
                             height: height * 0.075,
                           }}
                           onPress={() => {
-                            setActiveItem(clinic.name);
-                            setModalVisible(false); // Close the modal after selecting
+                            if (clinic.status === "0") {
+                              // If clinic status is 0 (Drafts), navigate to ClinicProfileCompletion with cl_id
+                              navigation.navigate('ClinicProfileCompletion1', { cl_id: clinic.cl_id });
+                            } else {
+                              // If clinic status is 1, do something else (not specified in the provided code)
+                              // You can add navigation logic or any other action here
+                            }
+                            handleItemSelection(clinic.name, clinic.profile_pic || '')
+                            // setActiveItem(clinic.name);
+                            // setModalVisible(false); // Close the modal after selecting
                           }}
                         >
                           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image
-                              source={{ uri: clinic.image }} // Assuming image is a URI
-                              style={styles.accountImage}
-                            />
-                            <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>{clinic.name}</Text>
+                            {clinic.status === "0" ? (
+                              <View style={[styles.accountImage, {
+                                width: 42,
+                                height: 42,
+                                borderRadius: 36,
+                                backgroundColor: '#E8F8FF',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                              }]}>
+                                <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>C</Text>
+                              </View>
+                            ) : clinic.profile_pic ? (
+                              <Image
+                                source={{ uri: clinic.profile_pic }}
+                                style={styles.accountImage}
+                              />
+                            ) : (
+                              <View style={[styles.accountImage, {
+                                width: 42,
+                                height: 42,
+                                borderRadius: 36,
+                                backgroundColor: '#E8F8FF',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                              }]}>
+                                <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>{clinic.name.charAt(0).toUpperCase()}</Text>
+                              </View>
+                            )}
+                            <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>
+                              {clinic.status === "0" ? `Clinic (Drafts)` : clinic.name}
+                            </Text>
                           </View>
                           {/* Check if this is the active item, and display DotActive accordingly */}
                           {activeItem === clinic.name ? (
@@ -618,72 +701,6 @@ const HomePage = ({ navigation, route }) => {
                     </>
                   )}
 
-                  {clinicData1.length > 0 && (
-                    <>
-                      <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.005 }]}>Clinic Account</Text>
-                      {clinicData1.map((clinic, index) => (
-                        <TouchableOpacity key={index}
-                          activeOpacity={0.8}
-                          style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            height: height * 0.075,
-                          }}
-                          onPress={() => {
-                            // Handle onPress
-                          }}
-                        >
-                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            {/* Conditionally render image and name based on cl_status */}
-                            {clStatus === '0' ? (
-                              <>
-                                <Image
-                                  source={require('../../../assets/img/DotActive.png')}
-                                  style={styles.accountImage}
-                                />
-                                <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>Clinic(Drafts) - {clinic.cl_id}</Text>
-                              </>
-                            ) : clStatus === '1' ? (
-                              <>
-                                <Image
-                                    source={require('../../../assets/img/DotActive.png')}
-                                  style={styles.accountImage}
-                                />
-                                <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>Clinic(Name) - {clinic.cl_id}</Text>
-                              </>
-                            ) : (
-                              // Render a default image and name if cl_status is neither 0 nor 1
-                              <>
-                                <Image
-                                      source={require('../../../assets/img/DotActive.png')}
-                                  style={styles.accountImage}
-                                />
-                                <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>Clinic - {clinic.cl_id}</Text>
-                              </>
-                            )}
-                          </View>
-                          {/* Check if this is the active item, and display DotActive accordingly */}
-                          {activeItem === clinic.name ? (
-                            <View style={commonStyles.activeIcon}>
-                              <Image
-                                source={require('../../../assets/img/DotActive.png')}
-                                style={commonStyles.icon}
-                              />
-                            </View>
-                          ) : (
-                            <View style={commonStyles.activeIcon}>
-                              <Image
-                                source={require('../../../assets/img/Active.png')}
-                                style={commonStyles.icon}
-                              />
-                            </View>
-                          )}
-                        </TouchableOpacity>
-                      ))}
-                      {clinicData1.length > 0 && <View style={{ height: 1, backgroundColor: '#ccc', marginBottom: 10, marginTop: 5 }} />}
-                    </>
-                  )}
 
                   {/* Buttons */}
                   <TouchableOpacity
@@ -711,10 +728,15 @@ const HomePage = ({ navigation, route }) => {
                     noLabel="No"
                     onYesPress={async () => {
                       try {
+
+                        const pr_id = await AsyncStorage.getItem('pr_id');
+                        const id = parseInt(pr_id);
+                        console.log('pr_id',id);
+
                         // Make API call to fetch cl_id
-                        const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqcreateclinic-ax.php');
+                        const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqcreateclinic-ax.php?pr_id=${id}`);
                         const data = await response.json();
-                        console.log(data);
+                        //console.log(data);
 
                         if (data && data.data && data.data.cl_id) {
                           // Store cl_id in AsyncStorage
@@ -723,7 +745,9 @@ const HomePage = ({ navigation, route }) => {
                         }
 
                         setShowPopup1(false);
-                        navigation.navigate('ClinicProfileCompletion1');
+                        navigation.navigate('ClinicProfileCompletion1', { cl_id: data.data.cl_id });
+
+                        //navigation.navigate('ClinicProfileCompletion1');
                       } catch (error) {
                         console.error('Error fetching cl_id:', error);
                         // Handle error
@@ -751,22 +775,42 @@ const HomePage = ({ navigation, route }) => {
                     <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>Create Office Profile</Text>
                   </TouchableOpacity>
 
+                  </ScrollView>
 
-                </ScrollView>
+                </TouchableOpacity>
               </TouchableOpacity>
             </Modal>
 
             <ScrollView style={styles.subContainer} onScroll={handleScroll} scrollEventThrottle={16}>
               <View style={styles.shadowContainer}>
                 <View style={styles.headerContainer}>
-                  <Text style={[commonStyles.headerText11BL, { }]}>Hey, Neha Parmar!</Text>
+                  <Text style={[commonStyles.headerText11BL]}>Hey, {activeItem || defaultName.name || ''}!</Text>
+                  {/* <Text style={[commonStyles.headerText11BL]}>Hey, {defaultName.name || ''}!</Text> */}
                 </View>
 
                 {/* White box with shadow */}
                 <View style={styles.boxContainer}>
                   <View style={{ flexDirection: 'row' }}>
                     <View style={styles.imageRow}>
-                      <Image source={require('../../../assets/img/ProfilePercent.png')} style={styles.image} />
+                      {profilePic ? (
+                        <Image
+                          source={{ uri: profilePic }}
+                          style={styles.accountImage}
+                        />
+                      ) : (
+                        <View style={[styles.accountImage, {
+                          width: 42,
+                          height: 42,
+                          borderRadius: 36,
+                          backgroundColor: '#E8F8FF',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }]}>
+                            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>
+                              {activeItem ? activeItem.charAt(0).toUpperCase() : defaultName ? defaultName.name.charAt(0).toUpperCase() : ''}
+                            </Text>
+                        </View>
+                      )}
                       {/* Add more images as needed */}
                     </View>
                     <View style={styles.textColumn}>
@@ -793,7 +837,7 @@ const HomePage = ({ navigation, route }) => {
                         right: width * 0.02,
                       //width: width * 0.25,
                     }}
-                     onPress={() => navigation.navigate('ProfileCompletion2')}
+                     onPress={() => navigation.navigate('ProfileCompletion4')}
                   >
                     <Text style={{
                       fontSize: responsiveFontSize(14),
@@ -1259,13 +1303,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center', // Center the image vertically
     padding: 5
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Background blur effect
+  },
   modalContent: {
     backgroundColor: '#FEFCFC',
-    padding: 20,
+    paddingVertical: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: height * 0.8, // Maximum height of 50%
-
+    paddingHorizontal: moderateScale(16),
+    maxHeight: '85%',
+    minHeight: 100,
+    paddingBottom: 30,
   },
   horizontalLine: {
     width: '20%',
@@ -1277,11 +1328,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#979797',
     borderRadius: 10
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Background blur effect
-  },
+  // modalContainer: {
+  //   flex: 1,
+  //   justifyContent: 'flex-end',
+  //   backgroundColor: 'rgba(0, 0, 0, 0.5)', // Background blur effect
+  // },
   container: {
     flexGrow: 1,
     backgroundColor: '#FEFCFC',

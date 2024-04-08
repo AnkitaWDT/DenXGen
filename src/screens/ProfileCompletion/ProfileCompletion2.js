@@ -500,7 +500,7 @@ const ProfileCompletion2 = ({ navigation }) => {
             console.error('An error occurred:', error);
         }
 
-        navigation.navigate('ProfileCompletion3');
+        navigation.navigate('NDProfileCompletion3');
     };
 
 
@@ -525,7 +525,7 @@ const ProfileCompletion2 = ({ navigation }) => {
                                     textAlign: 'center', paddingHorizontal: width * 0.02
                                 }]}>Choose your career category and unlock endless possibilities.</Text>
                                 {/* <Image source={require('../../../assets/img/Prog2.png')} style={commonStyles.progImage} /> */}
-                                    
+                                    <ProgressBar progress={progressPercentage / 100} color="#00B0FF" style={commonStyles.progImage} />
                             </View>
                     
 
@@ -550,34 +550,41 @@ const ProfileCompletion2 = ({ navigation }) => {
                             </TouchableHighlight>
 
                             {/* About Yourself Modal */}
-                            <Modal visible={isAboutModalVisible} transparent>
-                                    <TouchableWithoutFeedback onPress={() => closeModalA()}>
-                                    <View style={styles.modalContainer}>
-                                        <TouchableWithoutFeedback >
-                                    <View style={styles.modalContent}>
-                                        <View style={styles.horizontalLine}></View>
-                                        <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
-                                            Write something about yourself
-                                        </Text>
-                                                        <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
-                                            Note: Tell us something about yourself to let users know you better
-                                        </Text>
-                                        <TextInput
-                                            style={styles.modalTextarea}
-                                            multiline
-                                            placeholder="Write about yourself..."
-                                            placeholderTextColor="#979797"
-                                            value={newInputValue}
-                                            onChangeText={handleAboutChange}
-                                            textAlignVertical="top"
-                                        />
-                                        <TouchableOpacity onPress={handleAboutSave} style={commonStyles.button} activeOpacity={0.8}>
-                                            <Text style={commonStyles.buttonText}>Submit</Text>
+                                        <Modal
+                                            visible={isAboutModalVisible}
+                                            transparent
+                                            activeOpacity={1}
+                                        onRequestClose={() => closeModalA()} // To handle Android back button
+                                        >
+                                        <TouchableOpacity
+                                            activeOpacity={1}
+                                            style={styles.modalContainer}
+                                            onPress={() => closeModalA()} // Close the modal when clicking on the background
+                                        >
+                                            <TouchableOpacity style={styles.modalContent}
+                                                activeOpacity={1}
+                                                onPress={() => { }}>
+                                                <View style={styles.horizontalLine}></View>
+                                                <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
+                                                    Write something about yourself
+                                                </Text>
+                                                <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
+                                                    Note: Tell us something about yourself to let users know you better
+                                                </Text>
+                                                <TextInput
+                                                    style={styles.modalTextarea}
+                                                    multiline
+                                                    placeholder="Write about yourself..."
+                                                    placeholderTextColor="#979797"
+                                                    value={newInputValue}
+                                                    onChangeText={handleAboutChange}
+                                                    textAlignVertical="top"
+                                                />
+                                                <TouchableOpacity onPress={handleAboutSave} style={commonStyles.button} activeOpacity={0.8}>
+                                                    <Text style={commonStyles.buttonText}>Submit</Text>
+                                                </TouchableOpacity>
+                                            </TouchableOpacity>
                                         </TouchableOpacity>
-                                    </View>
-                                        </TouchableWithoutFeedback>
-                                    </View>
-                                    </TouchableWithoutFeedback>
                             </Modal>
                         </View>
 

@@ -3,16 +3,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
     PixelRatio, RefreshControl, View, Image, ImageBackground, StyleSheet, SafeAreaView, TouchableOpacity, Text, TouchableWithoutFeedback, Modal, Dimensions, FlatList
 } from 'react-native';
-import commonStyles from '../components/CommonStyles';
+import commonStyles from '../../components/CommonStyles';
 import { ScrollView } from 'react-native-gesture-handler';
 import Popover, { PopoverPlacement } from 'react-native-popover-view';
 import Video from 'react-native-video';
-import SocialLink from '../components/SocialLinks';
+import SocialLink from '../../components/SocialLinks';
 import { moderateScale } from 'react-native-size-matters';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
-import Animation from '../components/Loader';
+import Animation from '../../components/Loader';
 
 const { width, height } = Dimensions.get('window');
 
@@ -35,17 +35,20 @@ const ReadMoreText = ({ text, initialLimit }) => {
 
     return (
         <View>
-            <Text style={[commonStyles.headerText3BL, {textAlign: 'justify'}]}>{textToShow}</Text>
+            <Text style={[commonStyles.headerText3BL, { textAlign: 'justify' }]}>{textToShow}</Text>
             {text.length > initialLimit && (
                 <TouchableOpacity onPress={toggleText}>
-                    <Text style={[commonStyles.headerText3BL, { fontFamily: 'DMSans-SemiBold', textAlign: 'right'}]}>{readMoreText}</Text>
+                    <Text style={[commonStyles.headerText3BL, { fontFamily: 'DMSans-SemiBold', textAlign: 'right' }]}>{readMoreText}</Text>
                 </TouchableOpacity>
             )}
         </View>
     );
 };
 
-const PersonalProfile = ({ navigation, route }) => {
+const MyClinic = ({ navigation, route }) => {
+
+    const { cl_id } = route.params;
+    console.log(cl_id);
 
     const [refreshing, setRefreshing] = useState(false);
 
@@ -114,80 +117,13 @@ const PersonalProfile = ({ navigation, route }) => {
         setIsModalVisible(false);
     };
 
-    // const [servicesData, setServicesData] = useState([
-    //     'Dental implant',
-    //     'Root canal',
-    //     'Teeth Whitening',
-    //     'Root canal treatment',
-    //     'Dentures',
-    //     'Teeth cleaning',
-    //     'Dental braces',
-    // ]);
-
-  
-    // const educationData = [
-    //     {
-    //         licNo: 'D.Y. Patil College Of Dental Institute',
-    //         licText: 'BDS, Oral pathology, Dentistry',
-    //         fromYear: '2022',
-    //         fromMonth: 'Jun'
-    //     },
-    //     {
-    //         licNo: 'D.Y. Patil College Of Dental Institute',
-    //         licText: 'BDS, Oral pathology, Dentistry',
-    //         fromYear: '2022',
-    //         fromMonth: 'June',
-    //         toYear: '2023',
-    //         toMonth: 'Aug'
-    //     },
-    //     {
-    //         licNo: 'D.Y. Patil College Of Dental Institute',
-    //         licText: 'BDS, Oral pathology, Dentistry',
-    //         fromYear: '2022',
-    //         fromMonth: 'July'
-    //     },
-    //     // Add more education entries as needed
-    // ];
-    // const experienceData = [
-    //     {
-    //         licNo: 'D.Y. Patil College Of Dental Institute',
-    //         licText: 'BDS, Oral pathology, Dentistry',
-    //         fromYear: '2022',
-    //         fromMonth: 'Jun'
-    //     },
-    //     {
-    //         licNo: 'D.Y. Patil College Of Dental Institute',
-    //         licText: 'BDS, Oral pathology, Dentistry',
-    //         fromYear: '2022',
-    //         fromMonth: 'June',
-    //         toYear: '2023',
-    //         toMonth: 'Aug'
-    //     },
-    //     {
-    //         licNo: 'D.Y. Patil College Of Dental Institute',
-    //         licText: 'BDS, Oral pathology, Dentistry',
-    //         fromYear: '2022',
-    //         fromMonth: 'July'
-    //     },
-    //     {
-    //         licNo: 'D.Y. Patil College Of Dental Institute',
-    //         licText: 'BDS, Oral pathology, Dentistry',
-    //         fromYear: '2022',
-    //         fromMonth: 'June',
-    //         toYear: '2023',
-    //         toMonth: 'Aug'
-    //     },
-    //     // Add more education entries as needed
-    // ];
-
-
     const [showAllVid, setShowAllVid] = useState(false);
     const videos = [
         { id: 1, link: 'https://www.youtube.com/watch?v=video1' },
         { id: 2, link: 'https://www.youtube.com/watch?v=video2' },
         { id: 3, link: 'https://www.youtube.com/watch?v=video3' },
     ];
-   // const initialVideosToShow = showAllVid ? videos.length : 2;
+    // const initialVideosToShow = showAllVid ? videos.length : 2;
     const initialVideosToShow = showAllVid ? profileData.vidList.length : 2;
 
     const handleToggleShowAllVid = () => {
@@ -244,19 +180,25 @@ const PersonalProfile = ({ navigation, route }) => {
 
     const fetchData = async () => {
         try {
-            const pr_id = await AsyncStorage.getItem('pr_id');
-            const id = parseInt(pr_id);
-
-            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getvic-ax.php?prid=${id}`);
-            const data = await response.json();
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getclinicvic-ax.php?cl_id=${cl_id}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            console.log(response);
+            const responseBodyText = await response.text(); // Get response body as text
+            console.log('Response Body:', responseBodyText); // Log response body
+            const data = JSON.parse(responseBodyText); // Try to parse the response body as JSON
+            console.log('API Response:', data);
             setProfileData(data.data);
             setGalleryList(data.data.galleryList);
             setLoading(false);
         } catch (error) {
+            console.error('Error fetching data:', error);
             setError(error);
             setLoading(false);
         }
     };
+
 
     useFocusEffect(
         React.useCallback(() => {
@@ -265,7 +207,7 @@ const PersonalProfile = ({ navigation, route }) => {
     );
 
     useEffect(() => {
-       // console.log('profileData', JSON.stringify(profileData));
+        //console.log('profileData', JSON.stringify(profileData));
     }, [profileData]);
 
     if (loading) {
@@ -275,37 +217,11 @@ const PersonalProfile = ({ navigation, route }) => {
             </SafeAreaView>
         );
     }
-    
+
     const servicesData = profileData ? profileData.servList.map(item => item.service) : [];
-    const specialityData = profileData ? profileData.specList.map(item => item.speciality) : [];
-    const keyForteData = profileData ? profileData.keyfList.map(item => item.keyforte) : [];
-    const languages = profileData ? profileData.langList.map(lang => lang.language).join(', '): null;
-
-    const educationData = profileData ? profileData.eduList.map(edu => {
-        const fromMonth = edu.start_month; // Assuming you have a function to get month name
-        const fromYear = edu.start_year;
-        const toMonth = edu.end_month ? edu.end_month : '';
-        const toYear = edu.end_year;
-        const degree = edu.degree;
-        const institute = edu.institute;
-
-        // Format the educational details as needed
-        const licNo = `${institute}`;
-        const licText = `${degree}`;
-        return { licNo, licText, fromYear, fromMonth, toYear, toMonth };
-    }): null;
-
-    const experienceData = profileData ? profileData.woexpList.map(exp => {
-        const fromMonth = exp.start_month; // Assuming you have a function to get month name
-        const fromYear = exp.start_year;
-        const toMonth = exp.end_month ? exp.end_month : '';
-        const toYear = exp.end_year;
-        const company = exp.company;
-        const designation = exp.designation;
-
-        // Format the experience details as needed
-        return { company, designation, fromYear, fromMonth, toYear, toMonth };
-    }) : null;
+    const treatmentsData = profileData ? profileData.treatmentList.map(item => item.treatment) : [];
+    // const keyForteData = profileData ? profileData.keyfList.map(item => item.keyforte) : [];
+    // const languages = profileData ? profileData.langList.map(lang => lang.language).join(', ') : null;
 
 
     const renderTabContent = () => {
@@ -388,12 +304,12 @@ const PersonalProfile = ({ navigation, route }) => {
                 return (
                     <View>
                         <FlatList
-                            data={servicesData}
+                            data={treatmentsData}
                             keyExtractor={(item, index) => index.toString()}
                             renderItem={({ item }) => (
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
                                     <Image
-                                        source={require('../../assets/img/services.png')}
+                                        source={require('../../../assets/img/services.png')}
                                         style={{ width: 20, height: 25, marginRight: 10, }}
                                     />
                                     <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>
@@ -407,12 +323,12 @@ const PersonalProfile = ({ navigation, route }) => {
                 return (
                     <View>
                         <FlatList
-                            data={specialityData}
+                            data={servicesData}
                             keyExtractor={(item, index) => index.toString()}
                             renderItem={({ item }) => (
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
                                     <Image
-                                        source={require('../../assets/img/services.png')}
+                                        source={require('../../../assets/img/services.png')}
                                         style={{ width: 20, height: 25, marginRight: 10, }}
                                     />
                                     <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>
@@ -423,24 +339,26 @@ const PersonalProfile = ({ navigation, route }) => {
                     </View>
                 );
             case 3:
-                return (
-                    <View>
-                        <FlatList
-                            data={keyForteData}
-                            keyExtractor={(item, index) => index.toString()}
-                            renderItem={({ item }) => (
-                                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                                    <Image
-                                        source={require('../../assets/img/services.png')}
-                                        style={{ width: 20, height: 25, marginRight: 10, }}
-                                    />
-                                    <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>
-                                </View>
-                            )}
-                        // renderItem={({ item }) => <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>}
-                        />
-                    </View>
-                );
+
+                return null;
+                // return (
+                //     <View>
+                //         <FlatList
+                //             data={keyForteData}
+                //             keyExtractor={(item, index) => index.toString()}
+                //             renderItem={({ item }) => (
+                //                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                //                     <Image
+                //                         source={require('../../../assets/img/services.png')}
+                //                         style={{ width: 20, height: 25, marginRight: 10, }}
+                //                     />
+                //                     <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>
+                //                 </View>
+                //             )}
+                //         // renderItem={({ item }) => <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>}
+                //         />
+                //     </View>
+                // );
             case 4:
                 return (
                     <View style={{ marginBottom: 20 }}>
@@ -451,7 +369,7 @@ const PersonalProfile = ({ navigation, route }) => {
                             {profileData.vidList.slice(0, initialVideosToShow).map((video, index) => (
                                 <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                                     <Image
-                                        source={require('../../assets/img/videoL.png')}
+                                        source={require('../../../assets/img/videoL.png')}
                                         style={{ width: 22, height: 22, marginRight: 10 }}
                                     />
                                     <Text style={[commonStyles.headerText3BL, { marginRight: 10 }]}>{video.links}</Text>
@@ -477,7 +395,7 @@ const PersonalProfile = ({ navigation, route }) => {
                             {profileData.awaList.slice(0, initialAwardsToShow).map((awards, index) => (
                                 <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                                     <Image
-                                        source={require('../../assets/img/videoL.png')}
+                                        source={require('../../../assets/img/videoL.png')}
                                         style={{ width: 22, height: 22, marginRight: 10 }}
                                     />
                                     <Text style={[commonStyles.headerText3BL, { marginRight: 10 }]}>{awards.links}</Text>
@@ -504,7 +422,7 @@ const PersonalProfile = ({ navigation, route }) => {
 
                                 <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                                     <Image
-                                        source={require('../../assets/img/videoL.png')}
+                                        source={require('../../../assets/img/videoL.png')}
                                         style={{ width: 22, height: 22, marginRight: 10 }}
                                     />
                                     <Text style={[commonStyles.headerText3BL, { marginRight: 10 }]}>{blog.links}</Text>
@@ -541,7 +459,7 @@ const PersonalProfile = ({ navigation, route }) => {
             {/* SubContainer with Banner-like Image */}
             <ScrollView style={styles.subContainer} showsVerticalScrollIndicator={false}>
                 <ImageBackground
-                    source={profileData && profileData.profile_banner ? { uri: profileData.profile_banner } : require('../../assets/img/banner.png')}
+                    source={profileData && profileData.profile_banner ? { uri: profileData.profile_banner } : require('../../../assets/img/banner.png')}
                     style={styles.bannerImage}
                 >
                     <View style={styles.container1}>
@@ -549,11 +467,11 @@ const PersonalProfile = ({ navigation, route }) => {
                             <TouchableOpacity style={commonStyles.backContainer} activeOpacity={0.8}
                                 onPress={() => navigation.goBack()}>
                                 <Image
-                                    source={require('../../assets/img/Back.png')}
+                                    source={require('../../../assets/img/Back.png')}
                                     style={commonStyles.icon}
                                 />
                             </TouchableOpacity>
-{/* 
+                            {/* 
                             <Popover
                                 placement={PopoverPlacement.LEFT}
                                 from={(
@@ -561,7 +479,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                         style={commonStyles.backContainer1}
                                     >
                                         <Image
-                                            source={require('../../assets/img/Option.png')}
+                                            source={require('../../../assets/img/Option.png')}
                                             style={commonStyles.icon}
                                         />
                                     </TouchableOpacity>
@@ -570,7 +488,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                     <TouchableOpacity>
                                         <View style={styles.popoverItemContainer}>
                                             <Image
-                                                source={require('../../assets/img/Bookmark.png')}
+                                                source={require('../../../assets/img/Bookmark.png')}
                                                 style={styles.popoverItemIcon}
                                             />
                                             <Text style={styles.popoverItemText}>Save PDF</Text>
@@ -580,7 +498,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                     <TouchableOpacity>
                                         <View style={styles.popoverItemContainer}>
                                             <Image
-                                                source={require('../../assets/img/SaveCon.png')}
+                                                source={require('../../../assets/img/SaveCon.png')}
                                                 style={styles.popoverItemIcon}
                                             />
                                             <Text style={styles.popoverItemText}>Save Contact</Text>
@@ -590,7 +508,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                     <TouchableOpacity>
                                         <View style={styles.popoverItemContainer}>
                                             <Image
-                                                source={require('../../assets/img/Spam.png')}
+                                                source={require('../../../assets/img/Spam.png')}
                                                 style={styles.popoverItemIcon}
                                             />
                                             <Text style={styles.popoverItemText}>Report Spam</Text>
@@ -599,7 +517,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                     <TouchableOpacity>
                                         <View style={styles.popoverItemContainer}>
                                             <Image
-                                                source={require('../../assets/img/Link.png')}
+                                                source={require('../../../assets/img/Link.png')}
                                                 style={styles.popoverItemIcon}
                                             />
                                             <Text style={styles.popoverItemText}>Copy Link</Text>
@@ -617,7 +535,7 @@ const PersonalProfile = ({ navigation, route }) => {
                             />
                         ) : (
                             <Image
-                                source={require('../../assets/img/ProfileHome.png')}
+                                source={require('../../../assets/img/ProfileHome.png')}
                                 style={styles.profilePic}
                             />
                         )}
@@ -630,7 +548,7 @@ const PersonalProfile = ({ navigation, route }) => {
                             marginVertical: moderateScale(3),
                         }]} numberOfLines={1} ellipsizeMode="tail">MDS,BDS l Prosthodontics l 10+ years exp</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}>
-                            <Image source={require('../../assets/img/Location.png')} style={{ width: moderateScale(15), height: moderateScale(17), }} />
+                            <Image source={require('../../../assets/img/Location.png')} style={{ width: moderateScale(15), height: moderateScale(17), }} />
                             <Text style={[commonStyles.headerText5BL, {
                                 paddingHorizontal: moderateScale(8),
                                 lineHeight: moderateScale(18)
@@ -638,7 +556,7 @@ const PersonalProfile = ({ navigation, route }) => {
                             }]}>Vikhroli, Prosthodntic Care, Mumbai</Text>
                         </View>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}>
-                            <Image source={require('../../assets/img/languages.png')} style={{ width: moderateScale(15), height: moderateScale(14), }} />
+                            <Image source={require('../../../assets/img/languages.png')} style={{ width: moderateScale(15), height: moderateScale(14), }} />
                             <Text style={[commonStyles.headerText5BL, {
                                 paddingHorizontal: moderateScale(8),
                                 lineHeight: moderateScale(15)
@@ -658,11 +576,11 @@ const PersonalProfile = ({ navigation, route }) => {
                             {profileData ? profileData.name : null}
                         </Text>
 
-                        <Text style={[commonStyles.headerText2BL, {
+                        {/* <Text style={[commonStyles.headerText2BL, {
                             marginVertical: 3,
-                        }]} numberOfLines={1} ellipsizeMode="tail">{profileData ? profileData.profession : null} ┃ {profileData && profileData.specList.length > 0 ? profileData.specList[0].speciality : null} ┃ {profileData ? profileData.experience : null}</Text>
+                        }]} numberOfLines={1} ellipsizeMode="tail">{profileData ? profileData.profession : null} ┃ {profileData && profileData.specList.length > 0 ? profileData.specList[0].speciality : null} ┃ {profileData ? profileData.experience : null}</Text> */}
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}>
-                            <Image source={require('../../assets/img/LocationHome.png')} style={{ width: 15, height: 15, }} />
+                            <Image source={require('../../../assets/img/LocationHome.png')} style={{ width: 15, height: 15, }} />
                             <Text style={[commonStyles.headerText5BL, {
                                 paddingHorizontal: 8,
                                 lineHeight: 18
@@ -670,12 +588,12 @@ const PersonalProfile = ({ navigation, route }) => {
                             }]}>Vikhroli, Prosthodntic Care, Mumbai</Text>
                         </View>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}>
-                            <Image source={require('../../assets/img/languages.png')} style={{ width: 15, height: 15, }} />
-                            <Text style={[commonStyles.headerText5BL, {
+                            <Image source={require('../../../assets/img/languages.png')} style={{ width: 15, height: 15, }} />
+                            {/* <Text style={[commonStyles.headerText5BL, {
                                 paddingHorizontal: 8,
                                 lineHeight: 15
 
-                            }]}>{languages}</Text>
+                            }]}>{languages}</Text> */}
                         </View>
                         <View>
 
@@ -685,8 +603,8 @@ const PersonalProfile = ({ navigation, route }) => {
                     <View style={styles.horizontalLine}></View>
                     <View style={styles.containerC}>
                         {/* Left content */}
-                        <View style={{ flexDirection: 'row', alignItems: 'center'}}>
-                            <Text style={[commonStyles.headerText3BL, {  paddingRight: 8 }]}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Text style={[commonStyles.headerText3BL, { paddingRight: 8 }]}>
                                 Key Associate
                             </Text>
                             <Text style={[commonStyles.headerText5G, { textAlign: 'center' }]}>
@@ -701,9 +619,9 @@ const PersonalProfile = ({ navigation, route }) => {
                             <TouchableOpacity
                                 activeOpacity={0.8}
                                 onPress={() => navigation.navigate('Connections')}
-                                style={{ flexDirection: 'row', alignItems: 'center',  }}
+                                style={{ flexDirection: 'row', alignItems: 'center', }}
                             >
-                                <Text style={[commonStyles.headerText3BL, { paddingRight: 8}]}>
+                                <Text style={[commonStyles.headerText3BL, { paddingRight: 8 }]}>
                                     Connection
                                 </Text>
                                 <Text style={[commonStyles.headerText5G, { textAlign: 'center' }]}>
@@ -741,7 +659,7 @@ const PersonalProfile = ({ navigation, route }) => {
                         </View>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <TouchableOpacity onPress={() => setModalConnectVisible(true)}>
-                                <Image source={require('../../assets/img/connections.png')} style={{ width: 20, height: 20 }} />
+                                <Image source={require('../../../assets/img/connections.png')} style={{ width: 20, height: 20 }} />
                             </TouchableOpacity>
                             <Popover
                                 placement={PopoverPlacement.LEFT}
@@ -750,7 +668,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                         style={commonStyles.backContainer1}
                                     >
                                         <Image
-                                            source={require('../../assets/img/Option.png')}
+                                            source={require('../../../assets/img/Option.png')}
                                             style={{ width: 20, height: 20, marginLeft: width * 0.02 }}
                                         />
                                     </TouchableOpacity>
@@ -759,7 +677,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                     <TouchableOpacity>
                                         <View style={styles.popoverItemContainer}>
                                             <Image
-                                                source={require('../../assets/img/Bookmark.png')}
+                                                source={require('../../../assets/img/Bookmark.png')}
                                                 style={styles.popoverItemIcon}
                                             />
                                             <Text style={styles.popoverItemText}>Save PDF</Text>
@@ -769,7 +687,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                     <TouchableOpacity>
                                         <View style={styles.popoverItemContainer}>
                                             <Image
-                                                source={require('../../assets/img/SaveCon.png')}
+                                                source={require('../../../assets/img/SaveCon.png')}
                                                 style={styles.popoverItemIcon}
                                             />
                                             <Text style={styles.popoverItemText}>Save Contact</Text>
@@ -779,7 +697,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                     <TouchableOpacity>
                                         <View style={styles.popoverItemContainer}>
                                             <Image
-                                                source={require('../../assets/img/Spam.png')}
+                                                source={require('../../../assets/img/Spam.png')}
                                                 style={styles.popoverItemIcon}
                                             />
                                             <Text style={styles.popoverItemText}>Report Spam</Text>
@@ -788,7 +706,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                     <TouchableOpacity>
                                         <View style={styles.popoverItemContainer}>
                                             <Image
-                                                source={require('../../assets/img/Link.png')}
+                                                source={require('../../../assets/img/Link.png')}
                                                 style={styles.popoverItemIcon}
                                             />
                                             <Text style={styles.popoverItemText}>Copy Link</Text>
@@ -796,7 +714,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                     </TouchableOpacity>
                                 </View>
                             </Popover>
-                            {/* <Image source={require('../../assets/img/Option.png')} style={{ width: 20, height: 20, marginLeft: width * 0.02 }} /> */}
+                            {/* <Image source={require('../../../assets/img/Option.png')} style={{ width: 20, height: 20, marginLeft: width * 0.02 }} /> */}
                         </View>
                     </View>
                     {/* <Modal visible={modalConnectVisible} transparent 
@@ -852,7 +770,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                     {profileData?.socialList?.map((social, index) => (
                                         Object.entries(social).map(([platform, username]) => (
                                             // Exclude pr_id field and empty usernames
-                                            platform !== 'pr_id' && username.trim() !== '' &&
+                                            platform !== 'cl_id' && username.trim() !== '' &&
                                             <SocialLink key={platform} platform={platform} username={username} />
                                         ))
                                     ))}
@@ -868,23 +786,23 @@ const PersonalProfile = ({ navigation, route }) => {
                         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                             {/* Button 1 */}
                             <TouchableOpacity style={styles.buttonM} activeOpacity={0.8} onPress={toggleModalB}>
-                                <Text style={[commonStyles.buttonText2H, {  }]}>My Clinic</Text>
-                                <Image source={require('../../assets/img/dropdown.png')} style={styles.imageStyle1} />
+                                <Text style={[commonStyles.buttonText2H, {}]}>My Clinic</Text>
+                                <Image source={require('../../../assets/img/dropdown.png')} style={styles.imageStyle1} />
                             </TouchableOpacity>
                             {/* Button 2 */}
                             <TouchableOpacity style={styles.buttonM} activeOpacity={0.8} onPress={toggleModalB}>
-                                <Text style={[commonStyles.buttonText2H, {  }]}>Empanelled Clinic</Text>
-                                <Image source={require('../../assets/img/dropdown.png')} style={styles.imageStyle1} />
+                                <Text style={[commonStyles.buttonText2H, {}]}>Empanelled Clinic</Text>
+                                <Image source={require('../../../assets/img/dropdown.png')} style={styles.imageStyle1} />
                             </TouchableOpacity>
                             {/* Button 3 */}
                             <TouchableOpacity style={styles.buttonM} activeOpacity={0.8} onPress={toggleModalB}>
-                                <Text style={[commonStyles.buttonText2H, {  }]}>My Office</Text>
-                                <Image source={require('../../assets/img/dropdown.png')} style={styles.imageStyle1} />
+                                <Text style={[commonStyles.buttonText2H, {}]}>My Office</Text>
+                                <Image source={require('../../../assets/img/dropdown.png')} style={styles.imageStyle1} />
                             </TouchableOpacity>
                             {/* Button 4 */}
                             <TouchableOpacity style={styles.buttonM} activeOpacity={0.8} onPress={toggleModalB}>
-                                <Text style={[commonStyles.buttonText2H, { }]}>Associated Offices</Text>
-                                <Image source={require('../../assets/img/dropdown.png')} style={styles.imageStyle1} />
+                                <Text style={[commonStyles.buttonText2H, {}]}>Associated Offices</Text>
+                                <Image source={require('../../../assets/img/dropdown.png')} style={styles.imageStyle1} />
                             </TouchableOpacity>
                         </ScrollView>
 
@@ -919,7 +837,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                                 onPress={() => navigation.navigate('ClinicProfile')}
                                             >
                                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    <Image source={require('../../assets/img/clinicDefault.jpg')} style={styles.profileImage} />
+                                                    <Image source={require('../../../assets/img/clinicDefault.jpg')} style={styles.profileImage} />
                                                     <View style={{ flex: 1, }}>
                                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
                                                             <Text style={[commonStyles.headerText2BL, { lineHeight: 20 }]} numberOfLines={1}>Bhaskar Dental Clinic</Text>
@@ -933,7 +851,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                                         <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
 
                                                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                                <Image source={require('../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
+                                                                <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
                                                                 <Text style={[commonStyles.headerText5BL, {
                                                                     marginLeft: 4,
                                                                 }]} numberOfLines={1}>Ghatkopar, India</Text>
@@ -960,7 +878,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                                 onPress={() => navigation.navigate('ClinicProfile')}
                                             >
                                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    <Image source={require('../../assets/img/clinicDefault1.jpg')} style={styles.profileImage} />
+                                                    <Image source={require('../../../assets/img/clinicDefault1.jpg')} style={styles.profileImage} />
                                                     <View style={{ flex: 1, }}>
                                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
                                                             <Text style={[commonStyles.headerText2BL, { lineHeight: 20 }]} numberOfLines={1}>Bhaskar Dental Clinic</Text>
@@ -973,7 +891,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                                         <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
 
                                                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                                <Image source={require('../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
+                                                                <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
                                                                 <Text style={[commonStyles.headerText5BL, {
                                                                     marginLeft:4,
                                                                 }]} numberOfLines={1}>Ghatkopar, India</Text>
@@ -1027,7 +945,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                                     backgroundColor: '#FEFCFC'
                                                 }}
                                                 activeOpacity={0.8}
-                                                onPress={() => navigation.navigate('MyClinic', { cl_id: clinic.cl_id })}
+                                                onPress={() => navigation.navigate('MyProfile', { cl_id: clinic.cl_id })}
                                             >
 
                                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -1060,7 +978,7 @@ const PersonalProfile = ({ navigation, route }) => {
 
                                                         <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
                                                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                                <Image source={require('../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
+                                                                <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
                                                                 <Text style={[commonStyles.headerText5BL, { marginLeft: 4 }]} numberOfLines={1}>Ghatkopar, India</Text>
                                                             </View>
                                                         </View>
@@ -1090,7 +1008,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                     initialLimit={120}
                                 />
                             ) : (
-                               null
+                                null
                             )}
                         </View>
                     </View>
@@ -1102,7 +1020,7 @@ const PersonalProfile = ({ navigation, route }) => {
                         <View style={{ flexDirection: 'row', marginTop: 10 }}>
                             <View style={styles.licenceContainer2}>
                                 <Image
-                                    source={require('../../assets/img/mailP.png')}
+                                    source={require('../../../assets/img/mailP.png')}
                                     style={commonStyles.icon}
                                 />
                             </View>
@@ -1114,7 +1032,7 @@ const PersonalProfile = ({ navigation, route }) => {
                         <View style={{ flexDirection: 'row', marginTop: 10 }}>
                             <View style={styles.licenceContainer2}>
                                 <Image
-                                    source={require('../../assets/img/contactP1.png')}
+                                    source={require('../../../assets/img/contactP1.png')}
                                     style={commonStyles.icon}
                                 />
                             </View>
@@ -1124,19 +1042,185 @@ const PersonalProfile = ({ navigation, route }) => {
                             </View>
                         </View>
                     </View> */}
+
                     <View style={styles.horizontalLine}></View>
-                    <View style={[styles.aboutContainer, { marginBottom: 10 }]}>
+
+                    <View style={styles.aboutContainer}>
+                        <Text style={[commonStyles.headerText11BL, {
+                            //marginVertical: height * 0.01,
+                        }]}>Clinic Timings</Text>
+                        {/* <View style={{ marginTop: 10 }}>
+                            {profileData && profileData.timeList && profileData.timeList.map((time, index) => (
+                                <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                                    <Image
+                                        source={require('../../../assets/img/dot.png')}
+                                        style={{ width: 8, height: 8, marginHorizontal: 10 }}
+                                    />
+                                    <Text style={[commonStyles.headerText3BL, { marginRight: 10 }]}>{time.day} :</Text>
+                                    <Text style={[commonStyles.headerText3BL, {}]}>{`${time.start_time} - ${time.end_time}`}</Text>
+                                </View>
+                            ))}
+                        </View> */}
+
+                        {/* <View style={{ marginTop: 10 }}>
+                            {profileData && profileData.timeList && profileData.timeList.map((time, index) => (
+                                <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                                    <Image
+                                        source={require('../../../assets/img/dot.png')}
+                                        style={{ width: 8, height: 8, marginHorizontal: 10 }}
+                                    />
+                                    <Text style={[commonStyles.headerText3BL, { marginRight: 10 }]}>{time.day} :</Text>
+                                    <Text style={[commonStyles.headerText3BL, {}]}>{`${time.start_time.slice(0, 5)} - ${time.end_time.slice(0, 5)}`}</Text>
+                                </View>
+                            ))}
+                        </View> */}
+
+                        <View style={{ marginTop: 10 }}>
+                            {profileData && profileData.timeList && profileData.timeList.map((time, index) => {
+                                // Function to convert 24-hour time to 12-hour time with AM/PM
+                                const convertTo12HourFormat = (timeStr) => {
+                                    const [hours, minutes] = timeStr.split(':');
+                                    let period = 'AM';
+                                    let hour = parseInt(hours, 10);
+
+                                    if (hour >= 12) {
+                                        period = 'PM';
+                                        if (hour > 12) {
+                                            hour -= 12;
+                                        }
+                                    }
+                                    if (hour === 0) {
+                                        hour = 12; // 12 AM
+                                    }
+
+                                    return `${hour}:${minutes} ${period}`;
+                                };
+
+                                return (
+                                    <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                                        <Image
+                                            source={require('../../../assets/img/dot.png')}
+                                            style={{ width: 8, height: 8, marginHorizontal: 10 }}
+                                        />
+                                        <Text style={[commonStyles.headerText3BL, { marginRight: 10 }]}>{time.day} :</Text>
+                                        <Text style={[commonStyles.headerText3BL, {}]}>{`${convertTo12HourFormat(time.start_time)} - ${convertTo12HourFormat(time.end_time)}`}</Text>
+                                    </View>
+                                );
+                            })}
+                        </View>
+
+
+                        {/* <View style={{ marginTop: 10 }}>
+
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                                <Image
+                                    source={require('../../../assets/img/dot.png')}
+                                    style={{ width: 8, height: 8, marginHorizontal: 10 }}
+                                />
+                                <Text style={[commonStyles.headerText3BL, { marginRight: 10 }]}>Mon - Wed</Text>
+                                <Text style={[commonStyles.headerText3BL, {}]}>9:00 AM - 8:00 PM</Text>
+                            </View>
+
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                                <Image
+                                    source={require('../../../assets/img/dot.png')}
+                                    style={{ width: 8, height: 8, marginHorizontal: 10 }}
+                                />
+                                <Text style={[commonStyles.headerText3BL, { marginRight: 10 }]}>Thursday</Text>
+                                <Text style={[commonStyles.headerText3BL, {}]}>10:00 AM - 5:00 PM</Text>
+                            </View>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: height * 0.005 }}>
+                                <Image
+                                    source={require('../../../assets/img/dot.png')}
+                                    style={{ width: 8, height: 8, marginHorizontal: 10 }}
+                                />
+                                <Text style={[commonStyles.headerText3BL, { marginRight: 10 }]}>Friday - Saturday</Text>
+                                <Text style={[commonStyles.headerText3BL, {}]}>10:00 AM - 8:00 PM</Text>
+                            </View>
+                        </View> */}
+                    </View>
+                    <View style={styles.horizontalLine}></View>
+                    <View style={styles.aboutContainer}>
+                        <Text style={[commonStyles.headerText11BL, {
+                            //marginVertical: height * 0.01,
+                        }]}>Dental Members</Text>
+                        <View style={{ marginTop: 10 }}>
+                            <View>
+                                <Text style={[commonStyles.headerText4BL]}>Chief Dentist</Text>
+                                <TouchableOpacity
+                                    onPress={() => navigation.navigate('ProfileScreen')}
+                                    activeOpacity={0.8}
+                                    style={styles.contentContainer}>
+                                    <Image
+                                        source={require('../../../assets/img/DummyProfile1.png')}
+                                        style={styles.imageGridS}
+                                    />
+                                    <View style={{ marginTop: height * 0.005, paddingHorizontal: width * 0.01 }}>
+                                        <Text style={[commonStyles.headerText4BL, { marginTop: height * 0.005 }]} numberOfLines={1} ellipsizeMode="tail">Dr. Adil Mehta</Text>
+                                        <Text style={[commonStyles.headerText4G, {}]} numberOfLines={1} ellipsizeMode="tail">BDS, MDS(Endoden...</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                            <View>
+                                <Text style={[commonStyles.headerText4BL, { marginTop: 10 }]}>Empanelled Dental Members</Text>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TouchableOpacity
+                                        onPress={() => navigation.navigate('ProfileScreen')}
+                                        activeOpacity={0.8}
+                                        style={styles.contentContainer}>
+                                        <Image
+                                            source={require('../../../assets/img/DummyProfile2.png')}
+                                            style={styles.imageGridS}
+                                        />
+                                        <View style={{ marginTop: height * 0.005, paddingHorizontal: width * 0.01 }}>
+                                            <Text style={[commonStyles.headerText4BL, { marginTop: height * 0.005 }]} numberOfLines={1} ellipsizeMode="tail">Dr. Adil Mehta</Text>
+                                            <Text style={[commonStyles.headerText4G, {}]} numberOfLines={1} ellipsizeMode="tail">BDS, MDS(Endoden...</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => navigation.navigate('ProfileScreen')}
+                                        activeOpacity={0.8}
+                                        style={styles.contentContainer}>
+                                        <Image
+                                            source={require('../../../assets/img/DummyProfile3.png')}
+                                            style={styles.imageGridS}
+                                        />
+                                        <View style={{ marginTop: height * 0.005, paddingHorizontal: width * 0.01 }}>
+                                            <Text style={[commonStyles.headerText4BL, { marginTop: height * 0.005 }]} numberOfLines={1} ellipsizeMode="tail">Dr. Adil Mehta</Text>
+                                            <Text style={[commonStyles.headerText4G, {}]} numberOfLines={1} ellipsizeMode="tail">BDS, MDS(Endoden...</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => navigation.navigate('ProfileScreen')}
+                                        activeOpacity={0.8}
+                                        style={styles.contentContainer}>
+                                        <Image
+                                            source={require('../../../assets/img/DummyProfile1.png')}
+                                            style={styles.imageGridS}
+                                        />
+                                        <View style={{ marginTop: height * 0.005, paddingHorizontal: width * 0.01 }}>
+                                            <Text style={[commonStyles.headerText4BL, { marginTop: height * 0.005 }]} numberOfLines={1} ellipsizeMode="tail">Dr. Adil Mehta</Text>
+                                            <Text style={[commonStyles.headerText4G, {}]} numberOfLines={1} ellipsizeMode="tail">BDS, MDS(Endoden...</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                </View>
+
+                            </View>
+
+                        </View>
+                    </View>
+                    <View style={styles.horizontalLine}></View>
+                    {/* <View style={[styles.aboutContainer, { marginBottom: 10 }]}>
                         <Text style={[commonStyles.headerText11BL, {
                             //marginVertical: height * 0.01,
                         }]}>Licence Number</Text>
                         <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                           
-                            <View style={{  alignSelf: 'center' }}>
-                              
+
+                            <View style={{ alignSelf: 'center' }}>
+
                                 <Text style={[commonStyles.headerText2BL]}>
                                     {profileData ? profileData.license : null}
-                                    </Text>
-                                {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
+                                </Text>
                             </View>
                         </View>
                     </View>
@@ -1145,15 +1229,14 @@ const PersonalProfile = ({ navigation, route }) => {
                             //marginVertical: height * 0.01,
                         }]}>Registration Number</Text>
                         <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                           
-                            <View style={{  alignSelf: 'center' }}>
+
+                            <View style={{ alignSelf: 'center' }}>
                                 <Text style={[commonStyles.headerText2BL]}>
                                     {profileData ? profileData.reg_no : null}
                                 </Text>
-                                {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
                             </View>
                         </View>
-                    </View>
+                    </View> */}
 
                     <View style={[styles.aboutContainer, {}]}>
                         <Text style={[commonStyles.headerText11BL, {
@@ -1170,7 +1253,7 @@ const PersonalProfile = ({ navigation, route }) => {
                         </View>
                     </View>
                     <View style={styles.horizontalLine}></View>
-                    <View style={styles.aboutContainer}>
+                    {/* <View style={styles.aboutContainer}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text style={[commonStyles.headerText11BL, {}]}>Educational Details</Text>
                         </View>
@@ -1179,7 +1262,7 @@ const PersonalProfile = ({ navigation, route }) => {
                             <View key={index} style={{ flexDirection: 'row', marginVertical: 8 }}>
                                 <View style={styles.licenceContainer}>
                                     <Image
-                                        source={require('../../assets/img/Education11.png')}
+                                        source={require('../../../assets/img/Education11.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -1192,24 +1275,23 @@ const PersonalProfile = ({ navigation, route }) => {
 
                         {!showAll && educationData && educationData.length > 2 && (
                             <View>
-                                {/* <View style={styles.horizontalLine}></View> */}
                                 <TouchableOpacity style={styles.uploadButtonS} onPress={toggleShowAll} activeOpacity={0.8}>
                                     <Text style={commonStyles.buttonText1}>Show all {educationData.length} educations</Text>
-                                    <Image source={require('../../assets/img/RightArrow.png')} style={styles.imageStyle} />
+                                    <Image source={require('../../../assets/img/RightArrow.png')} style={styles.imageStyle} />
                                 </TouchableOpacity>
                             </View>
                         )}
                         {showAll && (
                             <TouchableOpacity style={styles.uploadButtonS} onPress={toggleShowAll} activeOpacity={0.8}>
                                 <Text style={commonStyles.buttonText1}>Hide all educations</Text>
-                                <Image source={require('../../assets/img/RightArrow.png')} style={styles.imageStyle} />
+                                <Image source={require('../../../assets/img/RightArrow.png')} style={styles.imageStyle} />
                             </TouchableOpacity>
                         )}
-                    </View>
+                    </View> */}
 
-             
-                    <View style={styles.horizontalLine}></View>
-                    <View>
+{/* 
+                    <View style={styles.horizontalLine}></View> */}
+                    {/* <View>
                         <View style={styles.aboutContainer}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                 <Text style={[commonStyles.headerText11BL, {
@@ -1221,7 +1303,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                 <View key={index} style={{ flexDirection: 'row', marginVertical: 8 }}>
                                     <View style={styles.licenceContainer}>
                                         <Image
-                                            source={require('../../assets/img/Experience11.png')}
+                                            source={require('../../../assets/img/Experience11.png')}
                                             style={commonStyles.icon}
                                         />
                                     </View>
@@ -1234,10 +1316,9 @@ const PersonalProfile = ({ navigation, route }) => {
 
                             {!showAllExp && experienceData && experienceData.length > 2 && (
                                 <View>
-                                    {/* <View style={styles.horizontalLine}></View> */}
                                     <TouchableOpacity style={styles.uploadButtonS} onPress={toggleShowAllExp} activeOpacity={0.8}>
                                         <Text style={commonStyles.buttonText1}>Show all {experienceData.length} experiences </Text>
-                                        <Image source={require('../../assets/img/RightArrow.png')} style={styles.imageStyle} />
+                                        <Image source={require('../../../assets/img/RightArrow.png')} style={styles.imageStyle} />
                                     </TouchableOpacity>
                                 </View>
 
@@ -1245,13 +1326,13 @@ const PersonalProfile = ({ navigation, route }) => {
                             {showAllExp && (
                                 <TouchableOpacity style={styles.uploadButtonS} onPress={toggleShowAllExp} activeOpacity={0.8}>
                                     <Text style={commonStyles.buttonText1}>Hide all experiences</Text>
-                                    <Image source={require('../../assets/img/RightArrow.png')} style={styles.imageStyle} />
+                                    <Image source={require('../../../assets/img/RightArrow.png')} style={styles.imageStyle} />
                                 </TouchableOpacity>
                             )}
                         </View>
 
-                    </View>
-                    <View style={styles.horizontalLine}></View>
+                    </View> */}
+                    {/* <View style={styles.horizontalLine}></View> */}
                     {/* <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.staticButtonsContainer}>
                         <TouchableOpacity
                             style={[styles.tabItem, selectedTab === 0 && styles.selectedTabItem]}
@@ -1291,7 +1372,7 @@ const PersonalProfile = ({ navigation, route }) => {
                             activeOpacity={0.8}
                         >
 
-                            <Text style={[styles.tabText, selectedTab === 1 && styles.selectedTabText]}>Services</Text>
+                            <Text style={[styles.tabText, selectedTab === 1 && styles.selectedTabText]}>Treatments</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.tabItem, selectedTab === 2 && styles.selectedTabItem]}
@@ -1299,22 +1380,22 @@ const PersonalProfile = ({ navigation, route }) => {
                             activeOpacity={0.8}
                         >
 
-                            <Text style={[styles.tabText, selectedTab === 2 && styles.selectedTabText]}>Specialities</Text>
+                            <Text style={[styles.tabText, selectedTab === 2 && styles.selectedTabText]}>Services</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             style={[styles.tabItem, selectedTab === 3 && styles.selectedTabItem]}
                             onPress={() => setSelectedTab(3)}
                             activeOpacity={0.8}
                         >
 
                             <Text style={[styles.tabText, selectedTab === 3 && styles.selectedTabText]}>Key Forte</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <TouchableOpacity
                             style={[styles.tabItem, selectedTab === 4 && styles.selectedTabItem]}
                             onPress={() => setSelectedTab(4)}
                             activeOpacity={0.8}
                         >
-                           
+
                             <Text style={[styles.tabText, selectedTab === 4 && styles.selectedTabText]}>Publications</Text>
                         </TouchableOpacity>
 
@@ -1346,9 +1427,9 @@ const PersonalProfile = ({ navigation, route }) => {
                             activeOpacity={0.8}
                         >
                             {selectedTab === 0 ? (
-                                <Image source={require('../../assets/img/gallery-white.png')} style={styles.tabImage} />
+                                <Image source={require('../../../assets/img/gallery-white.png')} style={styles.tabImage} />
                             ) : (
-                                <Image source={require('../../assets/img/gallery-blue.png')} style={styles.tabImage} />
+                                <Image source={require('../../../assets/img/gallery-blue.png')} style={styles.tabImage} />
                             )}
                             <Text style={[styles.tabText, selectedTab === 0 && styles.selectedTabText]}>Social Media</Text>
                         </TouchableOpacity>
@@ -1358,9 +1439,9 @@ const PersonalProfile = ({ navigation, route }) => {
                             activeOpacity={0.8}
                         >
                             {selectedTab === 1 ? (
-                                <Image source={require('../../assets/img/gallery-white.png')} style={styles.tabImage} />
+                                <Image source={require('../../../assets/img/gallery-white.png')} style={styles.tabImage} />
                             ) : (
-                                <Image source={require('../../assets/img/gallery-blue.png')} style={styles.tabImage} />
+                                <Image source={require('../../../assets/img/gallery-blue.png')} style={styles.tabImage} />
                             )}
                             <Text style={[styles.tabText, selectedTab === 1 && styles.selectedTabText]}>Gallery</Text>
                         </TouchableOpacity>
@@ -1370,9 +1451,9 @@ const PersonalProfile = ({ navigation, route }) => {
                             activeOpacity={0.8}
                         >
                             {selectedTab === 2 ? (
-                                <Image source={require('../../assets/img/gallery-white.png')} style={styles.tabImage} />
+                                <Image source={require('../../../assets/img/gallery-white.png')} style={styles.tabImage} />
                             ) : (
-                                <Image source={require('../../assets/img/gallery-blue.png')} style={styles.tabImage} />
+                                <Image source={require('../../../assets/img/gallery-blue.png')} style={styles.tabImage} />
                             )}
                             <Text style={[styles.tabText, selectedTab === 2 && styles.selectedTabText]}>Publications</Text>
                         </TouchableOpacity>
@@ -1382,9 +1463,9 @@ const PersonalProfile = ({ navigation, route }) => {
                             activeOpacity={0.8}
                         >
                             {selectedTab === 3 ? (
-                                <Image source={require('../../assets/img/gallery-white.png')} style={styles.tabImage} />
+                                <Image source={require('../../../assets/img/gallery-white.png')} style={styles.tabImage} />
                             ) : (
-                                <Image source={require('../../assets/img/gallery-blue.png')} style={styles.tabImage} />
+                                <Image source={require('../../../assets/img/gallery-blue.png')} style={styles.tabImage} />
                             )}
                             <Text style={[styles.tabText, selectedTab === 3 && styles.selectedTabText]}>Services</Text>
                         </TouchableOpacity>
@@ -1394,9 +1475,9 @@ const PersonalProfile = ({ navigation, route }) => {
                             activeOpacity={0.8}
                         >
                             {selectedTab === 4 ? (
-                                <Image source={require('../../assets/img/gallery-white.png')} style={styles.tabImage} />
+                                <Image source={require('../../../assets/img/gallery-white.png')} style={styles.tabImage} />
                             ) : (
-                                <Image source={require('../../assets/img/gallery-blue.png')} style={styles.tabImage} />
+                                <Image source={require('../../../assets/img/gallery-blue.png')} style={styles.tabImage} />
                             )}
                             <Text style={[styles.tabText, selectedTab === 4 && styles.selectedTabText]}>More</Text>
                         </TouchableOpacity>
@@ -1409,12 +1490,25 @@ const PersonalProfile = ({ navigation, route }) => {
                 </View>
 
             </ScrollView>
-        
+
         </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    contentContainer: {
+        borderRadius: 10, // Adjust the border top radius as needed
+        overflow: 'hidden',
+        marginVertical: 10,
+        width: width * 0.3,
+        justifyContent: 'center',
+        alignItems: 'center'
+
+    },
+    imageGridS: {
+        width: width * 0.2,
+        height: width * 0.2
+    },
     staticButtonsContainer: {
         flex: 1,
         flexDirection: 'row',
@@ -1624,7 +1718,7 @@ const styles = StyleSheet.create({
         // //justifyContent: "center",
         // alignItems: "center",
         // marginVertical: 10,
-       flexDirection: 'row',
+        flexDirection: 'row',
         // paddingLeft: 10, // Adjust this value as needed for spacing
         alignSelf: 'center',
         //height: moderateScale(16),
@@ -1766,9 +1860,9 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end', // Change from 'center' to 'flex-end'
         alignItems: 'center',
     },
-containerButton:{
-    marginVertical: height * 0.01,
-},
+    containerButton: {
+        marginVertical: height * 0.01,
+    },
     // modalContainer: {
     //     width: '100%',
     //     maxHeight: '90%',
@@ -1902,7 +1996,7 @@ containerButton:{
         alignSelf: 'center',
     },
     popoverItemText: {
-        fontSize:15,
+        fontSize: 15,
         color: '#121212',
         fontFamily: 'DMSans-Medium',
         lineHeight: height * 0.022, //28
@@ -1967,4 +2061,4 @@ containerButton:{
     },
 });
 
-export default PersonalProfile;
+export default MyClinic;

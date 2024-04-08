@@ -24,7 +24,9 @@ const responsiveFontSize = (size) => {
 
 
 
-const ClinicProfileCompletion1 = ({ navigation }) => {
+const ClinicProfileCompletion1 = ({ navigation, route }) => {
+
+    const { cl_id } = route.params ;
 
     const [selectedName, setSelectedName] = useState('');
     const [selectedEmail, setSelectedEmail] = useState('');
@@ -143,12 +145,12 @@ const ClinicProfileCompletion1 = ({ navigation }) => {
         //     ToastAndroid.show('Profession is Required', ToastAndroid.SHORT);
         // } else {
 
-        const cl_id = await AsyncStorage.getItem('cl_id');
+        // const cl_id = await AsyncStorage.getItem('cl_id');
         const acc_ty_id = await AsyncStorage.getItem('acc_ty_id');
         const pr_id = await AsyncStorage.getItem('pr_id');
         const id = parseInt(pr_id);
             const userData = {
-                cl_id: parseInt(cl_id),
+                cl_id: cl_id,
                 pr_id: id,
                 name: selectedName,
                 email: selectedEmail,

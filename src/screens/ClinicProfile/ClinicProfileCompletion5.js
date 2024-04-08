@@ -68,26 +68,32 @@ const ClinicProfileCompletion5 = ({ navigation }) => {
     useEffect(() => {
         const fetchTreatmentData = async () => {
             try {
-                const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/gettreatmentlist-ax.php`);
+                const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getcltreatmentlist-ax.php`);
                 const data = response.data;
                 console.log("Fetched data:", data); // Log fetched data
-
                 if (data.code === 1) {
-                    // Get the stored pr_ty_id from AsyncStorage
-                    const storedId = await AsyncStorage.getItem('acc_ty_id');
-                    console.log("Stored pr_ty_id:", storedId); // Log stored pr_ty_id
-
-                    const filteredData = data.data.filter(item => item.acc_ty_id === storedId);
-                    console.log("Filtered data:", filteredData); // Log filtered data
-
-                    const treatmentOptions = filteredData.map(item => ({
+                    const treatmentOptions = data.data.map(item => ({
                         treatment: item.treatment,
-                        id: parseInt(item.id) // Parse the id as an integer
+                        id: parseInt(item.id)
                     }));
-
-                    console.log("Dropdown options:", treatmentOptions); // Log dropdown options
-
                     setTreatmentsData(treatmentOptions);
+
+                // if (data.code === 1) {
+                //     // Get the stored pr_ty_id from AsyncStorage
+                //     const storedId = await AsyncStorage.getItem('acc_ty_id');
+                //     console.log("Stored pr_ty_id:", storedId); // Log stored pr_ty_id
+
+                //     const filteredData = data.data.filter(item => item.acc_ty_id === storedId);
+                //     console.log("Filtered data:", filteredData); // Log filtered data
+
+                //     const treatmentOptions = filteredData.map(item => ({
+                //         treatment: item.treatment,
+                //         id: parseInt(item.id) // Parse the id as an integer
+                //     }));
+
+                //     console.log("Dropdown options:", treatmentOptions); // Log dropdown options
+
+                //     setTreatmentsData(treatmentOptions);
                 } else {
                     console.error('Error fetching service options');
                 }
@@ -178,26 +184,33 @@ const ClinicProfileCompletion5 = ({ navigation }) => {
     useEffect(() => {
         const fetchServiceData = async () => {
             try {
-                const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getbusservlist-ax.php`);
+                const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getclservicelist-ax.php`);
                 const data = response.data;
                 console.log("Fetched data:", data); // Log fetched data
 
                 if (data.code === 1) {
-                    // Get the stored pr_ty_id from AsyncStorage
-                    const storedId = await AsyncStorage.getItem('acc_ty_id');
-                    console.log("Stored pr_ty_id:", storedId); // Log stored pr_ty_id
-
-                    const filteredData = data.data.filter(item => item.acc_ty_id === storedId);
-                    console.log("Filtered data:", filteredData); // Log filtered data
-
-                    const serviceOptions = filteredData.map(item => ({
+                    const serviceOptions = data.data.map(item => ({
                         service: item.service,
-                        id: parseInt(item.id) // Parse the id as an integer
+                        id: parseInt(item.id)
                     }));
-
-                    console.log("Dropdown options:", serviceOptions); // Log dropdown options
-
                     setServiceData(serviceOptions);
+
+                // if (data.code === 1) {
+                //     // Get the stored pr_ty_id from AsyncStorage
+                //     const storedId = await AsyncStorage.getItem('acc_ty_id');
+                //     console.log("Stored pr_ty_id:", storedId); // Log stored pr_ty_id
+
+                //     const filteredData = data.data.filter(item => item.acc_ty_id === storedId);
+                //     console.log("Filtered data:", filteredData); // Log filtered data
+
+                //     const serviceOptions = filteredData.map(item => ({
+                //         service: item.service,
+                //         id: parseInt(item.id) // Parse the id as an integer
+                //     }));
+
+                //     console.log("Dropdown options:", serviceOptions); // Log dropdown options
+
+                //     setServiceData(serviceOptions);
                 } else {
                     console.error('Error fetching service options');
                 }
@@ -286,12 +299,14 @@ const ClinicProfileCompletion5 = ({ navigation }) => {
         const pr_id = await AsyncStorage.getItem('pr_id');
         const id = parseInt(pr_id);
         const acc_ty_id = await AsyncStorage.getItem('acc_ty_id');
+        const cl_id = await AsyncStorage.getItem('cl_id');
+        const id1 = parseInt(cl_id);
 
 
         const userData = {
-            acc_ty_id: parseInt(acc_ty_id),
+            cl_id: id1,
             pr_id: id,
-            buserv_id: selectedServices,
+            serv_id: selectedServices,
             tret_id: selectedTreatments,
             payment: paymentLink,
             pi_dr_id: selectedButton === 'button1' ? 1 : 2,
@@ -300,15 +315,16 @@ const ClinicProfileCompletion5 = ({ navigation }) => {
         console.log('User Data:', userData);
 
         try {
-            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqbusinessdtls5-ax.php`, userData);
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqclinicdtls3-ax.php`, userData);
 
             console.log('dataresponse', response.data);
             ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
+            navigation.navigate('ClinicProfileCompletion6');
         } catch (error) {
             console.error('An error occurred:', error);
         }
 
-        navigation.navigate('ProfileCompletion6');
+        // navigation.navigate('ProfileCompletion6');
     };
 
 
@@ -316,7 +332,7 @@ const ClinicProfileCompletion5 = ({ navigation }) => {
     const totalSteps = 9; // Total number of steps
 
     const progressPercentage = (currentStep / totalSteps) * 100; // Calculate progress percentage
-    console.log("Progress Percentage:", progressPercentage);
+    //console.log("Progress Percentage:", progressPercentage);
 
     const [hoveredItem, setHoveredItem] = useState(null);
 
