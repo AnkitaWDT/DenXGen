@@ -220,6 +220,7 @@ const PersonalProfile = ({ navigation, route }) => {
     const [modalConnectVisible, setModalConnectVisible] = useState(false);
 
     const [profileData, setProfileData] = useState(null);
+    const [galleryList, setGalleryList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -231,6 +232,7 @@ const PersonalProfile = ({ navigation, route }) => {
             const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getvic-ax.php?prid=${id}`);
             const data = await response.json();
             setProfileData(data.data);
+            setGalleryList(data.data.galleryList);
             setLoading(false);
         } catch (error) {
             setError(error);
@@ -294,14 +296,14 @@ const PersonalProfile = ({ navigation, route }) => {
                 return (
                     <View>
                         <Video
-                            source={{ uri: 'https://www.denxgen.com/images/clinic-page/video-11.mp4' }} // Replace with the actual video URL
+                            source={profileData && profileData.profile_video ? { uri: profileData.profile_video } : { uri: 'https://www.denxgen.com/images/clinic-page/video-11.mp4' }}
+                            //source={{ uri: 'https://www.denxgen.com/images/clinic-page/video-11.mp4' }} // Replace with the actual video URL
                             style={{ aspectRatio: 3 / 2 }}
                             controls={false}
                             resizeMode="contain"
                         />
                         <View style={styles.imageGrid}>
-                            {/* Gallery Images */}
-                            {[1, 2, 3, 4, 5].map((image, index) => (
+                            {galleryList.map((image, index) => (
                                 <TouchableOpacity
                                     key={index}
                                     style={[
@@ -311,57 +313,55 @@ const PersonalProfile = ({ navigation, route }) => {
                                     onPress={() => toggleModal(index)}
                                     activeOpacity={0.8}>
                                     <Image
-                                        source={{
-                                            uri: 'https://www.denxgen.com/images/clinic-page/img/clinic-12.jpg',
-                                        }}
+                                        source={{ uri: image.gal_image }}
                                         style={styles.defaultImageU}
                                     />
                                 </TouchableOpacity>
                             ))}
-
-                            {/* Modal for Full Screen Image */}
-                            <Modal
-                                visible={isModalVisible}
-                                transparent={true}
-                                onRequestClose={closeModal}>
-                                <TouchableWithoutFeedback onPress={closeModal}>
-                                    <View
-                                        style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
-                                        <ScrollView
-                                            horizontal
-                                            pagingEnabled
-                                            showsHorizontalScrollIndicator={false}
-                                            onMomentumScrollEnd={event => {
-                                                const newIndex = Math.round(
-                                                    event.nativeEvent.contentOffset.x / width,
-                                                );
-                                                setSelectedImageIndex(newIndex);
-                                            }}
-                                            contentContainerStyle={{ flexGrow: 1 }}>
-                                            {[1, 2, 3, 4, 5, 6].map((image, index) => (
-                                                <View key={index} style={{ flex: 1, width: width }}>
-                                                    <Image
-                                                        source={{
-                                                            uri: 'https://www.denxgen.com/images/clinic-page/img/clinic-12.jpg',
-                                                        }}
-                                                        style={{
-                                                            width: width,
-                                                            height: height,
-                                                            resizeMode: 'contain',
-                                                        }}
-                                                    />
-                                                </View>
-                                            ))}
-                                        </ScrollView>
-                                        <TouchableOpacity
-                                            style={{ position: 'absolute', top: 20, right: 20 }}
-                                            onPress={closeModal}>
-                                            <Text style={{ color: 'FEFCFC', fontSize: 20 }}>X</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </TouchableWithoutFeedback>
-                            </Modal>
                         </View>
+
+                        {/* Modal for Full Screen Image */}
+                        <Modal
+                            visible={isModalVisible}
+                            transparent={true}
+                            onRequestClose={closeModal}>
+                            <TouchableWithoutFeedback onPress={closeModal}>
+                                <View
+                                    style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
+                                    {/* Modal content */}
+                                    <ScrollView
+                                        horizontal
+                                        pagingEnabled
+                                        showsHorizontalScrollIndicator={false}
+                                        onMomentumScrollEnd={event => {
+                                            const newIndex = Math.round(
+                                                event.nativeEvent.contentOffset.x / width,
+                                            );
+                                            setSelectedImageIndex(newIndex);
+                                        }}
+                                        contentContainerStyle={{ flexGrow: 1 }}>
+                                        {galleryList.map((image, index) => (
+                                            <View key={index} style={{ flex: 1, width: width }}>
+                                                <Image
+                                                    source={{ uri: image.gal_image }}
+                                                    style={{
+                                                        width: width,
+                                                        height: height,
+                                                        resizeMode: 'contain',
+                                                    }}
+                                                />
+                                            </View>
+                                        ))}
+                                    </ScrollView>
+                                    {/* Close button */}
+                                    <TouchableOpacity
+                                        style={{ position: 'absolute', top: 20, right: 20 }}
+                                        onPress={closeModal}>
+                                        <Text style={{ color: 'FEFCFC', fontSize: 20 }}>X</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </TouchableWithoutFeedback>
+                        </Modal>
 
 
                     </View>

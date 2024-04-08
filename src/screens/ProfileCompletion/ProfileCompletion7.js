@@ -23,6 +23,7 @@ import { moderateScale } from 'react-native-size-matters';
 import ImagePicker from 'react-native-image-crop-picker';
 import { ProgressBar } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AlertPopup from '../../components/AlertPopup';
 
 const { width, height } = Dimensions.get('window');
 
@@ -38,130 +39,10 @@ const ProfileCompletion7 = ({ navigation }) => {
     const [videoPath, setVideoPath] = useState(null);
     const [imagePaths, setImagePaths] = useState([]);
 
-    useEffect(() => {
-        if (videoPath && imagePaths.length === 5) {
-            // Both video and 5 images are uploaded
-            // navigation.navigate('HomeScreen');
-        }
-    }, [navigation, videoPath, imagePaths]);
+    const [showPopup, setShowPopup] = useState(false);
+    const [removingIndex, setRemovingIndex] = useState(null);
 
-    const handleVideoUpload = () => {
-        ImagePicker.openPicker({
-            mediaType: 'video',
-        }).then((response) => {
-            if (response.path) {
-                setVideoPath(response.path);
-            }
-        });
-    };
-
-    const handleImageUpload = async () => {
-        try {
-            const responses = await ImagePicker.openPicker({
-                mediaType: 'photo',
-                multiple: true,
-            });
-
-            const remainingSlots = 6 - imagePaths.length;
-
-            // Slice the responses array to fit the remaining slots
-            const selectedImages = responses.slice(0, remainingSlots);
-
-            // Map the selected images to paths
-            const paths = selectedImages.map((response) => response.path);
-
-            // Update image paths state
-            setImagePaths((prevPaths) => [...prevPaths, ...paths]);
-
-            if (responses.length > 6) {
-                // If the total number of images selected exceeds 6, show a message
-                ToastAndroid.show('You can only select up to 6 images.', ToastAndroid.SHORT);
-            }
-
-            const formData = new FormData();
-
-            // Append each image file with its respective index
-            paths.forEach((path, index) => {
-                formData.append(`photos`, {
-                    uri: path,
-                    type: 'image/jpeg',
-                    name: `image_${imagePaths.length + index}.jpg`,
-                });
-            });
-
-            const pr_id = await AsyncStorage.getItem('pr_id');
-            const id = parseInt(pr_id);
-            console.log(id);
-            console.log(pr_id);
-            if (id) {
-                console.log(id);
-                formData.append('pr_id', id);
-            }
-
-            console.log('FormData:', formData); // Log the FormData object
-
-            // Send formData to the server for image upload
-            const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls7-ax.php', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    // Add any additional headers if required
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error('Upload failed');
-            }
-
-            const responseData = await response.text();
-            console.log('Response from server:', responseData);
-            // Handle successful upload
-            // Optionally, you can navigate to the next screen here
-        } catch (error) {
-            console.error('Error uploading images:', error);
-            // Handle error
-        }
-    };
-
-
-    // const handleImageUpload = () => {
-    //     ImagePicker.openPicker({
-    //         mediaType: 'photo',
-    //         multiple: true,
-    //     }).then((responses) => {
-    //         if (responses.length + imagePaths.length > 6) {
-    //             // If the total number of images would exceed 5, show an alert.
-    //             //Alert.alert('Limit Exceeded', 'You can upload a maximum of 5 images.');
-    //             ToastAndroid.show('You can upload a maximum of 5 images.', ToastAndroid.SHORT);
-    //         } else {
-    //             // Append the selected images to the existing images, up to a maximum of 5.
-    //             const paths = responses.map((response) => response.path);
-    //             setImagePaths([...imagePaths, ...paths.slice(0, 6 - imagePaths.length)]);
-    //         }
-    //     });
-    // };
-
-
-    const handleRemoveImage = (index) => {
-        const updatedImages = [...imagePaths];
-        updatedImages.splice(index, 1);
-        setImagePaths(updatedImages);
-    };
-
-    const handleNext = () => {
-        if (videoPath && imagePaths.length === 6) {
-            navigation.navigate('ProfileCompletion5');
-        } else {
-            //Alert.alert('Incomplete', 'Please upload both video and 5 images.');
-            ToastAndroid.show('Please upload both video and 5 images.', ToastAndroid.SHORT);
-
-        }
-    };
-
-    const handleSkip = () => {
-        navigation.navigate('ProfileCompletion8');
-    };
+    const [imageInfo, setImageInfo] = useState([]);
 
 
     useEffect(() => {
@@ -179,83 +60,209 @@ const ProfileCompletion7 = ({ navigation }) => {
         fakeAsyncOperation();
     }, []);
 
+    const pickVideo = async () => {
+        try {
+            const video = await ImagePicker.openPicker({
+                mediaType: 'video',
+            });
+            setVideoPath(video.path); // Update the videoPath state with the selected video path
+            sendVideo(video);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const sendVideo = async (profile_video) => {
+        try {
+            if (profile_video) {
+                const formData = new FormData();
+                formData.append('profile_video', {
+                    uri: profile_video.path,
+                    type: profile_video.mime,
+                    name: 'video.mp4',
+                });
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                if (pr_id) {
+                    formData.append('pr_id', parseInt(pr_id));
+                }
+                const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls72-ax.php', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                if (!response.ok) {
+                    throw new Error('Banner image upload failed');
+                }
+                const data = await response.json();
+                console.log('Video upload response:', data);
+            }
+        } catch (error) {
+            console.error('Error uploading video:', error);
+        }
+    };
+
+    const handleImageUpload = async () => {
+        try {
+            const response = await ImagePicker.openPicker({
+                mediaType: 'photo',
+            });
+
+            if (response.path) {
+                const formData = new FormData();
+                formData.append('gal_image', {
+                    uri: response.path,
+                    type: 'image/jpeg',
+                    name: `image_${imageInfo.length + 1}.jpg`,
+                });
+
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                if (pr_id) {
+                    formData.append('pr_id', parseInt(pr_id));
+                }
+
+                const uploadResponse = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls71-ax', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                console.log(uploadResponse);
+
+                if (!uploadResponse.ok) {
+                    throw new Error('Upload failed');
+                }
+
+                const responseData = await uploadResponse.json();
+
+                console.log(responseData);
+                if (responseData && responseData.data && responseData.data.pr_gal_id) {
+                    setImageInfo(prevInfo => [...prevInfo, { path: response.path, pr_gal_id: responseData.data.pr_gal_id }]);
+                } else {
+                    throw new Error('Invalid response format');
+                }
+            }
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            ToastAndroid.show('Error uploading image. Please try again.', ToastAndroid.SHORT);
+        }
+    };
+
+    const handleRemoveImage = (index) => {
+        setRemovingIndex(index);
+        setShowPopup(true);
+    };
+
+    const confirmRemoveImage = async () => {
+        try {
+            const pr_gal_id = imageInfo[removingIndex].pr_gal_id;
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdelpersonaldtls71-ax.php?pr_gal_id=${pr_gal_id}`);
+
+            if (!response.ok) {
+                throw new Error('Failed to remove image');
+            }
+
+            console.log(response);
+
+            const updatedImages = [...imageInfo];
+            updatedImages.splice(removingIndex, 1);
+            setImageInfo(updatedImages);
+            setShowPopup(false);
+        } catch (error) {
+            console.error('Error removing image:', error);
+            ToastAndroid.show('Failed to remove image. Please try again.', ToastAndroid.SHORT);
+        }
+    };
+
+    const cancelRemoveImage = () => {
+        setRemovingIndex(null);
+        setShowPopup(false);
+    };
+
+    // const handleRemoveImage = (index) => {
+    //     const updatedImages = [...imagePaths];
+    //     updatedImages.splice(index, 1);
+    //     setImagePaths(updatedImages);
+    // };
+
+    const handleNext = () => {
+        if (videoPath && imagePaths.length === 5) {
+            navigation.navigate('ProfileCompletion5');
+        } else {
+            ToastAndroid.show('Please upload both video and 5 images.', ToastAndroid.SHORT);
+        }
+    };
+
+    const handleSkip = () => {
+        navigation.navigate('ProfileCompletion8');
+    };
+
     const currentStep = 7; // For example, current step is 4
     const totalSteps = 9; // Total number of steps
 
     const progressPercentage = (currentStep / totalSteps) * 100; // Calculate progress percentage
-    //console.log("Progress Percentage:", progressPercentage);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
             {isLoading ? (
                 <View style={{ justifyContent: 'center', alignSelf: 'center' }}>
-                    <Animation />
+                    {/* Placeholder for loading animation */}
                 </View>
-
             ) : (
                 <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-
                     <View style={styles.contentContainer}>
-
                         <View style={styles.headerTextContainer}>
-                            <Text style={[commonStyles.headerText1BL, {
-                                marginBottom: moderateScale(6), textAlign: 'center'
-                                }]}>Step 7 - Gallery</Text>
-                            <Text style={[commonStyles.headerText2BL, {
-                                textAlign: 'center', paddingHorizontal: width * 0.02
-                            }]}>Choose your career category and unlock endless possibilities.</Text>
-                            {/* <Image source={require('../../../assets/img/Prog2.png')} style={commonStyles.progImage} /> */}
-                                <ProgressBar
-                                    progress={progressPercentage / 100}
-                                    color="#00B0FF"
-                                    style={commonStyles.progImage}
-                                />
+                            <Text style={[commonStyles.headerText1BL, { marginBottom: 6, textAlign: 'center' }]}>
+                                Step 7 - Gallery
+                            </Text>
+                            <Text style={[commonStyles.headerText2BL, { textAlign: 'center', paddingHorizontal: '2%' }]}>
+                                Choose your career category and unlock endless possibilities.
+                            </Text>
+                            <ProgressBar progress={progressPercentage / 100} color="#00B0FF" style={commonStyles.progImage} />
                         </View>
-
-                            <View style={{ marginBottom: height * 0.025, }}>
-                                <Text style={[commonStyles.headerText4BL, {
-                                    marginBottom: height * 0.009,
-                                }]}>Upload Video here </Text>
-                       
-
-                                <TouchableOpacity
-                                    style={styles.uploadBanner}
-                                    onPress={handleVideoUpload}
-                                >
+                        <View style={{ marginBottom: 20 }}>
+                            <Text style={[commonStyles.headerText4BL, { marginBottom: 10 }]}>Upload Video here </Text>
+                                <TouchableOpacity style={styles.uploadBanner} onPress={pickVideo}>
                                     <View style={styles.videoContainer}>
-
                                         {videoPath ? (
                                             <View style={styles.bannerClickArea}>
                                                 <Image source={{ uri: videoPath }} style={styles.BannerImage} />
                                             </View>
-
                                         ) : (
                                             <View style={styles.bannerClickArea}>
                                                 <Image source={require('../../../assets/img/Add.png')} style={styles.defaultBannerImage} />
                                             </View>
                                         )}
                                     </View>
-
                                 </TouchableOpacity>
-                            </View>
-
-                            <View style={{ marginBottom: height * 0.001, }}>
-                                {/* Image Upload Section */}
-                                <Text style={[commonStyles.headerText4BL, {
-                                    marginBottom: height * 0.005,
-                                }]}>Upload Photos here</Text>
+                        </View>
+                            <View style={{ marginBottom: 5 }}>
+                                <Text style={[commonStyles.headerText4BL, { marginBottom: 5 }]}>Upload Photos here</Text>
                                 <View style={{ justifyContent: 'center' }}>
                                     <View style={styles.imageGrid}>
-                                        {imagePaths.map((path, index) => (
-                                            <View key={index} style={[styles.imageContainer]}>
-                                                <Image source={{ uri: path }} style={styles.defaultImageU} />
+                                        {imageInfo.map((info, index) => (
+                                            <View key={index} style={styles.imageContainer}>
+                                                <Image source={{ uri: info.path }} style={styles.defaultImageU} />
                                                 <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveImage(index)}>
                                                     <Image source={require('../../../assets/img/remove.png')} style={styles.removeIcon} />
                                                 </TouchableOpacity>
+                                                <AlertPopup
+                                                    visible={showPopup}
+                                                    onRequestClose={() => setShowPopup(false)}
+                                                    title="Confirm Removal"
+                                                    message="Are you sure you want to remove this image?"
+                                                    yesLabel="Yes"
+                                                    noLabel="No"
+                                                    onYesPress={confirmRemoveImage}
+                                                    onNoPress={cancelRemoveImage}
+                                                />
                                             </View>
                                         ))}
-                                        {[...Array(Math.max(0, 6 - imagePaths.length))].map((_, index) => (
-                                            <TouchableOpacity key={index} style={[styles.imageContainer]} onPress={handleImageUpload}>
+                                        {[...Array(Math.max(0, 6 - imageInfo.length))].map((_, index) => (
+                                            <TouchableOpacity key={index} style={styles.imageContainer} onPress={handleImageUpload}>
                                                 <View style={styles.defaultImageContainer}>
                                                     <Image source={require('../../../assets/img/Add.png')} style={styles.defaultImage} />
                                                 </View>
@@ -263,31 +270,19 @@ const ProfileCompletion7 = ({ navigation }) => {
                                         ))}
                                     </View>
                                 </View>
-
                             </View>
-
-
-                        <TouchableOpacity
-                            style={[commonStyles.button]}
-                            onPress={handleNext}
-                            activeOpacity={0.8}
-                        >
+                        <TouchableOpacity style={[commonStyles.button]} onPress={handleNext} activeOpacity={0.8}>
                             <Text style={commonStyles.buttonText}>Continue</Text>
                         </TouchableOpacity>
-
-                        <TouchableOpacity style={[commonStyles.button1, { marginBottom: height * 0.05, marginTop: height * 0.001, }]}
-                            activeOpacity={0.8}
-                                onPress={handleSkip}>
+                        <TouchableOpacity style={[commonStyles.button1, { marginBottom: 20 }]} onPress={handleSkip} activeOpacity={0.8}>
                             <Text style={commonStyles.buttonText1}>Skip</Text>
                         </TouchableOpacity>
-
                     </View>
                 </ScrollView>
             )}
         </SafeAreaView>
     );
 };
-
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,

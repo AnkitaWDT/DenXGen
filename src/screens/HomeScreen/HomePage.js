@@ -793,7 +793,7 @@ const HomePage = ({ navigation, route }) => {
                         right: width * 0.02,
                       //width: width * 0.25,
                     }}
-                     onPress={() => navigation.navigate('ProfileCompletion3')}
+                     onPress={() => navigation.navigate('ProfileCompletion2')}
                   >
                     <Text style={{
                       fontSize: responsiveFontSize(14),

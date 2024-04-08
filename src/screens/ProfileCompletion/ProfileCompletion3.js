@@ -548,43 +548,91 @@ const ProfileCompletion3 = () => {
     const sendVideo = async (profile_video) => {
         setIsSending(true);
 
-        let formData = new FormData();
-        if (profile_video) {
-            formData.append('profile_video', {
-                uri: profile_video.path,
-                type: profile_video.mime,
-                name: 'video.mp4',
-            });
-
-            const pr_id = await AsyncStorage.getItem('pr_id');
-            const id = parseInt(pr_id);
-            console.log(id);
-            console.log(pr_id);
-            if (id) {
-                console.log(id);
-                formData.append('pr_id', id);
-            }
-            console.log(formData);
-
-            fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls33-ax.php', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            })
-                .then(response => response.text()) // Get the response text directly
-                .then(data => {
-                    console.log('Video upload response:', data); // Log the response text
-                })
-                .catch(error => {
-                    console.error('Error uploading video:', error);
-                })
-                .finally(() => {
-                    setIsSending(false);
+        try {
+            let formData = new FormData();
+            if (profile_video) {
+                formData.append('profile_video', {
+                    uri: profile_video.path,
+                    type: profile_video.mime,
+                    name: 'video.mp4',
                 });
+
+
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                const id = parseInt(pr_id);
+                if (id) {
+                    formData.append('pr_id', id.toString()); // Ensure pr_id is appended as a string
+                }
+
+                console.log('FormData:', formData);
+
+                const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls72-ax.php', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                const data = await response.text();
+                console.log('Video upload response:', data);
+
+                // Check if upload was successful
+                if (response.ok) {
+                    // Handle success
+                } else {
+                    // Handle error
+                }
+            }
+        } catch (error) {
+            console.error('Error uploading video:', error);
+            // Handle error
+        } finally {
+            setIsSending(false);
         }
     };
+
+
+    // const sendVideo = async (profile_video) => {
+    //     setIsSending(true);
+
+    //     let formData = new FormData();
+    //     if (profile_video) {
+    //         formData.append('profile_video', {
+    //             uri: profile_video.path,
+    //             type: profile_video.mime,
+    //             name: 'video.mp4',
+    //         });
+
+    //         const pr_id = await AsyncStorage.getItem('pr_id');
+    //         const id = parseInt(pr_id);
+    //         console.log(id);
+    //         console.log(pr_id);
+    //         if (id) {
+    //             console.log(id);
+    //             formData.append('pr_id', id);
+    //         }
+    //         console.log(formData);
+
+    //         fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls72-ax.php', {
+    //             method: 'POST',
+    //             body: formData,
+    //             headers: {
+    //                 'Content-Type': 'multipart/form-data',
+    //             },
+    //         })
+    //             .then(response => response.text()) // Get the response text directly
+    //             .then(data => {
+    //                 console.log('Video upload response:', data); // Log the response text
+    //             })
+    //             .catch(error => {
+    //                 console.error('Error uploading video:', error);
+    //             })
+    //             .finally(() => {
+    //                 setIsSending(false);
+    //             });
+    //     }
+    // };
 
 
     return (
