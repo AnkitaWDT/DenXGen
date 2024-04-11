@@ -197,6 +197,7 @@ const ProfileCompletion4 = ({ navigation }) => {
         setPincode(location.pincode || '');
         setLandmark(location.landmark || '');
         setLocationId(location.id || '');
+        console.log(locationId);
         setIsModalVisible1(true); // Open the modal
     };
 
@@ -255,6 +256,7 @@ const ProfileCompletion4 = ({ navigation }) => {
 
         // Form data
         const formData = {
+            id: locationId,
             pr_id: id,
             loc_one: houseNumber,
             loc_two: area,

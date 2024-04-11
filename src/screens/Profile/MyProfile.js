@@ -68,6 +68,58 @@ const MyProfile = ({ navigation }) => {
       navigation.navigate('WebViewScreen', { url: developerUrl, pageName: 'WeDevelopTech' });
   };
 
+    const [selectedItem, setSelectedItem] = useState({ name: '', profilePic: '', id: '', type: '' });
+
+    useEffect(() => {
+        const fetchSelectedItemData = async () => {
+            try {
+                const selectedName = await AsyncStorage.getItem('selected_name');
+                const selectedProfilePic = await AsyncStorage.getItem('selected_profile_pic');
+                const selectedId = await AsyncStorage.getItem('selected_id');
+                const type = await AsyncStorage.getItem('selected_type');
+                setSelectedItem({ name: selectedName, profilePic: selectedProfilePic, id: selectedId, type: type });
+            } catch (error) {
+                console.error('Error fetching selected item data:', error);
+            }
+        };
+
+        const focusListener = navigation.addListener('focus', () => {
+            fetchSelectedItemData();
+        });
+
+        // Clean up the listener
+        return () => {
+            focusListener();
+        };
+    }, []);
+
+    const renderProfileImage = () => {
+        if (selectedItem.profilePic) {
+            return <Image source={{ uri: selectedItem.profilePic }} style={styles.profileImage} />;
+        } else if (selectedItem.name) {
+            return (
+                <View style={[styles.profileImage, {
+                    width: 70,
+                    height: 70,
+                    borderRadius: 36,
+                    backgroundColor: '#E8F8FF',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }]}>
+                    <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>{selectedItem.name.charAt(0).toUpperCase()}</Text>
+                </View>
+            );
+        } else {
+            // Handle the case when both profile picture and name are null
+            return (
+                <View style={styles.profileImage}>
+                    <Text style={styles.initials}>NA</Text>
+                </View>
+            );
+        }
+    };
+
+
     return (
         <SafeAreaView style={styles.container}>
             {isLoading ? (
@@ -98,7 +150,7 @@ const MyProfile = ({ navigation }) => {
 
                                 <TouchableOpacity
                                     activeOpacity={0.8}
-                                    onPress={() => navigation.navigate('PersonalProfile')}
+                                    // onPress={() => navigation.navigate('PersonalProfile')}                            
                                  style={styles.profileRowContainer}>
                                     <View style={styles.profileImageContainer}>
                                         <Image source={require('../../../assets/img/clinicDefault.jpg')} style={styles.profileImage} />
@@ -108,6 +160,41 @@ const MyProfile = ({ navigation }) => {
                                         <Text style={[commonStyles.headerText2BL, {
                                             marginVertical: 3,
                                         }]} numberOfLines={1} ellipsizeMode="tail">MDS,BDS ┃ Prosthodontics ┃ 10+ years exp</Text>
+                                    </View>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        console.log('TouchableOpacity pressed');
+                                        console.log('Selected item:', selectedItem);
+                                        // Check the selected item type
+                                        switch (selectedItem.type) {
+                                            case 'My Account':
+                                                console.log('Navigating to PersonalProfile');
+                                                navigation.navigate('PersonalProfile');
+                                                break;
+                                            case 'Clinic Account':
+                                                console.log('Navigating to MyClinic');
+                                                navigation.navigate('MyClinic', { cl_id: selectedItem.id });
+                                                break;
+                                            case 'Office Account':
+                                                console.log('Navigating to My Office');
+                                                navigation.navigate('MyOffice', { off_id: selectedItem.id });
+                                                // You can choose not to navigate or perform any other action
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }}
+                                >
+                                    <View style={styles.profileRowContainer}>
+                                        <View style={styles.profileImageContainer}>
+                                            {renderProfileImage()}
+                                        </View>
+                                        <View style={styles.profileInfoContainer}>
+                                            <Text style={[commonStyles.headerText0BL, {}]} adjustsFontSizeToFit numberOfLines={1} ellipsizeMode="tail">{selectedItem.name}</Text>
+                                            {/* <Text>Other profile info</Text> */}
+                                        </View>
                                     </View>
                                 </TouchableOpacity>
                             <View style={{ height: 1, backgroundColor: '#ccc' }} />

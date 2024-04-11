@@ -169,7 +169,8 @@ const ClinicProfileCompletion1 = ({ navigation, route }) => {
             console.log('dataresponse', response.data);
             ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
             console.log('Data Added to database');
-            navigation.navigate('ClinicProfileCompletion2');
+            //navigation.navigate('ClinicProfileCompletion2');
+            navigation.navigate('ClinicProfileCompletion2', { cl_id: cl_id });
         } catch (error) {
             console.error('An error occurred:', error);
         }

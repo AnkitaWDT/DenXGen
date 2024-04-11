@@ -35,7 +35,7 @@ const responsiveFontSize = (size) => {
 };
 
 
-const ClinicProfileCompletion5 = ({ navigation, route }) => {
+const EClinicProfileCompletion5 = ({ navigation, route }) => {
 
     const { cl_id } = route.params;
 
@@ -80,22 +80,22 @@ const ClinicProfileCompletion5 = ({ navigation, route }) => {
                     }));
                     setTreatmentsData(treatmentOptions);
 
-                // if (data.code === 1) {
-                //     // Get the stored pr_ty_id from AsyncStorage
-                //     const storedId = await AsyncStorage.getItem('acc_ty_id');
-                //     console.log("Stored pr_ty_id:", storedId); // Log stored pr_ty_id
+                    // if (data.code === 1) {
+                    //     // Get the stored pr_ty_id from AsyncStorage
+                    //     const storedId = await AsyncStorage.getItem('acc_ty_id');
+                    //     console.log("Stored pr_ty_id:", storedId); // Log stored pr_ty_id
 
-                //     const filteredData = data.data.filter(item => item.acc_ty_id === storedId);
-                //     console.log("Filtered data:", filteredData); // Log filtered data
+                    //     const filteredData = data.data.filter(item => item.acc_ty_id === storedId);
+                    //     console.log("Filtered data:", filteredData); // Log filtered data
 
-                //     const treatmentOptions = filteredData.map(item => ({
-                //         treatment: item.treatment,
-                //         id: parseInt(item.id) // Parse the id as an integer
-                //     }));
+                    //     const treatmentOptions = filteredData.map(item => ({
+                    //         treatment: item.treatment,
+                    //         id: parseInt(item.id) // Parse the id as an integer
+                    //     }));
 
-                //     console.log("Dropdown options:", treatmentOptions); // Log dropdown options
+                    //     console.log("Dropdown options:", treatmentOptions); // Log dropdown options
 
-                //     setTreatmentsData(treatmentOptions);
+                    //     setTreatmentsData(treatmentOptions);
                 } else {
                     console.error('Error fetching service options');
                 }
@@ -197,22 +197,22 @@ const ClinicProfileCompletion5 = ({ navigation, route }) => {
                     }));
                     setServiceData(serviceOptions);
 
-                // if (data.code === 1) {
-                //     // Get the stored pr_ty_id from AsyncStorage
-                //     const storedId = await AsyncStorage.getItem('acc_ty_id');
-                //     console.log("Stored pr_ty_id:", storedId); // Log stored pr_ty_id
+                    // if (data.code === 1) {
+                    //     // Get the stored pr_ty_id from AsyncStorage
+                    //     const storedId = await AsyncStorage.getItem('acc_ty_id');
+                    //     console.log("Stored pr_ty_id:", storedId); // Log stored pr_ty_id
 
-                //     const filteredData = data.data.filter(item => item.acc_ty_id === storedId);
-                //     console.log("Filtered data:", filteredData); // Log filtered data
+                    //     const filteredData = data.data.filter(item => item.acc_ty_id === storedId);
+                    //     console.log("Filtered data:", filteredData); // Log filtered data
 
-                //     const serviceOptions = filteredData.map(item => ({
-                //         service: item.service,
-                //         id: parseInt(item.id) // Parse the id as an integer
-                //     }));
+                    //     const serviceOptions = filteredData.map(item => ({
+                    //         service: item.service,
+                    //         id: parseInt(item.id) // Parse the id as an integer
+                    //     }));
 
-                //     console.log("Dropdown options:", serviceOptions); // Log dropdown options
+                    //     console.log("Dropdown options:", serviceOptions); // Log dropdown options
 
-                //     setServiceData(serviceOptions);
+                    //     setServiceData(serviceOptions);
                 } else {
                     console.error('Error fetching service options');
                 }
@@ -321,7 +321,7 @@ const ClinicProfileCompletion5 = ({ navigation, route }) => {
 
             console.log('dataresponse', response.data);
             ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
-            navigation.navigate('ClinicProfileCompletion6', { cl_id: cl_id });
+            navigation.navigate('EditClinicProfile', { cl_id: cl_id })
             //navigation.navigate('ClinicProfileCompletion6');
         } catch (error) {
             console.error('An error occurred:', error);
@@ -339,6 +339,48 @@ const ClinicProfileCompletion5 = ({ navigation, route }) => {
 
     const [hoveredItem, setHoveredItem] = useState(null);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getclinicvic-ax.php?cl_id=${cl_id}`);
+                const data = response.data;
+
+                if (data.code === 1) {
+                    const { pi_dr_id, servList, treatmentList, payment } = data.data;
+
+                    // Set pi_dr_id
+                    if (pi_dr_id !== '0') {
+                        setSelectedButton(pi_dr_id === '1' ? 'button1' : 'button2');
+                    }
+
+                    // Set servList
+                    if (servList && servList.length > 0) {
+                        const selectedServIds = servList.map(item => parseInt(item.serv_id));
+                        setSelectedServices(selectedServIds);
+                    }
+
+                    // Set treatmentList
+                    if (treatmentList && treatmentList.length > 0) {
+                        const selectedTretIds = treatmentList.map(item => parseInt(item.tret_id));
+                        setSelectedTreatments(selectedTretIds);
+                    }
+
+                    // Set payment
+                    if (payment) {
+                        setPaymentLink(payment);
+                    }
+                } else {
+                    console.error('Error fetching clinic data');
+                }
+            } catch (error) {
+                console.error('Error fetching clinic data:', error);
+            }
+        };
+
+        fetchData();
+    }, [cl_id]);
+
+
     return (
         <SafeAreaView style={{ flex: 1 }}>
             {isLoading ? (
@@ -355,23 +397,23 @@ const ClinicProfileCompletion5 = ({ navigation, route }) => {
                             <View style={styles.headerTextContainer}>
                                 <Text style={[commonStyles.headerText1BL, {
                                     marginBottom: 6, textAlign: 'center'
-                                }]}>Step 5 - Clinic Details</Text>
+                                }]}>Clinic Details</Text>
                                 <Text style={[commonStyles.headerText2BL, {
                                     textAlign: 'center', paddingHorizontal: width * 0.02
                                 }]}>Choose your career category and unlock endless possibilities.</Text>
                                 {/* <Image source={require('../../../assets/img/Prog2.png')} style={commonStyles.progImage} /> */}
-                                <ProgressBar
+                                {/* <ProgressBar
                                     progress={progressPercentage / 100}
                                     color="#00B0FF"
                                     style={commonStyles.progImage}
-                                />
+                                /> */}
                             </View>
 
 
 
                             <View style={styles.inputContainerWithLabel}>
                                 <Text style={[commonStyles.headerText4BL, { marginBottom: 8, }]}>
-                                     Office / Clinic Pickups & Drops <Text style={styles.requiredIndicator}>*</Text>
+                                    Office / Clinic Pickups & Drops <Text style={styles.requiredIndicator}>*</Text>
                                 </Text>
                                 <View style={styles.buttonContainer}>
                                     <TouchableOpacity
@@ -406,263 +448,263 @@ const ClinicProfileCompletion5 = ({ navigation, route }) => {
                                     Treatments Offered <Text style={styles.requiredIndicator}>*</Text>
                                 </Text>
 
-                                    <TouchableOpacity onPress={handleTreatmentsModal} style={[styles.inputContainer1]} activeOpacity={0.8}>
+                                <TouchableOpacity onPress={handleTreatmentsModal} style={[styles.inputContainer1]} activeOpacity={0.8}>
                                     <TextInput
                                         style={styles.inputs}
-                                            placeholder="Treatments Offered"
+                                        placeholder="Treatments Offered"
                                         placeholderTextColor="#979797"
-                                            value={selectedTreatmentsName.length > 0 ? selectedTreatmentsName[0] : ''}
+                                        value={selectedTreatmentsName.length > 0 ? selectedTreatmentsName[0] : ''}
                                         underlineColorAndroid="transparent"
                                         editable={false}
                                     />
-                                        {selectedTreatments.length > 0 ? (
-                                            <Text style={styles.totalServiceText}>+{selectedTreatments.filter(treatment => treatment !== 'Other').length + (showOtherTreatmentsInput ? 1 : 0)}</Text>
+                                    {selectedTreatments.length > 0 ? (
+                                        <Text style={styles.totalServiceText}>+{selectedTreatments.filter(treatment => treatment !== 'Other').length + (showOtherTreatmentsInput ? 1 : 0)}</Text>
                                     ) : (
                                         <Image source={require('../../../assets/img/Add.png')} style={styles.closeP} />
                                     )}
                                 </TouchableOpacity>
-                              
-                                    <Modal
-                                        visible={treatmentsModalVisible}
-                                        transparent
+
+                                <Modal
+                                    visible={treatmentsModalVisible}
+                                    transparent
+                                    activeOpacity={1}
+                                    onRequestClose={() => setTreatmentsModalVisible(false)} // To handle Android back button
+                                >
+                                    <TouchableOpacity
                                         activeOpacity={1}
-                                        onRequestClose={() => setTreatmentsModalVisible(false)} // To handle Android back button
+                                        style={styles.modalContainer}
+                                        onPress={() => setTreatmentsModalVisible(false)} // Close the modal when clicking on the background
                                     >
-                                        <TouchableOpacity
+                                        <TouchableOpacity style={styles.modalContent}
                                             activeOpacity={1}
-                                            style={styles.modalContainer}
-                                            onPress={() => setTreatmentsModalVisible(false)} // Close the modal when clicking on the background
-                                        >
-                                            <TouchableOpacity style={styles.modalContent}
-                                                activeOpacity={1}
-                                                onPress={() => { }}>
-                                                <View style={styles.horizontalLine}></View>
-                                                <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
-                                                    Treatments Offered <Text style={commonStyles.headerText3G}> (upto 5)</Text>
-                                                </Text>
-                                                <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
-                                                    Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
-                                                </Text>
-                                                <FlatList
-                                                    style={{ paddingBottom: showOtherTreatmentsInput ? 0 : height * 0.06 }}
-                                                    data={[...treatmentsData, { id: 'other', treatment: 'Other' }]} // Add 'Other' as an additional item
-                                                    renderItem={({ item }) => (
-                                                        <TouchableOpacity
-                                                            activeOpacity={0.8}
-                                                            onPress={() => {
-                                                                if (item.id === 'other') {
-                                                                    toggleOtherTreatmentsInput();
-                                                                } else {
-                                                                    toggleTreatments(item.id, item.treatment);
-                                                                }
-                                                            }}
-                                                            onMouseEnter={() => setHoveredItem(item.treatment)}
-                                                            onMouseLeave={() => setHoveredItem(null)}
+                                            onPress={() => { }}>
+                                            <View style={styles.horizontalLine}></View>
+                                            <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
+                                                Treatments Offered <Text style={commonStyles.headerText3G}> (upto 5)</Text>
+                                            </Text>
+                                            <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
+                                                Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
+                                            </Text>
+                                            <FlatList
+                                                style={{ paddingBottom: showOtherTreatmentsInput ? 0 : height * 0.06 }}
+                                                data={[...treatmentsData, { id: 'other', treatment: 'Other' }]} // Add 'Other' as an additional item
+                                                renderItem={({ item }) => (
+                                                    <TouchableOpacity
+                                                        activeOpacity={0.8}
+                                                        onPress={() => {
+                                                            if (item.id === 'other') {
+                                                                toggleOtherTreatmentsInput();
+                                                            } else {
+                                                                toggleTreatments(item.id, item.treatment);
+                                                            }
+                                                        }}
+                                                        onMouseEnter={() => setHoveredItem(item.treatment)}
+                                                        onMouseLeave={() => setHoveredItem(null)}
+                                                    >
+                                                        <View
+                                                            style={[
+                                                                styles.checkboxContainer,
+                                                                selectedTreatments.includes(item.treatment) && styles.selectedCheckboxContainer,
+                                                                hoveredItem === item.treatment && styles.hoveredCheckboxContainer,
+                                                            ]}
                                                         >
-                                                            <View
-                                                                style={[
-                                                                    styles.checkboxContainer,
-                                                                    selectedTreatments.includes(item.treatment) && styles.selectedCheckboxContainer,
-                                                                    hoveredItem === item.treatment && styles.hoveredCheckboxContainer,
-                                                                ]}
-                                                            >
-                                                                <Image
-                                                                    source={
-                                                                        selectedTreatments.includes(item.id) || (showOtherTreatmentsInput && item.id === 'other')
-                                                                            ? require('../../../assets/img/Rect1.png')
-                                                                            : require('../../../assets/img/Rect.png')
-                                                                    }
-                                                                    style={styles.checkboxImage}
-                                                                />
+                                                            <Image
+                                                                source={
+                                                                    selectedTreatments.includes(item.id) || (showOtherTreatmentsInput && item.id === 'other')
+                                                                        ? require('../../../assets/img/Rect1.png')
+                                                                        : require('../../../assets/img/Rect.png')
+                                                                }
+                                                                style={styles.checkboxImage}
+                                                            />
 
-                                                                <Text style={selectedTreatments.includes(item.treatment) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
-                                                                    {item.treatment}
-                                                                </Text>
-                                                            </View>
-                                                        </TouchableOpacity>
-                                                    )}
-                                                    keyExtractor={item => item.id}
-                                                />
-                                                {showOtherTreatmentsInput && (
-                                                    <View style={styles.otherContainer1}>
-                                                        <TextInput
-                                                            style={styles.inputs}
-                                                            placeholder="Other Treatments"
-                                                            placeholderTextColor="#979797"
-                                                            value={otherTreatments}
-                                                            onChangeText={(text) => setOtherTreatments(text)}
-                                                            underlineColorAndroid="transparent"
-                                                        />
-                                                    </View>
-                                                )}
-
-                                                {showOtherTreatmentsInput && (
-                                                    <TouchableOpacity style={[commonStyles.button, {}]} activeOpacity={0.8} onPress={handleTreatmentsModalSubmit}>
-                                                        <Text style={commonStyles.buttonText}>Submit</Text>
+                                                            <Text style={selectedTreatments.includes(item.treatment) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
+                                                                {item.treatment}
+                                                            </Text>
+                                                        </View>
                                                     </TouchableOpacity>
                                                 )}
+                                                keyExtractor={item => item.id}
+                                            />
+                                            {showOtherTreatmentsInput && (
+                                                <View style={styles.otherContainer1}>
+                                                    <TextInput
+                                                        style={styles.inputs}
+                                                        placeholder="Other Treatments"
+                                                        placeholderTextColor="#979797"
+                                                        value={otherTreatments}
+                                                        onChangeText={(text) => setOtherTreatments(text)}
+                                                        underlineColorAndroid="transparent"
+                                                    />
+                                                </View>
+                                            )}
 
-
-                                            </TouchableOpacity>
-                                            {showOtherServiceInput ?
-                                                null :
-                                                <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: height * 0.03, }]} activeOpacity={0.8} onPress={handleTreatmentsModalSubmit}>
+                                            {showOtherTreatmentsInput && (
+                                                <TouchableOpacity style={[commonStyles.button, {}]} activeOpacity={0.8} onPress={handleTreatmentsModalSubmit}>
                                                     <Text style={commonStyles.buttonText}>Submit</Text>
-                                                </TouchableOpacity>}
+                                                </TouchableOpacity>
+                                            )}
 
 
                                         </TouchableOpacity>
-                                    </Modal>
+                                        {showOtherServiceInput ?
+                                            null :
+                                            <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: height * 0.03, }]} activeOpacity={0.8} onPress={handleTreatmentsModalSubmit}>
+                                                <Text style={commonStyles.buttonText}>Submit</Text>
+                                            </TouchableOpacity>}
+
+
+                                    </TouchableOpacity>
+                                </Modal>
                             </View>
 
-                                <View style={styles.inputContainerWithLabel}>
-                                    <Text style={[commonStyles.headerText4BL, { marginBottom: moderateScale(8), }]}>
-                                        Services you looking for <Text style={styles.requiredIndicator}>*</Text>
-                                    </Text>
+                            <View style={styles.inputContainerWithLabel}>
+                                <Text style={[commonStyles.headerText4BL, { marginBottom: moderateScale(8), }]}>
+                                    Services you looking for <Text style={styles.requiredIndicator}>*</Text>
+                                </Text>
 
-                                    <TouchableOpacity onPress={handleServiceModal} activeOpacity={0.8} style={[styles.inputContainer1]}>
-                                        <TextInput
-                                            style={styles.inputs}
-                                            placeholder="Services"
-                                            placeholderTextColor="#979797"
-                                            // value={selectedServices.join(', ')}
-                                            value={selectedServiceName.length > 0 ? selectedServiceName[0] : ''}
-                                            underlineColorAndroid="transparent"
-                                            editable={false}
-                                        />
-                                        {/* <Text style={styles.totalServiceText}>
+                                <TouchableOpacity onPress={handleServiceModal} activeOpacity={0.8} style={[styles.inputContainer1]}>
+                                    <TextInput
+                                        style={styles.inputs}
+                                        placeholder="Services"
+                                        placeholderTextColor="#979797"
+                                        // value={selectedServices.join(', ')}
+                                        value={selectedServiceName.length > 0 ? selectedServiceName[0] : ''}
+                                        underlineColorAndroid="transparent"
+                                        editable={false}
+                                    />
+                                    {/* <Text style={styles.totalServiceText}>
                                         +{selectedServices.filter(service => service !== 'Other').length + (showOtherInput ? 1 : 0)}
                                     </Text> */}
-                                        {selectedServices.length > 0 ? (
-                                            <Text style={styles.totalServiceText}>+{selectedServices.filter(service => service !== 'Other').length + (showOtherServiceInput ? 1 : 0)}</Text>
-                                        ) : (
-                                            <Image source={require('../../../assets/img/Add.png')} style={styles.closeP} />
-                                        )}
-                                    </TouchableOpacity>
-                                    <Modal
-                                        visible={serviceModalVisible}
-                                        transparent
+                                    {selectedServices.length > 0 ? (
+                                        <Text style={styles.totalServiceText}>+{selectedServices.filter(service => service !== 'Other').length + (showOtherServiceInput ? 1 : 0)}</Text>
+                                    ) : (
+                                        <Image source={require('../../../assets/img/Add.png')} style={styles.closeP} />
+                                    )}
+                                </TouchableOpacity>
+                                <Modal
+                                    visible={serviceModalVisible}
+                                    transparent
+                                    activeOpacity={1}
+                                    onRequestClose={() => setServiceModalVisible(false)} // To handle Android back button
+                                >
+                                    <TouchableOpacity
                                         activeOpacity={1}
-                                        onRequestClose={() => setServiceModalVisible(false)} // To handle Android back button
+                                        style={styles.modalContainer}
+                                        onPress={() => setServiceModalVisible(false)} // Close the modal when clicking on the background
                                     >
-                                        <TouchableOpacity
+                                        <TouchableOpacity style={styles.modalContent}
                                             activeOpacity={1}
-                                            style={styles.modalContainer}
-                                            onPress={() => setServiceModalVisible(false)} // Close the modal when clicking on the background
-                                        >
-                                            <TouchableOpacity style={styles.modalContent}
-                                                activeOpacity={1}
-                                                onPress={() => { }}>
-                                                <View style={styles.horizontalLine}></View>
-                                                <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
-                                                    Tell us your services <Text style={commonStyles.headerText3G}> (upto 5)</Text>
-                                                </Text>
-                                                <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
-                                                    Note: Type services like Root Canal, Aligners, Oral Surgery,  etc to show specialisation you provide.
-                                                </Text>
-                                                <FlatList
-                                                    style={{ paddingBottom: showOtherServiceInput ? 0 : height * 0.06 }}
-                                                    data={[...servicesData, { id: 'other', service: 'Other' }]} // Add 'Other' as an additional item
-                                                    renderItem={({ item }) => (
-                                                        <TouchableOpacity
-                                                            activeOpacity={0.8}
-                                                            onPress={() => {
-                                                                if (item.id === 'other') {
-                                                                    toggleOtherServiceInput();
-                                                                } else {
-                                                                    toggleService(item.id, item.service);
-                                                                }
-                                                            }}
-                                                            onMouseEnter={() => setHoveredItem(item.service)}
-                                                            onMouseLeave={() => setHoveredItem(null)}
+                                            onPress={() => { }}>
+                                            <View style={styles.horizontalLine}></View>
+                                            <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
+                                                Tell us your services <Text style={commonStyles.headerText3G}> (upto 5)</Text>
+                                            </Text>
+                                            <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
+                                                Note: Type services like Root Canal, Aligners, Oral Surgery,  etc to show specialisation you provide.
+                                            </Text>
+                                            <FlatList
+                                                style={{ paddingBottom: showOtherServiceInput ? 0 : height * 0.06 }}
+                                                data={[...servicesData, { id: 'other', service: 'Other' }]} // Add 'Other' as an additional item
+                                                renderItem={({ item }) => (
+                                                    <TouchableOpacity
+                                                        activeOpacity={0.8}
+                                                        onPress={() => {
+                                                            if (item.id === 'other') {
+                                                                toggleOtherServiceInput();
+                                                            } else {
+                                                                toggleService(item.id, item.service);
+                                                            }
+                                                        }}
+                                                        onMouseEnter={() => setHoveredItem(item.service)}
+                                                        onMouseLeave={() => setHoveredItem(null)}
+                                                    >
+                                                        <View
+                                                            style={[
+                                                                styles.checkboxContainer,
+                                                                selectedServices.includes(item.service) && styles.selectedCheckboxContainer,
+                                                                hoveredItem === item.service && styles.hoveredCheckboxContainer,
+                                                            ]}
                                                         >
-                                                            <View
-                                                                style={[
-                                                                    styles.checkboxContainer,
-                                                                    selectedServices.includes(item.service) && styles.selectedCheckboxContainer,
-                                                                    hoveredItem === item.service && styles.hoveredCheckboxContainer,
-                                                                ]}
-                                                            >
-                                                                <Image
-                                                                    source={
-                                                                        selectedServices.includes(item.id) || (showOtherServiceInput && item.id === 'other')
-                                                                            ? require('../../../assets/img/Rect1.png')
-                                                                            : require('../../../assets/img/Rect.png')
-                                                                    }
-                                                                    style={styles.checkboxImage}
-                                                                />
+                                                            <Image
+                                                                source={
+                                                                    selectedServices.includes(item.id) || (showOtherServiceInput && item.id === 'other')
+                                                                        ? require('../../../assets/img/Rect1.png')
+                                                                        : require('../../../assets/img/Rect.png')
+                                                                }
+                                                                style={styles.checkboxImage}
+                                                            />
 
-                                                                <Text style={selectedServices.includes(item.service) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
-                                                                    {item.service}
-                                                                </Text>
-                                                            </View>
-                                                        </TouchableOpacity>
-                                                    )}
-                                                    keyExtractor={item => item.id}
-                                                />
-                                                {showOtherServiceInput && (
-                                                    <View style={styles.otherContainer1}>
-                                                        <TextInput
-                                                            style={styles.inputs}
-                                                            placeholder="Other Services"
-                                                            placeholderTextColor="#979797"
-                                                            value={otherService}
-                                                            onChangeText={(text) => setOtherService(text)}
-                                                            underlineColorAndroid="transparent"
-                                                        />
-                                                    </View>
-                                                )}
-
-                                                {showOtherServiceInput && (
-                                                    <TouchableOpacity style={[commonStyles.button, {}]} activeOpacity={0.8} onPress={handleServiceModalSubmit}>
-                                                        <Text style={commonStyles.buttonText}>Submit</Text>
+                                                            <Text style={selectedServices.includes(item.service) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
+                                                                {item.service}
+                                                            </Text>
+                                                        </View>
                                                     </TouchableOpacity>
                                                 )}
+                                                keyExtractor={item => item.id}
+                                            />
+                                            {showOtherServiceInput && (
+                                                <View style={styles.otherContainer1}>
+                                                    <TextInput
+                                                        style={styles.inputs}
+                                                        placeholder="Other Services"
+                                                        placeholderTextColor="#979797"
+                                                        value={otherService}
+                                                        onChangeText={(text) => setOtherService(text)}
+                                                        underlineColorAndroid="transparent"
+                                                    />
+                                                </View>
+                                            )}
 
-
-                                            </TouchableOpacity>
-                                            {showOtherServiceInput ?
-                                                null :
-                                                <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: height * 0.03, }]} activeOpacity={0.8} onPress={handleServiceModalSubmit}>
+                                            {showOtherServiceInput && (
+                                                <TouchableOpacity style={[commonStyles.button, {}]} activeOpacity={0.8} onPress={handleServiceModalSubmit}>
                                                     <Text style={commonStyles.buttonText}>Submit</Text>
-                                                </TouchableOpacity>}
+                                                </TouchableOpacity>
+                                            )}
 
 
                                         </TouchableOpacity>
-                                    </Modal>
+                                        {showOtherServiceInput ?
+                                            null :
+                                            <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: height * 0.03, }]} activeOpacity={0.8} onPress={handleServiceModalSubmit}>
+                                                <Text style={commonStyles.buttonText}>Submit</Text>
+                                            </TouchableOpacity>}
 
+
+                                    </TouchableOpacity>
+                                </Modal>
+
+                            </View>
+
+                            <View style={styles.inputContainerWithLabel}>
+                                <Text style={[commonStyles.headerText4BL, { marginBottom: moderateScale(8), }]}>
+                                    Payment Links <Text style={styles.requiredIndicator}>*</Text>
+                                </Text>
+                                <View style={styles.inputContainer1}>
+                                    <TextInput
+                                        style={styles.inputs}
+                                        placeholder="upi@okicici"
+                                        placeholderTextColor="#979797"
+                                        value={paymentLink}
+                                        onChangeText={(text) => setPaymentLink(text)}
+                                        underlineColorAndroid="transparent"
+                                    />
                                 </View>
-
-                                <View style={styles.inputContainerWithLabel}>
-                                    <Text style={[commonStyles.headerText4BL, { marginBottom: moderateScale(8), }]}>
-                                        Payment Links <Text style={styles.requiredIndicator}>*</Text>
-                                    </Text>
-                                    <View style={styles.inputContainer1}>
-                                        <TextInput
-                                            style={styles.inputs}
-                                            placeholder="upi@okicici"
-                                            placeholderTextColor="#979797"
-                                            value={paymentLink}
-                                            onChangeText={(text) => setPaymentLink(text)}
-                                            underlineColorAndroid="transparent"
-                                        />
-                                    </View>
-                                </View>
+                            </View>
 
 
-                                <TouchableOpacity
-                                    style={[commonStyles.button]}
-                                    onPress={handleNext}
-                                    activeOpacity={0.8}
-                                >
-                                    <Text style={commonStyles.buttonText}>Continue</Text>
-                                </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[commonStyles.button]}
+                                onPress={handleNext}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={commonStyles.buttonText}>Continue</Text>
+                            </TouchableOpacity>
 
 
                         </View>
                     </ScrollView>
                     {/* Continue Button */}
-                   
+
                 </View>
             )}
         </SafeAreaView>
@@ -734,7 +776,7 @@ const styles = StyleSheet.create({
     headerTextContainer: {
         width: '100%',
         alignItems: 'center',
-        //zIndex: 1,
+        marginBottom: 20,
     },
     headerText1: {
         fontSize: 24,
@@ -1032,4 +1074,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default ClinicProfileCompletion5;
+export default EClinicProfileCompletion5;

@@ -64,6 +64,14 @@ import SelectTeams from './SelectTeams';
 import ClinicProfile from './Profile/ClinicProfile';
 import WebViewScreen from '../components/WebViewScreen';
 import MyClinic from './Profile/MyClinic';
+import EditClinicProfile from './Profile/EditClinicProfile';
+import EClinicProfileCompletion1 from './ClinicProfile/EClinicProfileCompletion1';
+import EClinicProfileCompletion2 from './ClinicProfile/EClinicProfileCompletion2';
+import EClinicProfileCompletion3 from './ClinicProfile/EClinicProfileCompletion3';
+import EClinicProfileCompletion5 from './ClinicProfile/EClinicProfileCompletion5';
+import EClinicProfileCompletion7 from './ClinicProfile/EClinicProfileCompletion7';
+import MyOffice from './Profile/MyOffice';
+import EditOfficeProfile from './Profile/EditOfficeProfile';
 
 const Stack = createStackNavigator();
 
@@ -389,6 +397,46 @@ const Navigation = () => {
                 <Stack.Screen
                     name="MyClinic"
                     component={MyClinic}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="MyOffice"
+                    component={MyOffice}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="EditClinicProfile"
+                    component={EditClinicProfile}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="EditOfficeProfile"
+                    component={EditOfficeProfile}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="EClinicProfileCompletion1"
+                    component={EClinicProfileCompletion1}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="EClinicProfileCompletion2"
+                    component={EClinicProfileCompletion2}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="EClinicProfileCompletion3"
+                    component={EClinicProfileCompletion3}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="EClinicProfileCompletion5"
+                    component={EClinicProfileCompletion5}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="EClinicProfileCompletion7"
+                    component={EClinicProfileCompletion7}
                     options={{ headerShown: false }}
                 /> 
                 {/* <Stack.Screen

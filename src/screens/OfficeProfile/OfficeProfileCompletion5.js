@@ -14,13 +14,17 @@ import {
     PixelRatio,
     Keyboard,
     TouchableWithoutFeedback,
-    ToastAndroid
+    ToastAndroid,
+    FlatList
 } from 'react-native';
 import Animation from '../../components/Loader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import commonStyles from '../../components/CommonStyles';
 import { moderateScale } from 'react-native-size-matters';
 import { ProgressBar } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { API_CONFIG } from '../../API/APIConfig';
 
 const { width, height } = Dimensions.get('window');
 
@@ -31,7 +35,9 @@ const responsiveFontSize = (size) => {
 };
 
 
-const OfficeProfileCompletion5 = ({ navigation }) => {
+const OfficeProfileCompletion5 = ({ navigation, route }) => {
+
+    const { off_id } = route.params;
 
     const [isLoading, setIsLoading] = useState(true);
 
@@ -51,26 +57,56 @@ const OfficeProfileCompletion5 = ({ navigation }) => {
     }, []);
 
     const [selectedButton, setSelectedButton] = useState('');
+    const [paymentLink, setPaymentLink] = useState('');
 
-    const [treatmentsData] = useState([
-        'English',
-        'Hindi',
-        'Marathi',
-        'Bengali',
-        'Telugu',
-        'Tamil',
-        'Gujarati',
-        'Urdu',
-        'Kannada',
-        'Odia',
-        'Malayalam',
-        'Punjabi',
-    ]);
 
+    const [treatmentsData, setTreatmentsData] = useState([]);
     const [selectedTreatments, setSelectedTreatments] = useState([]);
     const [otherTreatments, setOtherTreatments] = useState('');
     const [treatmentsModalVisible, setTreatmentsModalVisible] = useState(false);
     const [showOtherTreatmentsInput, setShowOtherTreatmentsInput] = useState(false);
+    const [selectedTreatmentsName, setSelectedTreatmentsName] = useState('');
+
+    useEffect(() => {
+        const fetchTreatmentData = async () => {
+            try {
+                const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getofftreatmentlist-ax.php`);
+                const data = response.data;
+                console.log("Fetched data:", data); // Log fetched data
+                if (data.code === 1) {
+                    const treatmentOptions = data.data.map(item => ({
+                        treatment: item.treatment,
+                        id: parseInt(item.id)
+                    }));
+                    setTreatmentsData(treatmentOptions);
+
+                    // if (data.code === 1) {
+                    //     // Get the stored pr_ty_id from AsyncStorage
+                    //     const storedId = await AsyncStorage.getItem('acc_ty_id');
+                    //     console.log("Stored pr_ty_id:", storedId); // Log stored pr_ty_id
+
+                    //     const filteredData = data.data.filter(item => item.acc_ty_id === storedId);
+                    //     console.log("Filtered data:", filteredData); // Log filtered data
+
+                    //     const treatmentOptions = filteredData.map(item => ({
+                    //         treatment: item.treatment,
+                    //         id: parseInt(item.id) // Parse the id as an integer
+                    //     }));
+
+                    //     console.log("Dropdown options:", treatmentOptions); // Log dropdown options
+
+                    //     setTreatmentsData(treatmentOptions);
+                } else {
+                    console.error('Error fetching service options');
+                }
+            } catch (error) {
+                console.error('Error fetching service options:', error);
+            }
+        };
+
+        fetchTreatmentData();
+    }, []);
+
 
     const handleTreatmentsModal = () => {
         setTreatmentsModalVisible(true);
@@ -80,51 +116,113 @@ const OfficeProfileCompletion5 = ({ navigation }) => {
         setTreatmentsModalVisible(false);
     };
 
+    // const handleTreatmentsModalSubmit = () => {
+    //     let updatedTreatments = [...selectedTreatments];
+
+    //     // If otherSpecialty is not empty, include it
+    //     if (otherTreatments.trim() !== '') {
+    //         updatedTreatments.push(otherTreatments.trim());
+    //     }
+
+    //     // Update the main text input with the combined specialties
+    //     setSelectedTreatments(updatedTreatments);
+
+    //     // Close the modal
+    //     setTreatmentsModalVisible(false);
+    // };
+
     const handleTreatmentsModalSubmit = () => {
         let updatedTreatments = [...selectedTreatments];
+        const otherIndex = updatedTreatments.findIndex(treatment => treatment.hasOwnProperty('other'));
 
-        // If otherSpecialty is not empty, include it
         if (otherTreatments.trim() !== '') {
-            updatedTreatments.push(otherTreatments.trim());
+            const newOtherTreatment = { other: otherTreatments.trim() };
+            if (otherIndex !== -1) {
+                // Replace the existing "other" service with the new one
+                updatedTreatments[otherIndex] = newOtherTreatment;
+            } else {
+                // Add the new "other" service
+                updatedTreatments.push(newOtherTreatment);
+            }
+        } else {
+            // If otherTreatments is empty, remove the "other" service from selectedServices
+            if (otherIndex !== -1) {
+                updatedTreatments.splice(otherIndex, 1);
+            }
         }
 
-        // Update the main text input with the combined specialties
         setSelectedTreatments(updatedTreatments);
-
-        // Close the modal
+        console.log('updatedTreatments', updatedTreatments)
         setTreatmentsModalVisible(false);
     };
 
-    const toggleTreatments = (treatments) => {
-        if (selectedTreatments.includes(treatments)) {
-            setSelectedTreatments(selectedTreatments.filter((item) => item !== treatments));
-        } else {
-            if (selectedTreatments.length < 5) {
-                setSelectedTreatments([...selectedTreatments, treatments]);
-            } else {
-                ToastAndroid.show('You can select only upto 5 Treatments!', ToastAndroid.SHORT);
-            }
-        }
+
+    const toggleTreatments = (id, treatment) => {
+
+        const isSelected = selectedTreatments.includes(id);
+        setSelectedTreatments(prev => isSelected ? prev.filter(item => item !== id) : [...prev, id]);
+
+        // Update selectedServiceName accordingly
+        setSelectedTreatmentsName(isSelected ? [] : [treatment]);
+
     };
 
     const toggleOtherTreatmentsInput = () => {
+        if (showOtherTreatmentsInput) {
+            // If the "other" service input is currently shown, hide it
+            setOtherTreatments('');
+        }
         setShowOtherTreatmentsInput(!showOtherTreatmentsInput);
     };
 
-    const [servicesData] = useState([
-        'Dental implant',
-        'Root canal',
-        'Teeth Whitening',
-        'Root canal treatment',
-        'Dentures',
-        'Teeth cleaning',
-        'Dental braces',
-    ]);
-
+    const [servicesData, setServiceData] = useState([]);
     const [selectedServices, setSelectedServices] = useState([]);
+    const [selectedServiceName, setSelectedServiceName] = useState('');
     const [otherService, setOtherService] = useState('');
     const [serviceModalVisible, setServiceModalVisible] = useState(false);
     const [showOtherServiceInput, setOtherServiceInput] = useState(false);
+
+
+    useEffect(() => {
+        const fetchServiceData = async () => {
+            try {
+                const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getoffservicelist-ax.php`);
+                const data = response.data;
+                console.log("Fetched data:", data); // Log fetched data
+
+                if (data.code === 1) {
+                    const serviceOptions = data.data.map(item => ({
+                        service: item.service,
+                        id: parseInt(item.id)
+                    }));
+                    setServiceData(serviceOptions);
+
+                    // if (data.code === 1) {
+                    //     // Get the stored pr_ty_id from AsyncStorage
+                    //     const storedId = await AsyncStorage.getItem('acc_ty_id');
+                    //     console.log("Stored pr_ty_id:", storedId); // Log stored pr_ty_id
+
+                    //     const filteredData = data.data.filter(item => item.acc_ty_id === storedId);
+                    //     console.log("Filtered data:", filteredData); // Log filtered data
+
+                    //     const serviceOptions = filteredData.map(item => ({
+                    //         service: item.service,
+                    //         id: parseInt(item.id) // Parse the id as an integer
+                    //     }));
+
+                    //     console.log("Dropdown options:", serviceOptions); // Log dropdown options
+
+                    //     setServiceData(serviceOptions);
+                } else {
+                    console.error('Error fetching service options');
+                }
+            } catch (error) {
+                console.error('Error fetching service options:', error);
+            }
+        };
+
+        fetchServiceData();
+    }, []);
 
     const handleServiceModal = () => {
         setServiceModalVisible(true);
@@ -134,34 +232,54 @@ const OfficeProfileCompletion5 = ({ navigation }) => {
         setServiceModalVisible(false);
     };
 
-    const handleServiceModalSubmit = () => {
-        // Include selected services
-        let updatedServices = [...selectedServices];
 
-        // If otherService is not empty, include it
+    const handleServiceModalSubmit = () => {
+        let updatedServices = [...selectedServices];
+        const otherIndex = updatedServices.findIndex(service => service.hasOwnProperty('other'));
+
         if (otherService.trim() !== '') {
-            updatedServices.push(otherService.trim());
+            const newOtherService = { other: otherService.trim() };
+            if (otherIndex !== -1) {
+                // Replace the existing "other" service with the new one
+                updatedServices[otherIndex] = newOtherService;
+            } else {
+                // Add the new "other" service
+                updatedServices.push(newOtherService);
+            }
+        } else {
+            // If otherService is empty, remove the "other" service from selectedServices
+            if (otherIndex !== -1) {
+                updatedServices.splice(otherIndex, 1);
+            }
         }
 
-        // Update the main text input with the combined services
         setSelectedServices(updatedServices);
-
-        // Close the modal
+        console.log('updatedServices', updatedServices)
         setServiceModalVisible(false);
     };
 
 
-    const toggleService = (service) => {
-        if (selectedServices.includes(service)) {
-            setSelectedServices(selectedServices.filter((item) => item !== service));
-        } else {
-            if (selectedServices.length < 5) {
-                setSelectedServices([...selectedServices, service]);
-            } else {
-                ToastAndroid.show('You can select only upto 5 services!', ToastAndroid.SHORT);
-            }
-        }
+    const toggleService = (id, service) => {
+
+        const isSelected = selectedServices.includes(id);
+        setSelectedServices(prev => isSelected ? prev.filter(item => item !== id) : [...prev, id]);
+
+        // Update selectedServiceName accordingly
+        setSelectedServiceName(isSelected ? [] : [service]);
+
+        // Other logic related to limiting the number of selected services can be added here
+
+        // const isSelected = selectedServices.some(item => item.hasOwnProperty(id.toString())); // Check if the service is already selected
+        // const updatedServices = isSelected
+        //     ? selectedServices.filter(item => !item.hasOwnProperty(id.toString())) // Deselect the service
+        //     : [...selectedServices, { [id]: service }]; // Select the service
+
+        // setSelectedServices(updatedServices);
+
+        // // Update selectedServiceName accordingly
+        // setSelectedServiceName(isSelected ? '' : service);
     };
+
 
     const handleOtherServiceSubmit = () => {
         // Handle submission of other service
@@ -170,15 +288,54 @@ const OfficeProfileCompletion5 = ({ navigation }) => {
         setOtherServiceInput(false);
     };
 
-    const toggleOtherInput = () => {
+    const toggleOtherServiceInput = () => {
+        if (showOtherServiceInput) {
+            // If the "other" service input is currently shown, hide it
+            setOtherService('');
+        }
         setOtherServiceInput(!showOtherServiceInput);
     };
+
+    const handleNext = async () => {
+
+        const pr_id = await AsyncStorage.getItem('pr_id');
+        const id = parseInt(pr_id);
+        const acc_ty_id = await AsyncStorage.getItem('acc_ty_id');
+        //const cl_id = await AsyncStorage.getItem('cl_id');
+        //const id1 = parseInt(cl_id);
+
+
+        const userData = {
+            off_id: off_id,
+            pr_id: id,
+            serv_id: selectedServices,
+            tret_id: selectedTreatments,
+            payment: paymentLink,
+            pi_dr_id: selectedButton === 'button1' ? 1 : 2,
+        };
+
+        console.log('User Data:', userData);
+
+        try {
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqofficedtls3-ax.php`, userData);
+
+            console.log('dataresponse', response.data);
+            ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
+            navigation.navigate('OfficeProfileCompletion6', { off_id: off_id });
+            //navigation.navigate('ClinicProfileCompletion6');
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+
+        // navigation.navigate('ProfileCompletion6');
+    };
+
 
     const currentStep = 5; // For example, current step is 4
     const totalSteps = 9; // Total number of steps
 
     const progressPercentage = (currentStep / totalSteps) * 100; // Calculate progress percentage
-    console.log("Progress Percentage:", progressPercentage);
+    //console.log("Progress Percentage:", progressPercentage);
 
     const [hoveredItem, setHoveredItem] = useState(null);
 
@@ -197,8 +354,8 @@ const OfficeProfileCompletion5 = ({ navigation }) => {
 
                             <View style={styles.headerTextContainer}>
                                 <Text style={[commonStyles.headerText1BL, {
-                                    marginBottom: moderateScale(6), textAlign: 'center'
-                                }]}>Step 5 - Office Details</Text>
+                                    marginBottom: 6, textAlign: 'center'
+                                }]}>Step 5 - Clinic Details</Text>
                                 <Text style={[commonStyles.headerText2BL, {
                                     textAlign: 'center', paddingHorizontal: width * 0.02
                                 }]}>Choose your career category and unlock endless possibilities.</Text>
@@ -213,8 +370,8 @@ const OfficeProfileCompletion5 = ({ navigation }) => {
 
 
                             <View style={styles.inputContainerWithLabel}>
-                                <Text style={[commonStyles.headerText4BL, { marginBottom: moderateScale(8), }]}>
-                                     Office / Clinic Pickups & Drops <Text style={styles.requiredIndicator}>*</Text>
+                                <Text style={[commonStyles.headerText4BL, { marginBottom: 8, }]}>
+                                    Office / Clinic Pickups & Drops <Text style={styles.requiredIndicator}>*</Text>
                                 </Text>
                                 <View style={styles.buttonContainer}>
                                     <TouchableOpacity
@@ -245,7 +402,7 @@ const OfficeProfileCompletion5 = ({ navigation }) => {
                             </View>
 
                             <View style={styles.inputContainerWithLabel}>
-                                <Text style={[commonStyles.headerText4BL, { marginBottom: moderateScale(8), }]}>
+                                <Text style={[commonStyles.headerText4BL, { marginBottom: 8, }]}>
                                     Treatments Offered <Text style={styles.requiredIndicator}>*</Text>
                                 </Text>
 
@@ -254,13 +411,12 @@ const OfficeProfileCompletion5 = ({ navigation }) => {
                                         style={styles.inputs}
                                         placeholder="Treatments Offered"
                                         placeholderTextColor="#979797"
-                                        // value={selectedServices.join(', ')}
-                                        value={selectedTreatments.length > 0 ? selectedTreatments[0] : ''}
+                                        value={selectedTreatmentsName.length > 0 ? selectedTreatmentsName[0] : ''}
                                         underlineColorAndroid="transparent"
                                         editable={false}
                                     />
                                     {selectedTreatments.length > 0 ? (
-                                        <Text style={styles.totalServiceText}>+{selectedTreatments.filter(treatments => treatments !== 'Other').length + (showOtherTreatmentsInput ? 1 : 0)}</Text>
+                                        <Text style={styles.totalServiceText}>+{selectedTreatments.filter(treatment => treatment !== 'Other').length + (showOtherTreatmentsInput ? 1 : 0)}</Text>
                                     ) : (
                                         <Image source={require('../../../assets/img/Add.png')} style={styles.closeP} />
                                     )}
@@ -269,14 +425,17 @@ const OfficeProfileCompletion5 = ({ navigation }) => {
                                 <Modal
                                     visible={treatmentsModalVisible}
                                     transparent
+                                    activeOpacity={1}
                                     onRequestClose={() => setTreatmentsModalVisible(false)} // To handle Android back button
                                 >
                                     <TouchableOpacity
-                                        activeOpacity={0.8}
+                                        activeOpacity={1}
                                         style={styles.modalContainer}
                                         onPress={() => setTreatmentsModalVisible(false)} // Close the modal when clicking on the background
                                     >
-                                        <ScrollView style={styles.modalContent}>
+                                        <TouchableOpacity style={styles.modalContent}
+                                            activeOpacity={1}
+                                            onPress={() => { }}>
                                             <View style={styles.horizontalLine}></View>
                                             <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
                                                 Treatments Offered <Text style={commonStyles.headerText3G}> (upto 5)</Text>
@@ -284,56 +443,48 @@ const OfficeProfileCompletion5 = ({ navigation }) => {
                                             <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
                                                 Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
                                             </Text>
-                                            <View style={styles.servicesContainer11}>
-
-                                                {treatmentsData.map((treatments) => (
+                                            <FlatList
+                                                style={{ paddingBottom: showOtherTreatmentsInput ? 0 : height * 0.06 }}
+                                                data={[...treatmentsData, { id: 'other', treatment: 'Other' }]} // Add 'Other' as an additional item
+                                                renderItem={({ item }) => (
                                                     <TouchableOpacity
                                                         activeOpacity={0.8}
-                                                        key={treatments}
-                                                        onPress={() => toggleTreatments(treatments)}
-                                                        onMouseEnter={() => setHoveredItem(treatments)}
+                                                        onPress={() => {
+                                                            if (item.id === 'other') {
+                                                                toggleOtherTreatmentsInput();
+                                                            } else {
+                                                                toggleTreatments(item.id, item.treatment);
+                                                            }
+                                                        }}
+                                                        onMouseEnter={() => setHoveredItem(item.treatment)}
                                                         onMouseLeave={() => setHoveredItem(null)}
                                                     >
                                                         <View
                                                             style={[
                                                                 styles.checkboxContainer,
-                                                                selectedTreatments.includes(treatments) && styles.selectedCheckboxContainer,
-                                                                hoveredItem === treatments && styles.hoveredCheckboxContainer,
+                                                                selectedTreatments.includes(item.treatment) && styles.selectedCheckboxContainer,
+                                                                hoveredItem === item.treatment && styles.hoveredCheckboxContainer,
                                                             ]}
                                                         >
                                                             <Image
-                                                                source={selectedTreatments.includes(treatments) ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
+                                                                source={
+                                                                    selectedTreatments.includes(item.id) || (showOtherTreatmentsInput && item.id === 'other')
+                                                                        ? require('../../../assets/img/Rect1.png')
+                                                                        : require('../../../assets/img/Rect.png')
+                                                                }
                                                                 style={styles.checkboxImage}
                                                             />
-                                                            <Text style={selectedTreatments.includes(treatments) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
-                                                                {treatments}
+
+                                                            <Text style={selectedTreatments.includes(item.treatment) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
+                                                                {item.treatment}
                                                             </Text>
                                                         </View>
                                                     </TouchableOpacity>
-                                                ))}
-                                                <TouchableOpacity
-                                                    activeOpacity={0.8}
-                                                    onPress={toggleOtherTreatmentsInput}
-                                                    onMouseEnter={() => setHoveredItem('Other')}
-                                                    onMouseLeave={() => setHoveredItem(null)}
-                                                >
-                                                    <View
-                                                        style={[
-                                                            styles.checkboxContainer,
-                                                            showOtherTreatmentsInput && styles.selectedCheckboxContainer,
-                                                            hoveredItem === 'Other' && styles.hoveredCheckboxContainer,
-                                                        ]}
-                                                    >
-                                                        <Image
-                                                            source={showOtherTreatmentsInput ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
-                                                            style={styles.checkboxImage}
-                                                        />
-                                                        <Text style={showOtherTreatmentsInput ? commonStyles.headerText4B : commonStyles.headerText4BL}>Other</Text>
-                                                    </View>
-                                                </TouchableOpacity>
-                                            </View>
+                                                )}
+                                                keyExtractor={item => item.id}
+                                            />
                                             {showOtherTreatmentsInput && (
-                                                <View style={styles.inputContainer1}>
+                                                <View style={styles.otherContainer1}>
                                                     <TextInput
                                                         style={styles.inputs}
                                                         placeholder="Other Treatments"
@@ -344,10 +495,22 @@ const OfficeProfileCompletion5 = ({ navigation }) => {
                                                     />
                                                 </View>
                                             )}
-                                            <TouchableOpacity style={[commonStyles.button, { marginBottom: 20 }]} activeOpacity={0.8} onPress={handleTreatmentsModalSubmit}>
+
+                                            {showOtherTreatmentsInput && (
+                                                <TouchableOpacity style={[commonStyles.button, {}]} activeOpacity={0.8} onPress={handleTreatmentsModalSubmit}>
+                                                    <Text style={commonStyles.buttonText}>Submit</Text>
+                                                </TouchableOpacity>
+                                            )}
+
+
+                                        </TouchableOpacity>
+                                        {showOtherServiceInput ?
+                                            null :
+                                            <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: height * 0.03, }]} activeOpacity={0.8} onPress={handleTreatmentsModalSubmit}>
                                                 <Text style={commonStyles.buttonText}>Submit</Text>
-                                            </TouchableOpacity>
-                                        </ScrollView>
+                                            </TouchableOpacity>}
+
+
                                     </TouchableOpacity>
                                 </Modal>
                             </View>
@@ -363,7 +526,7 @@ const OfficeProfileCompletion5 = ({ navigation }) => {
                                         placeholder="Services"
                                         placeholderTextColor="#979797"
                                         // value={selectedServices.join(', ')}
-                                        value={selectedServices.length > 0 ? selectedServices[0] : ''}
+                                        value={selectedServiceName.length > 0 ? selectedServiceName[0] : ''}
                                         underlineColorAndroid="transparent"
                                         editable={false}
                                     />
@@ -371,23 +534,25 @@ const OfficeProfileCompletion5 = ({ navigation }) => {
                                         +{selectedServices.filter(service => service !== 'Other').length + (showOtherInput ? 1 : 0)}
                                     </Text> */}
                                     {selectedServices.length > 0 ? (
-                                        <Text style={styles.totalServiceText}>+{selectedServices.filter(service => service !== 'Other').length + (showOtherServiceInput ? 1 : 0)} more</Text>
+                                        <Text style={styles.totalServiceText}>+{selectedServices.filter(service => service !== 'Other').length + (showOtherServiceInput ? 1 : 0)}</Text>
                                     ) : (
                                         <Image source={require('../../../assets/img/Add.png')} style={styles.closeP} />
                                     )}
                                 </TouchableOpacity>
-
                                 <Modal
                                     visible={serviceModalVisible}
                                     transparent
+                                    activeOpacity={1}
                                     onRequestClose={() => setServiceModalVisible(false)} // To handle Android back button
                                 >
                                     <TouchableOpacity
-                                        activeOpacity={0.8}
+                                        activeOpacity={1}
                                         style={styles.modalContainer}
                                         onPress={() => setServiceModalVisible(false)} // Close the modal when clicking on the background
                                     >
-                                        <ScrollView style={styles.modalContent}>
+                                        <TouchableOpacity style={styles.modalContent}
+                                            activeOpacity={1}
+                                            onPress={() => { }}>
                                             <View style={styles.horizontalLine}></View>
                                             <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
                                                 Tell us your services <Text style={commonStyles.headerText3G}> (upto 5)</Text>
@@ -395,55 +560,48 @@ const OfficeProfileCompletion5 = ({ navigation }) => {
                                             <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
                                                 Note: Type services like Root Canal, Aligners, Oral Surgery,  etc to show specialisation you provide.
                                             </Text>
-                                            <View style={styles.servicesContainer11}>
-                                                {servicesData.map((service) => (
+                                            <FlatList
+                                                style={{ paddingBottom: showOtherServiceInput ? 0 : height * 0.06 }}
+                                                data={[...servicesData, { id: 'other', service: 'Other' }]} // Add 'Other' as an additional item
+                                                renderItem={({ item }) => (
                                                     <TouchableOpacity
                                                         activeOpacity={0.8}
-                                                        key={service}
-                                                        onPress={() => toggleService(service)}
-                                                        onMouseEnter={() => setHoveredItem(service)}
+                                                        onPress={() => {
+                                                            if (item.id === 'other') {
+                                                                toggleOtherServiceInput();
+                                                            } else {
+                                                                toggleService(item.id, item.service);
+                                                            }
+                                                        }}
+                                                        onMouseEnter={() => setHoveredItem(item.service)}
                                                         onMouseLeave={() => setHoveredItem(null)}
                                                     >
                                                         <View
                                                             style={[
                                                                 styles.checkboxContainer,
-                                                                selectedServices.includes(service) && styles.selectedCheckboxContainer,
-                                                                hoveredItem === service && styles.hoveredCheckboxContainer,
+                                                                selectedServices.includes(item.service) && styles.selectedCheckboxContainer,
+                                                                hoveredItem === item.service && styles.hoveredCheckboxContainer,
                                                             ]}
                                                         >
                                                             <Image
-                                                                source={selectedServices.includes(service) ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
+                                                                source={
+                                                                    selectedServices.includes(item.id) || (showOtherServiceInput && item.id === 'other')
+                                                                        ? require('../../../assets/img/Rect1.png')
+                                                                        : require('../../../assets/img/Rect.png')
+                                                                }
                                                                 style={styles.checkboxImage}
                                                             />
-                                                            <Text style={selectedServices.includes(service) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
-                                                                {service}
+
+                                                            <Text style={selectedServices.includes(item.service) ? commonStyles.headerText4B : commonStyles.headerText4BL}>
+                                                                {item.service}
                                                             </Text>
                                                         </View>
                                                     </TouchableOpacity>
-                                                ))}
-                                                <TouchableOpacity
-                                                    activeOpacity={0.8}
-                                                    onPress={toggleOtherInput}
-                                                    onMouseEnter={() => setHoveredItem('Other')}
-                                                    onMouseLeave={() => setHoveredItem(null)}
-                                                >
-                                                    <View
-                                                        style={[
-                                                            styles.checkboxContainer,
-                                                            showOtherServiceInput && styles.selectedCheckboxContainer,
-                                                            hoveredItem === 'Other' && styles.hoveredCheckboxContainer,
-                                                        ]}
-                                                    >
-                                                        <Image
-                                                            source={showOtherServiceInput ? require('../../../assets/img/Rect1.png') : require('../../../assets/img/Rect.png')}
-                                                            style={styles.checkboxImage}
-                                                        />
-                                                        <Text style={showOtherServiceInput ? commonStyles.headerText4B : commonStyles.headerText4BL}>Other</Text>
-                                                    </View>
-                                                </TouchableOpacity>
-                                            </View>
+                                                )}
+                                                keyExtractor={item => item.id}
+                                            />
                                             {showOtherServiceInput && (
-                                                <View style={styles.inputContainer1}>
+                                                <View style={styles.otherContainer1}>
                                                     <TextInput
                                                         style={styles.inputs}
                                                         placeholder="Other Services"
@@ -454,10 +612,22 @@ const OfficeProfileCompletion5 = ({ navigation }) => {
                                                     />
                                                 </View>
                                             )}
-                                            <TouchableOpacity style={[commonStyles.button, { marginBottom: 20 }]} activeOpacity={0.8} onPress={handleServiceModalSubmit}>
+
+                                            {showOtherServiceInput && (
+                                                <TouchableOpacity style={[commonStyles.button, {}]} activeOpacity={0.8} onPress={handleServiceModalSubmit}>
+                                                    <Text style={commonStyles.buttonText}>Submit</Text>
+                                                </TouchableOpacity>
+                                            )}
+
+
+                                        </TouchableOpacity>
+                                        {showOtherServiceInput ?
+                                            null :
+                                            <TouchableOpacity style={[commonStyles.button, { position: 'absolute', bottom: height * 0.03, }]} activeOpacity={0.8} onPress={handleServiceModalSubmit}>
                                                 <Text style={commonStyles.buttonText}>Submit</Text>
-                                            </TouchableOpacity>
-                                        </ScrollView>
+                                            </TouchableOpacity>}
+
+
                                     </TouchableOpacity>
                                 </Modal>
 
@@ -472,29 +642,26 @@ const OfficeProfileCompletion5 = ({ navigation }) => {
                                         style={styles.inputs}
                                         placeholder="upi@okicici"
                                         placeholderTextColor="#979797"
-                                        //value={selectedEmail}
-                                        //onChangeText={(text) => setSelectedEmail(text)}
+                                        value={paymentLink}
+                                        onChangeText={(text) => setPaymentLink(text)}
                                         underlineColorAndroid="transparent"
                                     />
                                 </View>
                             </View>
 
-                                {/* Continue Button */}
-                                <TouchableOpacity
-                                    style={[commonStyles.button, ]}
-                                    onPress={() => {
-                                        navigation.navigate('OfficeProfileCompletion6');
-                                        console.log('ProfileCompletion21');
-                                    }}
-                                    activeOpacity={0.8}
-                                >
-                                    <Text style={commonStyles.buttonText}>Continue</Text>
-                                </TouchableOpacity>
 
+                            <TouchableOpacity
+                                style={[commonStyles.button]}
+                                onPress={handleNext}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={commonStyles.buttonText}>Continue</Text>
+                            </TouchableOpacity>
 
 
                         </View>
                     </ScrollView>
+                    {/* Continue Button */}
 
                 </View>
             )}
@@ -528,10 +695,13 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         backgroundColor: '#FEFCFC',
-        padding: 20,
+        paddingVertical: 20,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        maxHeight: '90%', // Maximum height of 50%
+        paddingHorizontal: moderateScale(16),
+        maxHeight: '95%',
+        minHeight: 100,
+        paddingBottom: 30,
     },
     modalInput: {
         borderWidth: 1,
@@ -553,8 +723,8 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         backgroundColor: '#FEFCFC',
-        paddingHorizontal: moderateScale(16),
-        paddingBottom: moderateScale(100),
+        paddingHorizontal: 16,
+        paddingBottom: 100,
     },
     headerContainer: {
         position: 'relative',
@@ -580,7 +750,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     contentContainer: {
-        marginTop: moderateScale(32),
+        marginTop: 32,
         //justifyContent: 'center',
         //alignItems: 'center',
         //marginTop: height * 0.00,
@@ -598,9 +768,9 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         alignSelf: 'center',
         backgroundColor: '#FEFCFC',
-        height: moderateScale(41),
+        height: 42,
         width: '100%',
-        marginBottom: moderateScale(16),
+        marginBottom: 16,
         justifyContent: 'space-between',
     },
     totalServiceText: {
@@ -666,10 +836,10 @@ const styles = StyleSheet.create({
     },
     button: {
         flexDirection: 'row',
-        marginBottom: moderateScale(8),
+        marginBottom: 8,
     },
     buttonContainer: {
-        marginBottom: moderateScale(8),
+        marginBottom: 8,
     },
     modalHeaderText: {
         color: '#121212',
@@ -677,6 +847,18 @@ const styles = StyleSheet.create({
         fontFamily: 'Mukta-Bold',
         marginLeft: 10,
 
+    },
+    otherContainer1: {
+        flexDirection: 'row',
+        borderColor: '#1C1C1C',
+        borderWidth: 0.5,
+        borderRadius: 24,
+        alignSelf: 'center',
+        backgroundColor: '#FEFCFC',
+        height: moderateScale(41),
+        width: '100%',
+        //  marginBottom: moderateScale(16),
+        justifyContent: 'space-between',
     },
     uptoText: {
         color: '#979797',
@@ -827,8 +1009,8 @@ const styles = StyleSheet.create({
         marginRight: 18,
     },
     checkboxImage: {
-        height: moderateScale(18),
-        width: moderateScale(18),
+        height: 18,
+        width: 18,
 
         justifyContent: 'center',
         alignItems: 'center',
@@ -838,8 +1020,8 @@ const styles = StyleSheet.create({
     checkboxContainer: {
         flexDirection: 'row',
         //flexWrap: 'wrap',
-        marginVertical: moderateScale(12),
-        paddingRight: moderateScale(18),
+        marginVertical: 12,
+        paddingRight: 18,
         // paddingLeft: moderateScale(18),
     },
     hoveredCheckboxContainer: {
@@ -849,5 +1031,6 @@ const styles = StyleSheet.create({
         //paddingHorizontal: moderateScale(18),
     }
 });
+
 
 export default OfficeProfileCompletion5;

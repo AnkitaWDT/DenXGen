@@ -61,14 +61,15 @@ const SavedLocationContainer = ({ savedLocations }) => {
 
 
 
-const ClinicProfileCompletion4 = ({ navigation }) => {
+const ClinicProfileCompletion4 = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [savedLocations, setSavedLocations] = useState([]);
+    const { cl_id } = route.params;
 
     const fetchSavedLocations = async () => {
         try {
             // Fetch pr_id from AsyncStorage
-            const cl_id = await AsyncStorage.getItem('cl_id');
+            //const cl_id = await AsyncStorage.getItem('cl_id');
             if (!cl_id) {
                 console.error('pr_id not found in AsyncStorage');
                 return;
@@ -90,7 +91,7 @@ const ClinicProfileCompletion4 = ({ navigation }) => {
                     name: location.loc_one,
                 })));
             }
-            console.log(response);
+            //console.log(response);
             setIsLoading(false);
         } catch (error) {
             console.error('Error fetching saved locations:', error);
@@ -251,14 +252,14 @@ const ClinicProfileCompletion4 = ({ navigation }) => {
         }
         const pr_id = await AsyncStorage.getItem('pr_id');
         const id = parseInt(pr_id);
-        const cl_id = await AsyncStorage.getItem('cl_id');
-        const id1 = parseInt(cl_id);
+        // const cl_id = await AsyncStorage.getItem('cl_id');
+        // const id1 = parseInt(cl_id);
 
 
         // Form data
         const formData = {
             pr_id: id,
-            cl_id: id1,
+            cl_id: cl_id,
             loc_one: houseNumber,
             loc_two: area,
             city: city,
@@ -663,7 +664,8 @@ const ClinicProfileCompletion4 = ({ navigation }) => {
                     <TouchableOpacity
                         style={[commonStyles.button, styles.continueButton]}
                         onPress={() => {
-                            navigation.navigate('ClinicProfileCompletion5');
+                            //navigation.navigate('ClinicProfileCompletion5');
+                            navigation.navigate('ClinicProfileCompletion5', { cl_id: cl_id });
                             console.log('ProfileCompletion21');
                         }}
                         activeOpacity={0.8}

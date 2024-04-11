@@ -35,8 +35,9 @@ const responsiveFontSize = (size) => {
 };
 
 
-const ClinicProfileCompletion2 = ({ navigation }) => {
+const ClinicProfileCompletion2 = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(true);
+    const { cl_id } = route.params;
 
     useEffect(() => {
         const fakeAsyncOperation = async () => {
@@ -165,13 +166,13 @@ const ClinicProfileCompletion2 = ({ navigation }) => {
             });
         });
 
-        const cl_id = await AsyncStorage.getItem('cl_id');
+        //const cl_id = await AsyncStorage.getItem('cl_id');
         const acc_ty_id = await AsyncStorage.getItem('acc_ty_id');
         const pr_id = await AsyncStorage.getItem('pr_id');
         const id = parseInt(pr_id);
 
         const userData = {
-            cl_id: parseInt(cl_id),
+            cl_id: cl_id,
             //pr_id: id,
             timings: timingsArray
         };
@@ -184,7 +185,8 @@ const ClinicProfileCompletion2 = ({ navigation }) => {
             console.log('dataresponse', response.data);
             ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
             console.log('Data Added to database');
-            navigation.navigate('ClinicProfileCompletion3');
+            navigation.navigate('ClinicProfileCompletion3', { cl_id: cl_id });
+            //navigation.navigate('ClinicProfileCompletion3');
         } catch (error) {
             console.error('An error occurred:', error);
         }
@@ -225,7 +227,7 @@ const ClinicProfileCompletion2 = ({ navigation }) => {
         <SafeAreaView style={{ flex: 1 }}>
             {isLoading ? (
                 <View style={{ justifyContent: 'center', alignSelf: 'center' }}>
-                    <Text>Loading...</Text>
+                    <Animation />
                 </View>
             ) : (
                 <View style={{ flex: 1 }}>

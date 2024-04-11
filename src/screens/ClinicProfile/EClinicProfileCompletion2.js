@@ -35,9 +35,9 @@ const responsiveFontSize = (size) => {
 };
 
 
-const OfficeProfileCompletion2 = ({ navigation, route }) => {
+const EClinicProfileCompletion2 = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(true);
-    const { off_id } = route.params;
+    const { cl_id } = route.params;
 
     useEffect(() => {
         const fakeAsyncOperation = async () => {
@@ -172,7 +172,7 @@ const OfficeProfileCompletion2 = ({ navigation, route }) => {
         const id = parseInt(pr_id);
 
         const userData = {
-            off_id: off_id,
+            cl_id: cl_id,
             //pr_id: id,
             timings: timingsArray
         };
@@ -180,12 +180,12 @@ const OfficeProfileCompletion2 = ({ navigation, route }) => {
         console.log('User Data:', userData);
 
         try {
-            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqofficedtls2-ax.php`, userData);
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqclinicdtls2-ax.php`, userData);
 
             console.log('dataresponse', response.data);
             ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
             console.log('Data Added to database');
-            navigation.navigate('OfficeProfileCompletion3', { off_id: off_id });
+            navigation.navigate('EditClinicProfile', { cl_id: cl_id });
             //navigation.navigate('ClinicProfileCompletion3');
         } catch (error) {
             console.error('An error occurred:', error);
@@ -222,6 +222,44 @@ const OfficeProfileCompletion2 = ({ navigation, route }) => {
     //     console.log('User Data:', userData);
     //     //navigation.navigate('ClinicProfileCompletion3');
     // };
+
+    const [clinicTimings, setClinicTimings] = useState([]);
+
+    useEffect(() => {
+        const fetchClinicData = async () => {
+            try {
+                const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getclinicvic-ax.php?cl_id=${cl_id}`);
+                const clinicData = response.data.data;
+
+                // Initialize selectedTimes object with fetched days
+                const initialSelectedTimes = {};
+                days.forEach(day => {
+                    initialSelectedTimes[day.day] = []; // Initialize with an empty array for all days
+                });
+
+                // Prefill timings for days that have data in the API response
+                clinicData.timeList.forEach(timeData => {
+                    const { day, start_time, end_time } = timeData;
+                    initialSelectedTimes[day].push({ from: start_time, to: end_time }); // Push each timing to the respective day
+                });
+
+                // Fill in remaining days with blank timings
+                days.forEach(day => {
+                    if (initialSelectedTimes[day.day].length === 0) {
+                        initialSelectedTimes[day.day].push({ from: '', to: '' }); // Push a blank timing if the day has no timings
+                    }
+                });
+
+                setSelectedTimes(initialSelectedTimes);
+            } catch (error) {
+                console.error('Error fetching clinic data:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchClinicData();
+    }, [cl_id, days]);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -735,5 +773,4 @@ const styles = StyleSheet.create({
 
 });
 
-
-export default OfficeProfileCompletion2;
+export default EClinicProfileCompletion2;

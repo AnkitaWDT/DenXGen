@@ -32,9 +32,9 @@ const responsiveFontSize = (size) => {
 };
 
 
-const ClinicProfileCompletion6 = ({ navigation }) => {
+const ClinicProfileCompletion6 = ({ navigation, route }) => {
 
-
+    const { cl_id } = route.params;
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -255,7 +255,8 @@ const ClinicProfileCompletion6 = ({ navigation }) => {
                                 <TouchableOpacity
                                     style={[commonStyles.button, ]}
                                     onPress={() => {
-                                        navigation.navigate('ClinicProfileCompletion7');
+                                        // navigation.navigate('ClinicProfileCompletion7');
+                                        navigation.navigate('ClinicProfileCompletion7', { cl_id: cl_id });
                                         console.log('ProfileCompletion21');
                                     }}
                                     activeOpacity={0.8}

@@ -45,10 +45,10 @@ const ReadMoreText = ({ text, initialLimit }) => {
     );
 };
 
-const MyClinic = ({ navigation, route }) => {
+const MyOffice = ({ navigation, route }) => {
 
-    const { cl_id } = route.params;
-    console.log(cl_id);
+    const { off_id } = route.params;
+    console.log(off_id);
 
     const [refreshing, setRefreshing] = useState(false);
 
@@ -180,7 +180,7 @@ const MyClinic = ({ navigation, route }) => {
 
     const fetchData = async () => {
         try {
-            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getclinicvic-ax.php?cl_id=${cl_id}`);
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getofficevic-ax.php?off_id=${off_id}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
@@ -341,24 +341,24 @@ const MyClinic = ({ navigation, route }) => {
             case 3:
 
                 return null;
-                // return (
-                //     <View>
-                //         <FlatList
-                //             data={keyForteData}
-                //             keyExtractor={(item, index) => index.toString()}
-                //             renderItem={({ item }) => (
-                //                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                //                     <Image
-                //                         source={require('../../../assets/img/services.png')}
-                //                         style={{ width: 20, height: 25, marginRight: 10, }}
-                //                     />
-                //                     <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>
-                //                 </View>
-                //             )}
-                //         // renderItem={({ item }) => <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>}
-                //         />
-                //     </View>
-                // );
+            // return (
+            //     <View>
+            //         <FlatList
+            //             data={keyForteData}
+            //             keyExtractor={(item, index) => index.toString()}
+            //             renderItem={({ item }) => (
+            //                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+            //                     <Image
+            //                         source={require('../../../assets/img/services.png')}
+            //                         style={{ width: 20, height: 25, marginRight: 10, }}
+            //                     />
+            //                     <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>
+            //                 </View>
+            //             )}
+            //         // renderItem={({ item }) => <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>}
+            //         />
+            //     </View>
+            // );
             case 4:
                 return (
                     <View style={{ marginBottom: 20 }}>
@@ -645,8 +645,8 @@ const MyClinic = ({ navigation, route }) => {
                             <TouchableOpacity
                                 style={[commonStyles.buttonS, { marginRight: height * 0.01 }]}
                                 activeOpacity={0.8}
-                                onPress={() => navigation.navigate('EditClinicProfile', { cl_id: cl_id })}
-                                //     navigation.navigate('ClinicProfileCompletion7', { cl_id: cl_id });
+                                onPress={() => navigation.navigate('EditClinicProfile', { off_id: off_id })}
+                            //     navigation.navigate('ClinicProfileCompletion7', { off_id: off_id });
                             >
                                 <Text style={commonStyles.buttonTextS}>Edit profile</Text>
                             </TouchableOpacity>
@@ -771,7 +771,7 @@ const MyClinic = ({ navigation, route }) => {
                                     {profileData?.socialList?.map((social, index) => (
                                         Object.entries(social).map(([platform, username]) => (
                                             // Exclude pr_id field and empty usernames
-                                            platform !== 'cl_id' && username.trim() !== '' &&
+                                            platform !== 'off_id' && username.trim() !== '' &&
                                             <SocialLink key={platform} platform={platform} username={username} />
                                         ))
                                     ))}
@@ -1290,7 +1290,7 @@ const MyClinic = ({ navigation, route }) => {
                         )}
                     </View> */}
 
-{/* 
+                    {/* 
                     <View style={styles.horizontalLine}></View> */}
                     {/* <View>
                         <View style={styles.aboutContainer}>
@@ -2062,4 +2062,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default MyClinic;
+export default MyOffice;

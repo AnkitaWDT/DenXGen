@@ -24,6 +24,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { ProgressBar } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AlertPopup from '../../components/AlertPopup';
+import Video from 'react-native-video';
 const { width, height } = Dimensions.get('window');
 
 const responsiveFontSize = (size) => {
@@ -33,7 +34,7 @@ const responsiveFontSize = (size) => {
 };
 
 
-const ClinicProfileCompletion7 = ({ navigation, route }) => {
+const EClinicProfileCompletion7 = ({ navigation, route }) => {
     const { cl_id } = route.params;
 
     const [isLoading, setIsLoading] = useState(true);
@@ -192,7 +193,7 @@ const ClinicProfileCompletion7 = ({ navigation, route }) => {
     const handleNext = () => {
         if (videoPath && imagePaths.length === 5) {
             //navigation.navigate('ProfileCompletion5');
-            navigation.navigate('ClinicProfileCompletion8', { cl_id: cl_id });
+            navigation.navigate('EditClinicProfile', { cl_id: cl_id })
         } else {
             ToastAndroid.show('Please upload both video and 5 images.', ToastAndroid.SHORT);
         }
@@ -208,32 +209,71 @@ const ClinicProfileCompletion7 = ({ navigation, route }) => {
 
     const progressPercentage = (currentStep / totalSteps) * 100; // Calculate progress percentage
 
+    const [profileVideoUrl, setProfileVideoUrl] = useState('');
+    const [galleryImages, setGalleryImages] = useState([]);
+
+    useEffect(() => {
+        const fetchClinicData = async () => {
+            try {
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getclinicvic-ax.php?cl_id=${cl_id}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch clinic data');
+                }
+                const data = await response.json();
+                if (data.code === 1 && data.data) {
+                    // Update profile video state
+                    if (data.data.profile_video) {
+                        setVideoPath(data.data.profile_video);
+                    }
+                    // Update gallery list state
+                    if (data.data.galleryList && data.data.galleryList.length > 0) {
+                        const galleryImages = data.data.galleryList.map(item => item.gal_image);
+                        setImageInfo(galleryImages);
+                    }
+                } else {
+                    throw new Error('Invalid response format');
+                }
+                setIsLoading(false); // Update loading state
+            } catch (error) {
+                console.error('Error fetching clinic data:', error);
+                setIsLoading(false); // Update loading state in case of error
+            }
+        };
+
+        fetchClinicData();
+    }, [cl_id]);
+
+
     return (
         <SafeAreaView style={{ flex: 1 }}>
             {isLoading ? (
                 <View style={{ justifyContent: 'center', alignSelf: 'center' }}>
-                    {/* Placeholder for loading animation */}
+                    <Animation />
                 </View>
             ) : (
                 <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
                     <View style={styles.contentContainer}>
                         <View style={styles.headerTextContainer}>
                             <Text style={[commonStyles.headerText1BL, { marginBottom: 6, textAlign: 'center' }]}>
-                                Step 7 - Gallery
+                                Gallery
                             </Text>
                             <Text style={[commonStyles.headerText2BL, { textAlign: 'center', paddingHorizontal: '2%' }]}>
                                 Choose your career category and unlock endless possibilities.
                             </Text>
-                            <ProgressBar progress={progressPercentage / 100} color="#00B0FF" style={commonStyles.progImage} />
+                            {/* <ProgressBar progress={progressPercentage / 100} color="#00B0FF" style={commonStyles.progImage} /> */}
                         </View>
                         <View style={{ marginBottom: 20 }}>
                             <Text style={[commonStyles.headerText4BL, { marginBottom: 10 }]}>Upload Video here </Text>
                             <TouchableOpacity style={styles.uploadBanner} onPress={pickVideo}>
                                 <View style={styles.videoContainer}>
                                     {videoPath ? (
-                                        <View style={styles.bannerClickArea}>
-                                            <Image source={{ uri: videoPath }} style={styles.BannerImage} />
-                                        </View>
+
+                                            <Video source={{ uri: videoPath }}
+                            //source={{ uri: 'https://www.denxgen.com/images/clinic-page/video-11.mp4' }} // Replace with the actual video URL
+                                        style={styles.bannerClickArea}
+                                        controls={false}
+                                        resizeMode="contain"
+                        />
                                     ) : (
                                         <View style={styles.bannerClickArea}>
                                             <Image source={require('../../../assets/img/Add.png')} style={styles.defaultBannerImage} />
@@ -245,7 +285,7 @@ const ClinicProfileCompletion7 = ({ navigation, route }) => {
                         <View style={{ marginBottom: 5 }}>
                             <Text style={[commonStyles.headerText4BL, { marginBottom: 5 }]}>Upload Photos here</Text>
                             <View style={{ justifyContent: 'center' }}>
-                                <View style={styles.imageGrid}>
+                                {/* <View style={styles.imageGrid}>
                                     {imageInfo.map((info, index) => (
                                         <View key={index} style={styles.imageContainer}>
                                             <Image source={{ uri: info.path }} style={styles.defaultImageU} />
@@ -271,15 +311,45 @@ const ClinicProfileCompletion7 = ({ navigation, route }) => {
                                             </View>
                                         </TouchableOpacity>
                                     ))}
-                                </View>
+                                </View> */}
+                                    <View style={{ justifyContent: 'center' }}>
+                                        <View style={styles.imageGrid}>
+                                            {imageInfo.map((path, index) => (
+                                                <View key={index} style={styles.imageContainer}>
+                                                    <Image source={{ uri: path }} style={styles.defaultImageU} />
+                                                    <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveImage(index)}>
+                                                        <Image source={require('../../../assets/img/remove.png')} style={styles.removeIcon} />
+                                                    </TouchableOpacity>
+                                                    <AlertPopup
+                                                        visible={showPopup}
+                                                        onRequestClose={() => setShowPopup(false)}
+                                                        title="Confirm Removal"
+                                                        message="Are you sure you want to remove this image?"
+                                                        yesLabel="Yes"
+                                                        noLabel="No"
+                                                        onYesPress={confirmRemoveImage}
+                                                        onNoPress={cancelRemoveImage}
+                                                    />
+                                                </View>
+                                            ))}
+                                            {[...Array(Math.max(0, 6 - imageInfo.length))].map((_, index) => (
+                                                <TouchableOpacity key={index} style={styles.imageContainer} onPress={handleImageUpload}>
+                                                    <View style={styles.defaultImageContainer}>
+                                                        <Image source={require('../../../assets/img/Add.png')} style={styles.defaultImage} />
+                                                    </View>
+                                                </TouchableOpacity>
+                                            ))}
+                                        </View>
+                                    </View>
+
                             </View>
                         </View>
                         <TouchableOpacity style={[commonStyles.button]} onPress={handleNext} activeOpacity={0.8}>
                             <Text style={commonStyles.buttonText}>Continue</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={[commonStyles.button1, { marginBottom: 20 }]} onPress={handleSkip} activeOpacity={0.8}>
+                        {/* <TouchableOpacity style={[commonStyles.button1, { marginBottom: 20 }]} onPress={handleSkip} activeOpacity={0.8}>
                             <Text style={commonStyles.buttonText1}>Skip</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                 </ScrollView>
             )}
@@ -301,7 +371,7 @@ const styles = StyleSheet.create({
     headerTextContainer: {
         width: '100%',
         alignItems: 'center',
-        //zIndex: 1,
+        marginBottom: 20,
     },
     previewImage: {
         width: width * 0.45,
@@ -402,4 +472,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default ClinicProfileCompletion7;
+export default EClinicProfileCompletion7;

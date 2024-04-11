@@ -24,9 +24,10 @@ const responsiveFontSize = (size) => {
 
 
 
-const OfficeProfileCompletion1 = ({ navigation, route }) => {
+const EClinicProfileCompletion1 = ({ navigation, route }) => {
 
-    const { off_id } = route.params;
+    const { cl_id } = route.params;
+    console.log(cl_id);
 
     const [selectedName, setSelectedName] = useState('');
     const [selectedEmail, setSelectedEmail] = useState('');
@@ -47,6 +48,29 @@ const OfficeProfileCompletion1 = ({ navigation, route }) => {
     const [eyear, setEyear] = useState('');
 
     const [selectedDate, setSelectedDate] = useState(new Date());
+
+    useEffect(() => {
+        const fetchClinicData = async () => {
+            try {
+                const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getclinicvic-ax.php?cl_id=${cl_id}`);
+                const clinicData = response.data.data;
+                setSelectedName(clinicData.name);
+                setSelectedEmail(clinicData.email);
+                setSelectedContactNumber(clinicData.phoneno);
+                setSelectedAlternateContactNumber(clinicData.alternate);
+                //setTextareaValues(clinicData.about);
+                setTextareaValues({ aboutYourself: clinicData.about });
+                setNewInputValue(clinicData.about);
+                setSelectedWappNumber(clinicData.wp_number);
+                setEyear(clinicData.est_year);
+                setIsLoading(false);
+            } catch (error) {
+                console.error('Error fetching clinic data:', error);
+            }
+        };
+
+        fetchClinicData();
+    }, [cl_id]);
 
     const handleDateChange = (event, date) => {
         if (date === undefined) {
@@ -150,7 +174,7 @@ const OfficeProfileCompletion1 = ({ navigation, route }) => {
         const pr_id = await AsyncStorage.getItem('pr_id');
         const id = parseInt(pr_id);
         const userData = {
-            off_id: off_id,
+            cl_id: cl_id,
             pr_id: id,
             name: selectedName,
             email: selectedEmail,
@@ -164,13 +188,13 @@ const OfficeProfileCompletion1 = ({ navigation, route }) => {
         console.log('User Data:', userData);
 
         try {
-            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqofficedtls1-ax.php`, userData);
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqclinicdtls1-ax.php`, userData);
 
             console.log('dataresponse', response.data);
             ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
             console.log('Data Added to database');
-        
-            navigation.navigate('OfficeProfileCompletion2', { off_id: off_id });
+            //navigation.navigate('ClinicProfileCompletion2');
+            navigation.navigate('EditClinicProfile', { cl_id: cl_id })
         } catch (error) {
             console.error('An error occurred:', error);
         }
@@ -218,27 +242,27 @@ const OfficeProfileCompletion1 = ({ navigation, route }) => {
                             <View style={styles.headerTextContainer}>
                                 <Text style={[commonStyles.headerText1BL, {
                                     marginBottom: 6, textAlign: 'center'
-                                }]}>Step 1- Office Details</Text>
+                                }]}>Clinic Details</Text>
                                 <Text style={[commonStyles.headerText2BL, {
                                     textAlign: 'center', paddingHorizontal: width * 0.02
                                 }]}>Please provide your personal details for better user experience.</Text>
                                 {/* <Image source={require('../../../assets/img/Prog2.png')} style={commonStyles.progImage} /> */}
-                                <ProgressBar
+                                {/* <ProgressBar
                                     progress={progressPercentage / 100}
                                     color="#00B0FF"
                                     style={commonStyles.progImage}
-                                />
+                                /> */}
                             </View>
 
                             <View style={styles.inputContainerWithLabel}>
                                 <Text style={[commonStyles.headerText4BL, {
                                     marginBottom: 8,
 
-                                }]}>Office Name <Text style={styles.requiredIndicator}>*</Text></Text>
+                                }]}>Clinic Name <Text style={styles.requiredIndicator}>*</Text></Text>
                                 <View style={[styles.inputContainer1, isNameFocused && styles.inputFocused]}>
                                     <TextInput
                                         style={styles.inputs}
-                                        placeholder="Enter your office name"
+                                        placeholder="Enter your clinic name"
                                         placeholderTextColor={'#979797'}
                                         value={selectedName}
                                         onChangeText={(text) => setSelectedName(text)}
@@ -539,7 +563,7 @@ const styles = StyleSheet.create({
     headerTextContainer: {
         width: '100%',
         alignItems: 'center',
-        //zIndex: 1,
+        marginBottom: 20,
     },
 
     contentContainer: {
@@ -655,4 +679,5 @@ const styles = StyleSheet.create({
     },
 });
 
-export default OfficeProfileCompletion1;
+
+export default EClinicProfileCompletion1;

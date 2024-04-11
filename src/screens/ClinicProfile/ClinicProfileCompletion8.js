@@ -33,7 +33,9 @@ const responsiveFontSize = (size) => {
 };
 
 
-const ClinicProfileCompletion8 = ({ navigation }) => {
+const ClinicProfileCompletion8 = ({ navigation, route }) => {
+
+    const { cl_id } = route.params;
 
     const [isSocialModalVisible, setIsSocialModalVisible] = useState(false);
     const [isVideoModalVisible, setIsVideoModalVisible] = useState(false);
@@ -232,8 +234,8 @@ const ClinicProfileCompletion8 = ({ navigation }) => {
 
 
     const handleNext = async () => {
-        const cl_id = await AsyncStorage.getItem('cl_id');
-        const id = parseInt(cl_id);
+        //const cl_id = await AsyncStorage.getItem('cl_id');
+        //const id = parseInt(cl_id);
 
         const socialMediaArray = [
             { instagram: instaLink || "" },
@@ -244,7 +246,7 @@ const ClinicProfileCompletion8 = ({ navigation }) => {
 
 
         const userData = {
-            cl_id: id,
+            cl_id: cl_id,
             vid_id: videoInputs,
             awa_id: awardsInputs,
             pub_id: blogsInputs,

@@ -32,8 +32,9 @@ const responsiveFontSize = (size) => {
 };
 
 
-const OfficeProfileCompletion6 = ({ navigation }) => {
+const OfficeProfileCompletion6 = ({ navigation, route }) => {
 
+    const { off_id } = route.params;
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -140,7 +141,7 @@ const OfficeProfileCompletion6 = ({ navigation }) => {
                             <View style={styles.headerTextContainer}>
                                 <Text style={[commonStyles.headerText1BL, {
                                     marginBottom: 6, textAlign: 'center'
-                                }]}>Step 6 - Office Details</Text>
+                                }]}>Step 6 - Clinic Details</Text>
                                 <Text style={[commonStyles.headerText2BL, {
                                     textAlign: 'center', paddingHorizontal: width * 0.02
                                 }]}>Choose your career category and unlock endless possibilities.</Text>
@@ -254,7 +255,8 @@ const OfficeProfileCompletion6 = ({ navigation }) => {
                             <TouchableOpacity
                                 style={[commonStyles.button,]}
                                 onPress={() => {
-                                    navigation.navigate('ClinicProfileCompletion7');
+                                    // navigation.navigate('ClinicProfileCompletion7');
+                                    navigation.navigate('OfficeProfileCompletion7', { off_id: off_id });
                                     console.log('ProfileCompletion21');
                                 }}
                                 activeOpacity={0.8}

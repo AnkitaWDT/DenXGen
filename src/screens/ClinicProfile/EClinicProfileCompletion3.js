@@ -36,7 +36,7 @@ const responsiveFontSize = (size) => {
 };
 
 
-const ClinicProfileCompletion3 = ({ navigation, route }) => {
+const EClinicProfileCompletion3 = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [profileImage, setProfileImage] = useState(null);
     const [bannerImage, setBannerImage] = useState(null);
@@ -45,6 +45,28 @@ const ClinicProfileCompletion3 = ({ navigation, route }) => {
 
     const defaultProfileImage = require('../../../assets/img/DProfile.png');
     const defaultBannerImage = require('../../../assets/img/DBanner.png');
+
+    useEffect(() => {
+        const fetchClinicData = async () => {
+            try {
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getclinicvic-ax.php?cl_id=${cl_id}`);
+                const data = await response.json();
+                if (data.code === 1 && data.data && data.data.profile_pic) {
+                    setProfileImage({ path: data.data.profile_pic });
+                }
+                if (data.code === 1 && data.data && data.data.profile_banner) {
+                    setBannerImage({ path: data.data.profile_banner });
+                }
+            } catch (error) {
+                console.error('Error fetching clinic data:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchClinicData();
+    }, [cl_id]);
+
 
     const handleProfileUpload = async () => {
         // Call pickImage function with type 'profile'
@@ -302,7 +324,7 @@ const ClinicProfileCompletion3 = ({ navigation, route }) => {
         // }
 
         //navigation.navigate('ClinicProfileCompletion4');
-        navigation.navigate('ClinicProfileCompletion4', { cl_id: cl_id });
+        navigation.navigate('EditClinicProfile', { cl_id: cl_id })
         console.log('ProfileCompletion4');
     };
 
@@ -343,15 +365,15 @@ const ClinicProfileCompletion3 = ({ navigation, route }) => {
                         <View style={styles.headerTextContainer}>
                             <Text style={[commonStyles.headerText1BL, {
                                 marginBottom: moderateScale(6), textAlign: 'center'
-                            }]}>Step 3 - Update Photo</Text>
+                            }]}>Update Photo</Text>
                             <Text style={[commonStyles.headerText2BL, {
                                 textAlign: 'center', paddingHorizontal: width * 0.02
                             }]}>Choose your career category and unlock endless possibilities.</Text>
-                            <ProgressBar
+                            {/* <ProgressBar
                                 progress={progressPercentage / 100}
                                 color="#00B0FF"
                                 style={commonStyles.progImage}
-                            />
+                            /> */}
                         </View>
 
                         <View style={styles.defaultContainer}>
@@ -386,10 +408,10 @@ const ClinicProfileCompletion3 = ({ navigation, route }) => {
                             <Text style={commonStyles.buttonText}>Continue</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={[commonStyles.button1, { marginBottom: height * 0.05, marginTop: height * 0.001, }]}
+                        {/* <TouchableOpacity style={[commonStyles.button1, { marginBottom: height * 0.05, marginTop: height * 0.001, }]}
                             activeOpacity={0.8}>
                             <Text style={commonStyles.buttonText1}>Skip</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
 
                     </View>
                 </ScrollView>
@@ -413,7 +435,7 @@ const styles = StyleSheet.create({
     headerTextContainer: {
         width: '100%',
         alignItems: 'center',
-        //zIndex: 1,
+        marginBottom: 20,
     },
     previewImage: {
         width: width * 0.45,
@@ -445,4 +467,4 @@ const styles = StyleSheet.create({
         resizeMode: 'cover',
     },
 });
-export default ClinicProfileCompletion3;
+export default EClinicProfileCompletion3;

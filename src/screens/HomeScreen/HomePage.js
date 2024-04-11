@@ -109,6 +109,25 @@ const HomePage = ({ navigation, route }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
 
+  useEffect(() => {
+    // Fetch the selected profile picture URL from AsyncStorage when the component mounts
+    const fetchProfilePic = async () => {
+      const pic = await AsyncStorage.getItem('selected_profile_pic');
+      setProfilePic(pic);
+    };
+
+    // Fetch the default name and set activeItem to "My Account" by default
+    const fetchDefaultName = async () => {
+      const name = await AsyncStorage.getItem('selected_name');
+      setDefaultName({ name });
+      setActiveItem(name || 'My Account');
+    };
+
+    fetchProfilePic();
+    fetchDefaultName();
+  }, []);
+
+
   useFocusEffect(
     React.useCallback(() => {
       fetchData();
@@ -122,7 +141,7 @@ const HomePage = ({ navigation, route }) => {
 
       const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getvic-ax.php?prid=${id}`);
       const data = await response.json();
-      setDefaultName({ name: data.data.name, profile_pic: data.data.profile_pic });
+      setDefaultName({ name: data.data.name, profile_pic: data.data.profile_pic, id:data.data.id });
     } catch (error) {
       console.error('Error fetching default name:', error);
     }
@@ -165,21 +184,21 @@ const HomePage = ({ navigation, route }) => {
     setIsPopupVisible(false);
   };
 
-  const officeData = [
-    {
-      id: 1,
-      name: 'Abhishek More',
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww', // URL to the image of the office
-      // Other properties specific to each office
-    },
-    {
-      id: 2,
-      name: 'Mitali',
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww',
-      // Other properties specific to each office
-    },
-    // Add more office objects as needed
-  ];
+  // const officeData = [
+  //   {
+  //     id: 1,
+  //     name: 'Abhishek More',
+  //     image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww', // URL to the image of the office
+  //     // Other properties specific to each office
+  //   },
+  //   {
+  //     id: 2,
+  //     name: 'Mitali',
+  //     image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww',
+  //     // Other properties specific to each office
+  //   },
+  //   // Add more office objects as needed
+  // ];
 
 //   const clinicData = [
 //     {
@@ -205,6 +224,7 @@ const HomePage = ({ navigation, route }) => {
         // Assuming response.data contains an array of clinic objects
         setClinicData(response.data.data);
         //console.log(clinicData);
+        //console.log(clinicData);
       } catch (error) {
         console.error('Error fetching clinic data:', error);
       }
@@ -214,28 +234,31 @@ const HomePage = ({ navigation, route }) => {
     fetchClinicData();
   }, [clinicData]); // Include clinicData in the dependency array
 
-  const getModalHeight = () => {
-    const buttonHeight = 50; // Height of each button
-    const headingHeight = 30; // Height of each heading
-    const cardHeight = 180; // Height of each card
+  const [officeData, setOfficeData] = useState([]); // State to hold clinic data
 
-    const buttonsCount = 4; // Number of buttons
-    const officeCardsCount = officeData.length;
-    const clinicCardsCount = clinicData.length;
+  useEffect(() => {
+    // Fetch clinic data from API
+    const fetchOfficeData = async () => {
+      try {
 
-    const maxModalHeightPercentage = 0.8; // Adjust as needed
-    const minModalHeightPercentage = 0.3; // Adjust as needed
+        const pr_id = await AsyncStorage.getItem('pr_id');
+        // Parse pr_id to an integer
+        const id = parseInt(pr_id);
+        // Make GET request to your API endpoint that returns clinic data
+        const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getofficelist-ax.php?pr_id=${id}`); // Replace YOUR_API_ENDPOINT with your actual API endpoint
+        // Assuming response.data contains an array of clinic objects
+        setOfficeData(response.data.data);
+        //console.log(clinicData);
+        //console.log(clinicData);
+      } catch (error) {
+        console.error('Error fetching clinic data:', error);
+      }
+    };
 
-    const totalHeight =
-      buttonHeight * buttonsCount +
-      headingHeight * 2 + // Two headings for office and clinic
-      cardHeight * (officeCardsCount + clinicCardsCount);
+    // Call fetchClinicData when component mounts
+    fetchOfficeData();
+  }, [officeData]); // Include clinicData in the dependency array
 
-    const maxModalHeight = Math.min(totalHeight, windowHeight * maxModalHeightPercentage);
-    const minModalHeight = Math.max(windowHeight * minModalHeightPercentage, totalHeight + 20); // 20 is the additional margin
-
-    return { minModalHeight, maxModalHeight };
-  };
 
   const windowHeight = Dimensions.get('window').height;
 
@@ -246,19 +269,59 @@ const HomePage = ({ navigation, route }) => {
   const [showPopup1, setShowPopup1] = useState(false);
   const [showPopup2, setShowPopup2] = useState(false);
 
-  const handleItemSelection = async (name, profilePic) => {
+  const [selectedItem, setSelectedItem] = useState({
+    name: '',
+    profilePic: '',
+    type: ''
+  });
+
+  // const handleItemSelection = async (name, profilePic) => {
+  //   setActiveItem(name);
+  //   setProfilePic(profilePic);
+  //   setModalVisible(false);
+  //   // Save display_id in AsyncStorage
+  //   await AsyncStorage.setItem('display_id', name); // Assuming display_id is the ID you want to save
+  //   try {
+  //     const storedDisplayId = await AsyncStorage.getItem('display_id');
+  //     console.log('Value stored in display_id:', storedDisplayId);
+  //   } catch (error) {
+  //     console.error('Error retrieving value from AsyncStorage:', error);
+  //   }
+  // };
+
+  const handleItemSelection = async (name, profilePic, type, id) => {
+    setSelectedItem({ name, profilePic, type });
+    setModalVisible(false);
     setActiveItem(name);
     setProfilePic(profilePic);
-    setModalVisible(false);
-    // Save display_id in AsyncStorage
-    await AsyncStorage.setItem('display_id', name); // Assuming display_id is the ID you want to save
-    try {
-      const storedDisplayId = await AsyncStorage.getItem('display_id');
-      console.log('Value stored in display_id:', storedDisplayId);
-    } catch (error) {
-      console.error('Error retrieving value from AsyncStorage:', error);
+
+    switch (type) {
+      case 'My Account':
+        await AsyncStorage.setItem('selected_id', id.toString());
+        await AsyncStorage.setItem('selected_name', name);
+        await AsyncStorage.setItem('selected_type', type);
+        await AsyncStorage.setItem('selected_profile_pic', profilePic || ''); // Save profile pic URL, or empty string if it's null
+        console.log('Selected My Account:', name, profilePic, type); // Log the selected value
+        break;
+      case 'Clinic Account':
+        await AsyncStorage.setItem('selected_id', id.toString());
+        await AsyncStorage.setItem('selected_name', name);
+        await AsyncStorage.setItem('selected_type', type);
+        await AsyncStorage.setItem('selected_profile_pic', profilePic || ''); // Save profile pic URL, or empty string if it's null
+        console.log('Selected Clinic Account:', name, profilePic, type); // Log the selected value
+        break;
+      case 'Office Account':
+        await AsyncStorage.setItem('selected_id', id.toString());
+        await AsyncStorage.setItem('selected_name', name);
+        await AsyncStorage.setItem('selected_type', type);
+        await AsyncStorage.setItem('selected_profile_pic', profilePic || ''); // Save profile pic URL, or empty string if it's null
+        console.log('Selected Office Account:', name, profilePic, type); // Log the selected value
+        break;
+      default:
+        break;
     }
   };
+
 
 
   useEffect(() => {
@@ -523,14 +586,14 @@ const HomePage = ({ navigation, route }) => {
                       justifyContent: 'space-between',
                       height: height * 0.075,
                     }}
-                      onPress={() => handleItemSelection(defaultName.name, defaultName.profile_pic)}
+                      onPress={() => handleItemSelection(defaultName.name, defaultName.profile_pic, 'My Account', defaultName.id)}
                     // onPress={() => {
                     //   setActiveItem('My Account');
                     //   setModalVisible(false); // Close the modal after selecting
                     // }}
                   >
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        {defaultName.profile_pic ? (
+                        {/* {defaultName.profile_pic ? (
                           <Image
                             source={{ uri: defaultName.profile_pic }}
                             style={styles.accountImage}
@@ -548,14 +611,34 @@ const HomePage = ({ navigation, route }) => {
                               {defaultName.name.charAt(0).toUpperCase()}
                             </Text>
                           </View>
+                        )} */}
+                        {defaultName.profile_pic ? (
+                          <Image
+                            source={{ uri: defaultName.profile_pic }}
+                            style={styles.accountImage}
+                          />
+                        ) : (
+                          <View style={[styles.accountImage, {
+                            width: 42,
+                            height: 42,
+                            borderRadius: 36,
+                            backgroundColor: '#E8F8FF',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }]}>
+                            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>
+                              {defaultName.name ? defaultName.name.charAt(0).toUpperCase() : ''}
+                            </Text>
+                          </View>
                         )}
+
                         <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>
                           {defaultName.name}
                         </Text>
                       </View>
 
                     {/* Check if this is the active item, and display DotActive accordingly */}
-                    {activeItem === 'My Account' ? (
+                      {activeItem === defaultName.name ? (
                       <View style={commonStyles.activeIcon}>
                         <Image
                           source={require('../../../assets/img/DotActive.png')}
@@ -585,18 +668,53 @@ const HomePage = ({ navigation, route }) => {
                             justifyContent: 'space-between',
                             height: height * 0.075,
                           }}
-                          onPress={() => handleItemSelection(office.name, office.image)}
-                          // onPress={() => {
-                          //   setActiveItem(office.name);
-                          //   setModalVisible(false); // Close the modal after selecting
-                          // }}
+                          // onPress={() => handleItemSelection(office.name, office.image, 'Office Account', office.id)}
+                          onPress={() => {
+                            if (office.status === "0") {
+                              // If clinic status is 0 (Drafts), navigate to ClinicProfileCompletion with cl_id
+                              navigation.navigate('ClinicProfileCompletion1', { off_id: office.off_id });
+                            } else {
+                              // If clinic status is 1, do something else (not specified in the provided code)
+                              // You can add navigation logic or any other action here
+                            }
+                            handleItemSelection(office.name, office.profile_pic || '', 'Office Account', office.off_id)
+                            // setActiveItem(clinic.name);
+                            // setModalVisible(false); // Close the modal after selecting
+                          }}
                         >
                           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image
-                              source={{ uri: office.image }} // Assuming image is a URI
-                              style={styles.accountImage}
-                            />
-                            <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>{office.name}</Text>
+                            {office.status === "0" ? (
+                              <View style={[styles.accountImage, {
+                                width: 42,
+                                height: 42,
+                                borderRadius: 36,
+                                backgroundColor: '#E8F8FF',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                              }]}>
+                                <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>O</Text>
+                              </View>
+                            ) : office.profile_pic ? (
+                              <Image
+                                  source={{ uri: office.profile_pic }}
+                                style={styles.accountImage}
+                              />
+                            ) : (
+                              <View style={[styles.accountImage, {
+                                width: 42,
+                                height: 42,
+                                borderRadius: 36,
+                                backgroundColor: '#E8F8FF',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                              }]}>
+                                    <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>{office.name.charAt(0).toUpperCase()}</Text>
+                              </View>
+                            )}
+                            
+                            <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>
+                              {office.status === "0" ? `Office (Drafts)` : office.name}
+                            </Text>
                           </View>
                           {/* Check if this is the active item, and display DotActive accordingly */}
                           {activeItem === office.name ? (
@@ -641,7 +759,7 @@ const HomePage = ({ navigation, route }) => {
                               // If clinic status is 1, do something else (not specified in the provided code)
                               // You can add navigation logic or any other action here
                             }
-                            handleItemSelection(clinic.name, clinic.profile_pic || '')
+                            handleItemSelection(clinic.name, clinic.profile_pic || '', 'Clinic Account', clinic.cl_id)
                             // setActiveItem(clinic.name);
                             // setModalVisible(false); // Close the modal after selecting
                           }}
@@ -764,9 +882,8 @@ const HomePage = ({ navigation, route }) => {
                   <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginBottom: height * 0.02 }}
                     activeOpacity={0.8}
                     onPress={() => {
-                      setModalVisible(false);
+                      setShowPopup2(true);
                       AsyncStorage.setItem('acc_ty_id', '2');
-                      navigation.navigate('OfficeProfileCompletion1'); // Navigate to the desired screen
                     }}>
                     <Image
                       source={require('../../../assets/img/AddAcc.png')}
@@ -774,6 +891,47 @@ const HomePage = ({ navigation, route }) => {
                     />
                     <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>Create Office Profile</Text>
                   </TouchableOpacity>
+
+                    <AlertPopup
+                      visible={showPopup2}
+                      onRequestClose={() => setShowPopup2(false)}
+                      title="Do you want to save changes?"
+                      message="Do you want to create an office account?"
+                      yesLabel="Yes"
+                      noLabel="No"
+                      onYesPress={async () => {
+                        try {
+
+                          const pr_id = await AsyncStorage.getItem('pr_id');
+                          const id = parseInt(pr_id);
+                          console.log('pr_id', id);
+
+                          // Make API call to fetch cl_id
+                          const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqcreateoffice-ax.php?pr_id=${id}`);
+                          const data = await response.json();
+                          //console.log(data);
+
+                          if (data && data.data && data.data.off_id) {
+                            // Store cl_id in AsyncStorage
+                            await AsyncStorage.setItem('off_id', String(data.data.off_id));
+                            await AsyncStorage.setItem('off_status', String(data.data.status));
+                          }
+
+                          setShowPopup1(false);
+                          navigation.navigate('OfficeProfileCompletion1', { off_id: data.data.off_id });
+
+                        } catch (error) {
+                          console.error('Error fetching off_id:', error);
+                          // Handle error
+                        }
+
+                        // setShowPopup1(false);
+                        // AsyncStorage.setItem('acc_ty_id', '1');
+                        // navigation.navigate('ClinicProfileCompletion4'); 
+                        // setModalVisible(false);
+                      }}
+                    />
+
 
                   </ScrollView>
 
@@ -806,20 +964,21 @@ const HomePage = ({ navigation, route }) => {
                           justifyContent: 'center',
                           alignItems: 'center',
                         }]}>
-                            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>
-                              {activeItem ? activeItem.charAt(0).toUpperCase() : defaultName ? defaultName.name.charAt(0).toUpperCase() : ''}
-                            </Text>
+                          <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>
+                            {activeItem ? activeItem.charAt(0).toUpperCase() :
+                              (defaultName && defaultName.name) ? defaultName.name.charAt(0).toUpperCase() : ''}
+                          </Text>
                         </View>
                       )}
-                      {/* Add more images as needed */}
                     </View>
                     <View style={styles.textColumn}>
-                                          <Text style={[commonStyles.headerText4BL, { marginBottom: height * 0.005 }]}>{truncateText1('Complete Profile', width * 0.4, 10)}</Text>
-                                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Text style={[commonStyles.headerText4BL, { marginBottom: height * 0.005 }]}>
+                        {truncateText1('Complete Profile', width * 0.4, 10)}
+                      </Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Image source={require('../../../assets/img/clock.png')} style={styles.image1} />
                         <Text style={[commonStyles.headerText5G]}>75% completed</Text>
                       </View>
-                      {/* <Text style={[commonStyles.headerText5G]}>75 % completed</Text> */}
                     </View>
                   </View>
                   {/* Button */}
@@ -834,10 +993,9 @@ const HomePage = ({ navigation, route }) => {
                       justifyContent: 'space-between',
                       alignItems: 'center',
                       position: 'absolute',
-                        right: width * 0.02,
-                      //width: width * 0.25,
+                      right: width * 0.02,
                     }}
-                     onPress={() => navigation.navigate('ProfileCompletion4')}
+                    onPress={() => navigation.navigate('ProfileCompletion2')}
                   >
                     <Text style={{
                       fontSize: responsiveFontSize(14),
