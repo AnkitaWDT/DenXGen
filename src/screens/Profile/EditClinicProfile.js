@@ -508,7 +508,7 @@ const EditClinicProfile = ({ navigation, route }) => {
                     noLabel="No"
                     onYesPress={() => {
                         setShowPopup4(false);
-                        navigation.navigate('ProfileCompletion8');
+                        navigation.navigate('EClinicProfileCompletion8', { cl_id: cl_id });
                     }}
                 />
 

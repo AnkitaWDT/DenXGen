@@ -72,6 +72,13 @@ import EClinicProfileCompletion5 from './ClinicProfile/EClinicProfileCompletion5
 import EClinicProfileCompletion7 from './ClinicProfile/EClinicProfileCompletion7';
 import MyOffice from './Profile/MyOffice';
 import EditOfficeProfile from './Profile/EditOfficeProfile';
+import EOfficeProfileCompletion1 from './OfficeProfile/EOfficeProfileCompletion1';
+import EOfficeProfileCompletion2 from './OfficeProfile/EOfficeProfileCompletion2';
+import EOfficeProfileCompletion3 from './OfficeProfile/EOfficeProfileCompletion3';
+import EOfficeProfileCompletion5 from './OfficeProfile/EOfficeProfileCompletion5';
+import EOfficeProfileCompletion7 from './OfficeProfile/EOfficeProfileCompletion7';
+import EClinicProfileCompletion8 from './ClinicProfile/EClinicProfileCompletion8';
+import EOfficeProfileCompletion8 from './OfficeProfile/EOfficeProfileCompletion8';
 
 const Stack = createStackNavigator();
 
@@ -437,6 +444,41 @@ const Navigation = () => {
                 <Stack.Screen
                     name="EClinicProfileCompletion7"
                     component={EClinicProfileCompletion7}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="EClinicProfileCompletion8"
+                    component={EClinicProfileCompletion8}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="EOfficeProfileCompletion1"
+                    component={EOfficeProfileCompletion1}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="EOfficeProfileCompletion2"
+                    component={EOfficeProfileCompletion2}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="EOfficeProfileCompletion3"
+                    component={EOfficeProfileCompletion3}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="EOfficeProfileCompletion5"
+                    component={EOfficeProfileCompletion5}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="EOfficeProfileCompletion7"
+                    component={EOfficeProfileCompletion7}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="EOfficeProfileCompletion8"
+                    component={EOfficeProfileCompletion8}
                     options={{ headerShown: false }}
                 /> 
                 {/* <Stack.Screen

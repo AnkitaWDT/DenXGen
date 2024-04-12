@@ -41,52 +41,42 @@ const SplashScreen = ({ navigation }) => {
                     // User not logged in
                     showLoginScreen();
                 } else {
-                    showHomeScreen();
+                    //showHomeScreen();
 
-                //     const userData = {
-                //         status: await AsyncStorage.getItem('status'),
-                //         isregistered: await AsyncStorage.getItem('isregistered'),
-                //     };
+                    const userData = {
+                        status: await AsyncStorage.getItem('status'),
+                        isregistered: await AsyncStorage.getItem('isregistered'),
+                    };
 
-                //     // Fetch the updated API response
-                //     const phoneNumber = await AsyncStorage.getItem('phoneno');
-                //     const response = await fetch(`${API_CONFIG.API_DOMAIN}${API_CONFIG.loginUrl}?phno=${phoneNumber}`);
-                //     const apiData = await response.json();
+                    // Fetch the updated API response
+                    const phoneNumber = await AsyncStorage.getItem('phoneno');
+                    const response = await fetch(`${API_CONFIG.API_DOMAIN}${API_CONFIG.loginUrl}?phno=${phoneNumber}`);
+                    const apiData = await response.json();
 
-                //     // Update the userData object with new values
-                //     userData.status = apiData.data.status;
-                //     //userData.isregistered = apiData.data.isregistered.toString(); // Convert to string
+                    // Update the userData object with new values
+                    userData.status = apiData.data.status;
+                    //userData.isregistered = apiData.data.isregistered.toString(); // Convert to string
 
-                //     // Save the updated userData object back to AsyncStorage
-                //     await AsyncStorage.setItem('status', userData.status);
-                //     await AsyncStorage.setItem('isregistered', userData.isregistered);
+                    // Save the updated userData object back to AsyncStorage
+                    await AsyncStorage.setItem('status', userData.status);
 
-                //     console.log("Status:", userData.status);
-                //     console.log("IsRegistered:", userData.isregistered);
+                    console.log("Status:", userData.status);
 
-                //     // Compare the current and new userData.status values
-                //    if (parseInt(userData.status) === 1 && parseInt(userData.isregistered) === 1) {
+                    // Compare the current and new userData.status values
+                   if (parseInt(userData.status) === 1) {
 
-                //         console.log('HomeScreen');
-                //         showHomeScreen();
-                //     }
-                //     else if (parseInt(userData.status) === 0) {
-                //         console.log('SelectCategory');
-                //        showHomeScreen();
-                //         //showSelectCategoryScreen();
-                //     }
-                //    else if (parseInt(userData.status) === 0 ) {
-                //        console.log('Profile');
-                //        showHomeScreen();
-                //    }
-                //     else if (parseInt(userData.status) === 1 ) {
-                //        console.log('Profile');
-                //        showHomeScreen();
-                //    }
-                //     else {
-                //         console.log('WaitingScreen2');
-                //         null;
-                //     }
+                        console.log('HomeScreen');
+                        showHomeScreen();
+                    }
+                    else if (parseInt(userData.status) === 0) {
+                        console.log('SelectCategory');
+                       showSelectCategoryScreen();
+                        //showSelectCategoryScreen();
+                    }
+                    else {
+                        console.log('WaitingScreen2');
+                        null;
+                    }
                 }
             } catch (error) {
                 // Handle AsyncStorage errors

@@ -223,6 +223,14 @@ const OfficeProfileCompletion2 = ({ navigation, route }) => {
     //     //navigation.navigate('ClinicProfileCompletion3');
     // };
 
+    const removeInput = (day, index) => {
+        setSelectedTimes(prevState => {
+            const updatedTimes = { ...prevState };
+            updatedTimes[day][index] = { from: '', to: '' }; // Clear both inputs
+            return updatedTimes;
+        });
+    };
+    
     return (
         <SafeAreaView style={{ flex: 1 }}>
             {isLoading ? (
@@ -320,6 +328,17 @@ const OfficeProfileCompletion2 = ({ navigation, route }) => {
                                                                 editable={false}
                                                             />
                                                         </TouchableOpacity>
+                                                        {(time.from && time.to) ? ( // Render remove image if both inputs have values
+                                                            <TouchableOpacity onPress={() => removeInput(day, index)}>
+                                                                <Image
+                                                                    source={require('../../../assets/img/remove.png')}
+                                                                    style={{ width: 20, height: 20, marginLeft: 10 }}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        ) : (
+                                                            // Placeholder element with the same size as the remove image
+                                                            <View style={{ width: 20, height: 20, marginLeft: 10 }} />
+                                                        )}
                                                     </View>
                                                 ))}
                                             </View>

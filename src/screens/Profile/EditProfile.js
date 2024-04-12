@@ -87,7 +87,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/nameE.png')}
+                                        source={require('../../../assets/img/nameP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -99,7 +99,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/conP.png')}
+                                        source={require('../../../assets/img/callP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -111,7 +111,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/mailE.png')}
+                                        source={require('../../../assets/img/mailP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -135,7 +135,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/YouP.png')}
+                                        source={require('../../../assets/img/aboutP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -202,7 +202,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/mailPP.png')}
+                                        source={require('../../../assets/img/licenceP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -214,7 +214,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/serP.png')}
+                                        source={require('../../../assets/img/servicesP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -226,7 +226,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/serP.png')}
+                                        source={require('../../../assets/img/specialityP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -250,7 +250,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/keyP.png')}
+                                        source={require('../../../assets/img/qualiP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -305,7 +305,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/genderP.png')}
+                                        source={require('../../../assets/img/eduP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -317,7 +317,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/mailPP.png')}
+                                        source={require('../../../assets/img/expP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -373,7 +373,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/mailPP.png')}
+                                        source={require('../../../assets/img/homeVP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -386,7 +386,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/aboutP.png')}
+                                        source={require('../../../assets/img/langP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -398,7 +398,7 @@ const EditProfile = ({ navigation }) => {
                              <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/serP.png')}
+                                        source={require('../../../assets/img/qualP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -410,7 +410,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/mailPP.png')}
+                                        source={require('../../../assets/img/registrationP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -423,7 +423,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/serP.png')}
+                                        source={require('../../../assets/img/paymentP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -479,7 +479,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/genderP.png')}
+                                        source={require('../../../assets/img/videoP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -491,7 +491,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/mailPP.png')}
+                                        source={require('../../../assets/img/awardsP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -503,7 +503,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/mailPP.png')}
+                                        source={require('../../../assets/img/blogP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -515,7 +515,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/nameP.png')}
+                                        source={require('../../../assets/img/socialP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -541,7 +541,7 @@ const EditProfile = ({ navigation }) => {
                     noLabel="No"
                     onYesPress={() => {
                         setShowPopup4(false);
-                        navigation.navigate('ProfileCompletion8');
+                        navigation.navigate('NDProfileCompletion8');
                     }}
                 />
 
@@ -570,7 +570,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/genderP.png')}
+                                        source={require('../../../assets/img/imageP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -582,7 +582,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/mailPP.png')}
+                                        source={require('../../../assets/img/imageP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -608,7 +608,7 @@ const EditProfile = ({ navigation }) => {
                     noLabel="No"
                     onYesPress={() => {
                         setShowPopup5(false);
-                        navigation.navigate('NDProfileCompletion3');
+                        navigation.navigate('ProfileCompletion3');
                     }}
                 />
 
@@ -638,7 +638,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/genderP.png')}
+                                        source={require('../../../assets/img/vidP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -650,7 +650,7 @@ const EditProfile = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/mailPP.png')}
+                                        source={require('../../../assets/img/galleryP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -676,7 +676,7 @@ const EditProfile = ({ navigation }) => {
                     noLabel="No"
                     onYesPress={() => {
                         setShowPopup6(false);
-                        navigation.navigate('ProfileCompletion7');
+                        navigation.navigate('NDProfileCompletion7');
                     }}
                 />
 

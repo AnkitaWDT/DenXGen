@@ -93,13 +93,12 @@ const OfficeProfileCompletion3 = ({ navigation, route }) => {
                 if (!response.ok) {
                     throw new Error('Profile image upload failed');
                 }
-                // Log the response to debug
+                //setProfileImage(profile_pic);
                 const responseData = await response.text();
                 console.log('Response from server:', responseData);
             }
         } catch (error) {
-            console.error('Error uploading profile image:', error);
-            // Handle error
+            ToastAndroid.show('Error uploading profile image', ToastAndroid.SHORT);
         }
     };
 
@@ -148,6 +147,8 @@ const OfficeProfileCompletion3 = ({ navigation, route }) => {
                     },
                 });
 
+                //setBannerImage(profile_banner);
+
                 const responseData = await response.text();
                 console.log('Response from server:', responseData);
 
@@ -158,8 +159,7 @@ const OfficeProfileCompletion3 = ({ navigation, route }) => {
                 console.log('Banner image uploaded successfully:', data);
             }
         } catch (error) {
-            console.error('Error uploading banner image:', error);
-            // Handle error
+            ToastAndroid.show('Error uploading banner image', ToastAndroid.SHORT);
         }
     };
 

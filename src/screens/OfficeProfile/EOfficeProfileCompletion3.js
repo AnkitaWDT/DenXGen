@@ -36,12 +36,12 @@ const responsiveFontSize = (size) => {
 };
 
 
-const EClinicProfileCompletion3 = ({ navigation, route }) => {
+const EOfficeProfileCompletion3 = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [profileImage, setProfileImage] = useState(null);
     const [bannerImage, setBannerImage] = useState(null);
 
-    const { cl_id } = route.params;
+    const { off_id } = route.params;
 
     const defaultProfileImage = require('../../../assets/img/DProfile.png');
     const defaultBannerImage = require('../../../assets/img/DBanner.png');
@@ -49,7 +49,7 @@ const EClinicProfileCompletion3 = ({ navigation, route }) => {
     useEffect(() => {
         const fetchClinicData = async () => {
             try {
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getclinicvic-ax.php?cl_id=${cl_id}`);
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getofficevic-ax.php?off_id=${off_id}`);
                 const data = await response.json();
                 if (data.code === 1 && data.data && data.data.profile_pic) {
                     setProfileImage({ path: data.data.profile_pic });
@@ -65,7 +65,7 @@ const EClinicProfileCompletion3 = ({ navigation, route }) => {
         };
 
         fetchClinicData();
-    }, [cl_id]);
+    }, [off_id]);
 
 
     const handleProfileUpload = async () => {
@@ -89,14 +89,14 @@ const EClinicProfileCompletion3 = ({ navigation, route }) => {
                 });
 
                 const pr_id = await AsyncStorage.getItem('pr_id');
-                //const cl_id = await AsyncStorage.getItem('cl_id');
-                const id = parseInt(cl_id);
+                //const off_id = await AsyncStorage.getItem('off_id');
+                const id = parseInt(off_id);
                 const id1 = parseInt(pr_id);
                 console.log(id);
                 console.log(pr_id);
                 if (id) {
                     console.log(id);
-                    formData.append('cl_id', id);
+                    formData.append('off_id', id);
                 }
                 if (id1) {
                     console.log(id1);
@@ -104,7 +104,7 @@ const EClinicProfileCompletion3 = ({ navigation, route }) => {
                 }
                 console.log(formData);
                 // Send formData to the server for profile image upload
-                const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqclinicprofileimg-ax.php', {
+                const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqofficeprofileimg-ax.php', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -145,14 +145,14 @@ const EClinicProfileCompletion3 = ({ navigation, route }) => {
                 });
 
                 const pr_id = await AsyncStorage.getItem('pr_id');
-                //const cl_id = await AsyncStorage.getItem('cl_id');
-                const id = parseInt(cl_id);
+                //const off_id = await AsyncStorage.getItem('off_id');
+                const id = parseInt(off_id);
                 const id1 = parseInt(pr_id);
                 console.log(id);
                 console.log(pr_id);
                 if (id) {
                     console.log(id);
-                    formData.append('cl_id', id);
+                    formData.append('off_id', id);
                 }
                 if (id1) {
                     console.log(id1);
@@ -160,7 +160,7 @@ const EClinicProfileCompletion3 = ({ navigation, route }) => {
                 }
                 console.log(formData);
                 // Send formData to the server for banner image upload
-                const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqcliniccoverimg-ax.php', {
+                const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqofficecoverimg-ax.php', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -324,7 +324,7 @@ const EClinicProfileCompletion3 = ({ navigation, route }) => {
         // }
 
         //navigation.navigate('ClinicProfileCompletion4');
-        navigation.navigate('EditClinicProfile', { cl_id: cl_id })
+        navigation.navigate('EditOfficeProfile', { off_id: off_id })
         console.log('ProfileCompletion4');
     };
 
@@ -467,4 +467,4 @@ const styles = StyleSheet.create({
         resizeMode: 'cover',
     },
 });
-export default EClinicProfileCompletion3;
+export default EOfficeProfileCompletion3;

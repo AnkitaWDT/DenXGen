@@ -33,7 +33,9 @@ const responsiveFontSize = (size) => {
 };
 
 
-const NDProfileCompletion8 = ({ navigation }) => {
+const EOfficeProfileCompletion8 = ({ navigation, route }) => {
+
+    const { off_id } = route.params;
 
     const [isSocialModalVisible, setIsSocialModalVisible] = useState(false);
     const [isVideoModalVisible, setIsVideoModalVisible] = useState(false);
@@ -232,8 +234,6 @@ const NDProfileCompletion8 = ({ navigation }) => {
 
 
     const handleNext = async () => {
-        const pr_id = await AsyncStorage.getItem('pr_id');
-        const id = parseInt(pr_id);
 
         const socialMediaArray = [
             { instagram: instaLink || "" },
@@ -244,7 +244,7 @@ const NDProfileCompletion8 = ({ navigation }) => {
 
 
         const userData = {
-            pr_id: id,
+            off_id: off_id,
             vid_id: videoInputs,
             awa_id: awardsInputs,
             pub_id: blogsInputs,
@@ -264,7 +264,7 @@ const NDProfileCompletion8 = ({ navigation }) => {
         };
 
         try {
-            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls8-ax.php`, userData);
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqofficedtls4-ax.php`, userData);
 
             console.log('dataresponse', response.data);
             ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
@@ -273,79 +273,47 @@ const NDProfileCompletion8 = ({ navigation }) => {
         }
 
         console.log('User Data:', userData);
-        navigation.navigate('EditProfile')
+        navigation.navigate('EditOfficeProfile', { off_id: off_id })
     };
 
-    // const [userData, setUserData] = useState(null);
-
-
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             const pr_id = await AsyncStorage.getItem('pr_id');
-    //             const id = parseInt(pr_id);
-
-    //             const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getvic-ax.php?prid=${id}`);
-    //             const data = await response.json();
-    //             setUserData(data.data);
-    //         } catch (error) {
-    //             setIsLoading(false);
-    //         }
-    //     };
-
-    //     fetchData(); // Call the function immediately
-
-    // }, []);
-
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchClinicData = async () => {
             try {
-                const pr_id = await AsyncStorage.getItem('pr_id');
-                const id = parseInt(pr_id);
+                const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getofficevic-ax.php?off_id=${off_id}`);
+                const clinicData = response.data.data;
+                setIsLoading(false);
 
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getvic-ax.php?prid=${id}`);
-                const responseData = await response.json(); // Parse response JSON
-                console.log('API response:', responseData); // Log the response to understand its structure
+                // Prefill data from the API response
+                if (clinicData) {
+                    // Prefill video links
+                    const videoLinks = clinicData.vidList.map(video => video.links);
+                    setVideoInputs(videoLinks);
 
-                if (response.ok) {
-                    const data = responseData.data;
-                    setIsLoading(false);
+                    // Prefill awards
+                    const awards = clinicData.awaList.map(award => award.links);
+                    setAwardsInputs(awards);
 
-                    // Prefill data from the API response
-                    if (data) {
-                        // Prefill video links
-                        const videoLinks = data.vidList.map(video => video.links);
-                        setVideoInputs(videoLinks);
+                    // Prefill publication/blog links
+                    const publications = clinicData.pubList.map(publication => publication.links);
+                    setBlogsInputs(publications);
 
-                        // Prefill awards
-                        const awards = data.awaList.map(award => award.links);
-                        setAwardsInputs(awards);
-
-                        // Prefill publication/blog links
-                        const publications = data.pubList.map(publication => publication.links);
-                        setBlogsInputs(publications);
-
-                        // Prefill social media links
-                        const socialMedia = data.socialList[0]; // Assuming there's only one entry in socialList
-                        if (socialMedia) {
-                            setInstaLink(socialMedia.instagram || null);
-                            setWhatsappLink(socialMedia.whatsapp || null);
-                            setLinkedInLink(socialMedia.linkedin || null);
-                            setFacebookLink(socialMedia.facebook || null);
-                            setOtherLink(socialMedia.other || null);
-                        }
+                    // Prefill social media links
+                    const socialMedia = clinicData.socialList[0]; // Assuming there's only one entry in socialList
+                    if (socialMedia) {
+                        setInstaLink(socialMedia.instagram || null);
+                        setWhatsappLink(socialMedia.whatsapp || null);
+                        setLinkedInLink(socialMedia.linkedin || null);
+                        setFacebookLink(socialMedia.facebook || null);
+                        setOtherLink(socialMedia.other || null);
                     }
-                } else {
-                    console.error('Failed to fetch data:', responseData.message);
                 }
             } catch (error) {
                 console.error('Error fetching clinic data:', error);
             }
         };
 
-        fetchData();
-    }, []);
-
+        fetchClinicData();
+    }, [off_id]);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -362,7 +330,7 @@ const NDProfileCompletion8 = ({ navigation }) => {
                         <View style={styles.headerTextContainer}>
                             <Text style={[commonStyles.headerText1BL, {
                                 marginBottom: moderateScale(6), textAlign: 'center'
-                            }]}>Gallery</Text>
+                            }]}>Clinic Links</Text>
                             <Text style={[commonStyles.headerText2BL, {
                                 textAlign: 'center', paddingHorizontal: width * 0.02
                             }]}>Choose your career category and unlock endless possibilities.</Text>
@@ -794,7 +762,7 @@ const styles = StyleSheet.create({
     headerTextContainer: {
         width: '100%',
         alignItems: 'center',
-       marginBottom: 20
+        marginBottom: 20,
     },
     headerText1: {
         fontSize: 24,
@@ -1083,4 +1051,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default NDProfileCompletion8;
+export default EOfficeProfileCompletion8;

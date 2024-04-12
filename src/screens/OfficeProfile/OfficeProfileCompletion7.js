@@ -190,12 +190,7 @@ const OfficeProfileCompletion7 = ({ navigation, route }) => {
     // };
 
     const handleNext = () => {
-        if (videoPath && imagePaths.length === 5) {
-            //navigation.navigate('ProfileCompletion5');
-            navigation.navigate('OfficeProfileCompletion8', { off_id: off_id });
-        } else {
-            ToastAndroid.show('Please upload both video and 5 images.', ToastAndroid.SHORT);
-        }
+        navigation.navigate('OfficeProfileCompletion8', { off_id: off_id });
     };
 
     const handleSkip = () => {

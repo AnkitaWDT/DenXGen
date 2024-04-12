@@ -645,7 +645,7 @@ const MyOffice = ({ navigation, route }) => {
                             <TouchableOpacity
                                 style={[commonStyles.buttonS, { marginRight: height * 0.01 }]}
                                 activeOpacity={0.8}
-                                onPress={() => navigation.navigate('EditClinicProfile', { off_id: off_id })}
+                                onPress={() => navigation.navigate('EditOfficeProfile', { off_id: off_id })}
                             //     navigation.navigate('ClinicProfileCompletion7', { off_id: off_id });
                             >
                                 <Text style={commonStyles.buttonTextS}>Edit profile</Text>

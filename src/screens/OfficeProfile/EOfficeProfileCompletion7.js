@@ -25,7 +25,6 @@ import { ProgressBar } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AlertPopup from '../../components/AlertPopup';
 import Video from 'react-native-video';
-
 const { width, height } = Dimensions.get('window');
 
 const responsiveFontSize = (size) => {
@@ -35,7 +34,9 @@ const responsiveFontSize = (size) => {
 };
 
 
-const NDProfileCompletion7 = ({ navigation }) => {
+const EOfficeProfileCompletion7 = ({ navigation, route }) => {
+    const { off_id } = route.params;
+
     const [isLoading, setIsLoading] = useState(true);
     const [videoPath, setVideoPath] = useState(null);
     const [imagePaths, setImagePaths] = useState([]);
@@ -44,33 +45,6 @@ const NDProfileCompletion7 = ({ navigation }) => {
     const [removingIndex, setRemovingIndex] = useState(null);
 
     const [imageInfo, setImageInfo] = useState([]);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const pr_id = await AsyncStorage.getItem('pr_id');
-                const id = parseInt(pr_id);
-
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getvic-ax.php?prid=${id}`);
-                const data = await response.json();
-                console.log(data.data.profile_video);
-                if (data.data.profile_video) {
-                    setVideoPath(data.data.profile_video);
-                }
-                // Update gallery list state
-                if (data.data.galleryList && data.data.galleryList.length > 0) {
-                    const galleryImages = data.data.galleryList.map(item => item.gal_image);
-                    setImageInfo(galleryImages);
-                }
-                setIsLoading(false);
-            } catch (error) {
-                setIsLoading(false);
-            }
-        };
-
-        fetchData(); // Call the function immediately
-
-    }, []);
 
 
     useEffect(() => {
@@ -109,11 +83,11 @@ const NDProfileCompletion7 = ({ navigation }) => {
                     type: profile_video.mime,
                     name: 'video.mp4',
                 });
-                const pr_id = await AsyncStorage.getItem('pr_id');
-                if (pr_id) {
-                    formData.append('pr_id', parseInt(pr_id));
+                //const cl_id = await AsyncStorage.getItem('cl_id');
+                if (off_id) {
+                    formData.append('off_id', parseInt(off_id));
                 }
-                const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls72-ax.php', {
+                const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqofficevideo-ax.php', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -145,12 +119,12 @@ const NDProfileCompletion7 = ({ navigation }) => {
                     name: `image_${imageInfo.length + 1}.jpg`,
                 });
 
-                const pr_id = await AsyncStorage.getItem('pr_id');
-                if (pr_id) {
-                    formData.append('pr_id', parseInt(pr_id));
+                //const cl_id = await AsyncStorage.getItem('cl_id');
+                if (off_id) {
+                    formData.append('off_id', parseInt(off_id));
                 }
 
-                const uploadResponse = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls71-ax', {
+                const uploadResponse = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqofficegallery-ax.php', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -167,8 +141,8 @@ const NDProfileCompletion7 = ({ navigation }) => {
                 const responseData = await uploadResponse.json();
 
                 console.log(responseData);
-                if (responseData && responseData.data && responseData.data.pr_gal_id) {
-                    setImageInfo(prevInfo => [...prevInfo, { path: response.path, pr_gal_id: responseData.data.pr_gal_id }]);
+                if (responseData && responseData.data && responseData.data.off_gal_id) {
+                    setImageInfo(prevInfo => [...prevInfo, { path: response.path, off_gal_id: responseData.data.off_gal_id }]);
                 } else {
                     throw new Error('Invalid response format');
                 }
@@ -186,8 +160,8 @@ const NDProfileCompletion7 = ({ navigation }) => {
 
     const confirmRemoveImage = async () => {
         try {
-            const pr_gal_id = imageInfo[removingIndex].pr_gal_id;
-            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdelpersonaldtls71-ax.php?pr_gal_id=${pr_gal_id}`);
+            const off_gal_id = imageInfo[removingIndex].off_gal_id;
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdelofficegallery-ax.php?off_gal_id=${off_gal_id}`);
 
             if (!response.ok) {
                 throw new Error('Failed to remove image');
@@ -217,23 +191,55 @@ const NDProfileCompletion7 = ({ navigation }) => {
     // };
 
     const handleNext = () => {
-        navigation.navigate('EditProfile');
+        navigation.navigate('EditOfficeProfile', { off_id: off_id })
     };
 
-    const handleSkip = () => {
-        navigation.navigate('ProfileCompletion8');
-    };
 
     const currentStep = 7; // For example, current step is 4
     const totalSteps = 9; // Total number of steps
 
     const progressPercentage = (currentStep / totalSteps) * 100; // Calculate progress percentage
 
+    const [profileVideoUrl, setProfileVideoUrl] = useState('');
+    const [galleryImages, setGalleryImages] = useState([]);
+
+    useEffect(() => {
+        const fetchClinicData = async () => {
+            try {
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getofficevic-ax.php?off_id=${off_id}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch clinic data');
+                }
+                const data = await response.json();
+                if (data.code === 1 && data.data) {
+                    // Update profile video state
+                    if (data.data.profile_video) {
+                        setVideoPath(data.data.profile_video);
+                    }
+                    // Update gallery list state
+                    if (data.data.galleryList && data.data.galleryList.length > 0) {
+                        const galleryImages = data.data.galleryList.map(item => item.gal_image);
+                        setImageInfo(galleryImages);
+                    }
+                } else {
+                    throw new Error('Invalid response format');
+                }
+                setIsLoading(false); // Update loading state
+            } catch (error) {
+                console.error('Error fetching clinic data:', error);
+                setIsLoading(false); // Update loading state in case of error
+            }
+        };
+
+        fetchClinicData();
+    }, [off_id]);
+
+
     return (
         <SafeAreaView style={{ flex: 1 }}>
             {isLoading ? (
                 <View style={{ justifyContent: 'center', alignSelf: 'center' }}>
-                    {/* Placeholder for loading animation */}
+                    <Animation />
                 </View>
             ) : (
                 <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
@@ -251,28 +257,19 @@ const NDProfileCompletion7 = ({ navigation }) => {
                             <Text style={[commonStyles.headerText4BL, { marginBottom: 10 }]}>Upload Video here </Text>
                             <TouchableOpacity style={styles.uploadBanner} onPress={pickVideo}>
                                 <View style={styles.videoContainer}>
-                                    {/* {videoPath ? (
-                                        <View style={styles.bannerClickArea}>
-                                            <Image source={{ uri: videoPath }} style={styles.BannerImage} />
-                                        </View>
+                                    {videoPath ? (
+
+                                        <Video source={{ uri: videoPath }}
+                                            //source={{ uri: 'https://www.denxgen.com/images/clinic-page/video-11.mp4' }} // Replace with the actual video URL
+                                            style={styles.bannerClickArea}
+                                            controls={false}
+                                            resizeMode="contain"
+                                        />
                                     ) : (
                                         <View style={styles.bannerClickArea}>
                                             <Image source={require('../../../assets/img/Add.png')} style={styles.defaultBannerImage} />
                                         </View>
-                                    )} */}
-                                        {videoPath ? (
-
-                                            <Video source={{ uri: videoPath }}
-                                                //source={{ uri: 'https://www.denxgen.com/images/clinic-page/video-11.mp4' }} // Replace with the actual video URL
-                                                style={styles.bannerClickArea}
-                                                controls={false}
-                                                resizeMode="contain"
-                                            />
-                                        ) : (
-                                            <View style={styles.bannerClickArea}>
-                                                <Image source={require('../../../assets/img/Add.png')} style={styles.defaultBannerImage} />
-                                            </View>
-                                        )}
+                                    )}
                                 </View>
                             </TouchableOpacity>
                         </View>
@@ -306,43 +303,44 @@ const NDProfileCompletion7 = ({ navigation }) => {
                                         </TouchableOpacity>
                                     ))}
                                 </View> */}
-                                    <View style={{ justifyContent: 'center' }}>
-                                        <View style={styles.imageGrid}>
-                                            {imageInfo.map((path, index) => (
-                                                <View key={index} style={styles.imageContainer}>
-                                                    <Image source={{ uri: path }} style={styles.defaultImageU} />
-                                                    <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveImage(index)}>
-                                                        <Image source={require('../../../assets/img/remove.png')} style={styles.removeIcon} />
-                                                    </TouchableOpacity>
-                                                    <AlertPopup
-                                                        visible={showPopup}
-                                                        onRequestClose={() => setShowPopup(false)}
-                                                        title="Confirm Removal"
-                                                        message="Are you sure you want to remove this image?"
-                                                        yesLabel="Yes"
-                                                        noLabel="No"
-                                                        onYesPress={confirmRemoveImage}
-                                                        onNoPress={cancelRemoveImage}
-                                                    />
-                                                </View>
-                                            ))}
-                                            {[...Array(Math.max(0, 6 - imageInfo.length))].map((_, index) => (
-                                                <TouchableOpacity key={index} style={styles.imageContainer} onPress={handleImageUpload}>
-                                                    <View style={styles.defaultImageContainer}>
-                                                        <Image source={require('../../../assets/img/Add.png')} style={styles.defaultImage} />
-                                                    </View>
+                                <View style={{ justifyContent: 'center' }}>
+                                    <View style={styles.imageGrid}>
+                                        {imageInfo.map((path, index) => (
+                                            <View key={index} style={styles.imageContainer}>
+                                                <Image source={{ uri: path }} style={styles.defaultImageU} />
+                                                <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveImage(index)}>
+                                                    <Image source={require('../../../assets/img/remove.png')} style={styles.removeIcon} />
                                                 </TouchableOpacity>
-                                            ))}
-                                        </View>
+                                                <AlertPopup
+                                                    visible={showPopup}
+                                                    onRequestClose={() => setShowPopup(false)}
+                                                    title="Confirm Removal"
+                                                    message="Are you sure you want to remove this image?"
+                                                    yesLabel="Yes"
+                                                    noLabel="No"
+                                                    onYesPress={confirmRemoveImage}
+                                                    onNoPress={cancelRemoveImage}
+                                                />
+                                            </View>
+                                        ))}
+                                        {[...Array(Math.max(0, 6 - imageInfo.length))].map((_, index) => (
+                                            <TouchableOpacity key={index} style={styles.imageContainer} onPress={handleImageUpload}>
+                                                <View style={styles.defaultImageContainer}>
+                                                    <Image source={require('../../../assets/img/Add.png')} style={styles.defaultImage} />
+                                                </View>
+                                            </TouchableOpacity>
+                                        ))}
                                     </View>
+                                </View>
+
                             </View>
                         </View>
                         <TouchableOpacity style={[commonStyles.button]} onPress={handleNext} activeOpacity={0.8}>
                             <Text style={commonStyles.buttonText}>Continue</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={[commonStyles.button1, { marginBottom: 20 }]} onPress={handleSkip} activeOpacity={0.8}>
+                        {/* <TouchableOpacity style={[commonStyles.button1, { marginBottom: 20 }]} onPress={handleSkip} activeOpacity={0.8}>
                             <Text style={commonStyles.buttonText1}>Skip</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                 </ScrollView>
             )}
@@ -464,4 +462,5 @@ const styles = StyleSheet.create({
     },
 });
 
-export default NDProfileCompletion7;
+
+export default EOfficeProfileCompletion7;

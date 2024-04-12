@@ -95,111 +95,107 @@ const OTPScreen = ({ navigation, route }) => {
     //     setInputValues(newInputValues);
     // };
 
-    const handleVerify = async () => {
-        try {
-            const enteredOTP = otp.join('');
-
-            if (!enteredOTP) {
-                console.log('Please enter OTP!');
-                ToastAndroid.show('Please enter OTP!', ToastAndroid.SHORT);
-                return;
-            }
-
-            // Retrieve password from AsyncStorage
-            const password = await AsyncStorage.getItem('password');
-
-            if (!password) {
-                console.log('Password not found in AsyncStorage.');
-                ToastAndroid.show('Password not found.', ToastAndroid.SHORT);
-                return;
-            }
-
-            if (enteredOTP === password) {
-                // Password matches OTP
-                console.log('OTP Verified Successfully!');
-                // Navigate to next screen
-              
-                ToastAndroid.show('OTP Verified Successfully!', ToastAndroid.SHORT);
-                await AsyncStorage.setItem('userLoggedIn', 'true');
-                navigation.navigate('Personalize');
-            } else {
-                // Invalid OTP
-                console.log('Invalid OTP!');
-                ToastAndroid.show('Invalid OTP!', ToastAndroid.SHORT);
-            }
-
-            // Reset OTP input fields
-            setOtp(['', '', '', '', '']);
-        } catch (error) {
-            console.log('Error occurred:', error);
-            ToastAndroid.show('Error occurred. Please try again.', ToastAndroid.SHORT);
-        }
-    };
-
-
     // const handleVerify = async () => {
     //     try {
+    //         const enteredOTP = otp.join('');
 
-    //         const endpoint = `${API_CONFIG.API_DOMAIN}${API_CONFIG.loginUrl}?phno=${encodeURIComponent(phoneNumber)}`;
-
-    //         const response2 = await fetch(endpoint);
-    //         const data = await response2.json();
-
-    //         if (data.code === 1) {
-    //             const correctOTP = data.data.password.toString();
-    //             const enteredOTP = otp.join('');
-
-    //             console.log(correctOTP);
-    //             console.log(enteredOTP);
-
-    //             if (enteredOTP === correctOTP) {
-    //                 console.log('OTP Verified Successfully!');
-
-    //                 await AsyncStorage.setItem('userLoggedIn', 'true');
-    //                 await AsyncStorage.setItem('isregistered', data.data.isregistered.toString());
-    //                 await AsyncStorage.setItem('status', data.data.status.toString());
-    //                 await AsyncStorage.setItem('pr_id', String(data.data.pr_id));
-    //                 const pr_id = await AsyncStorage.getItem('pr_id');
-    //                 console.log(pr_id);
-
-    //                 ToastAndroid.show('OTP Verified Successfully!', ToastAndroid.SHORT);
-
-    //                 console.log("Status:", data.data.status);
-    //                 console.log("IsRegistered:", data.data.isregistered);
-
-    //                 if (parseInt(data.data.status) === 0 && parseInt(data.data.isregistered) === 0) {
-    //                     navigation.replace('Personalize', { phoneNumber: phoneNumber });
-    //                 } else if (parseInt(data.data.status) === 0 && parseInt(data.data.isregistered) === 1) {
-    //                     navigation.replace('Personalize', { phoneNumber: phoneNumber });
-    //                 } else if (parseInt(data.data.status) === 1 && parseInt(data.data.isregistered) === 0) {
-    //                     navigation.replace('Personalize');
-    //                 } else if (parseInt(data.data.status) === 1 && parseInt(data.data.isregistered) === 1) {
-    //                     navigation.replace('HomeScreen');
-    //                 } 
-    //                 else {
-    //                     console.log('WaitingScreen2');
-    //                     navigation.replace('WaitingScreen', { phoneNumber: phoneNumber });
-    //                 }
-    //             } else {
-    //                 console.log('Invalid OTP!');
-    //                 ToastAndroid.show('Invalid OTP!', ToastAndroid.SHORT);
-    //                 // Perform invalid OTP action
-    //             }
-    //         } else {
-    //             console.log('Failed to retrieve OTP. Please try again.');
-    //             ToastAndroid.show(
-    //                 'Failed to retrieve OTP. Please try again.',
-    //                 ToastAndroid.SHORT,
-    //             );
-    //             // Perform OTP retrieval failure action
+    //         if (!enteredOTP) {
+    //             console.log('Please enter OTP!');
+    //             ToastAndroid.show('Please enter OTP!', ToastAndroid.SHORT);
+    //             return;
     //         }
 
-    //         setOtp(['', '', '', '', '']); // Reset OTP input fields
+    //         // Retrieve password from AsyncStorage
+    //         const password = await AsyncStorage.getItem('password');
+
+    //         if (!password) {
+    //             console.log('Password not found in AsyncStorage.');
+    //             ToastAndroid.show('Password not found.', ToastAndroid.SHORT);
+    //             return;
+    //         }
+
+    //         if (enteredOTP === password) {
+    //             // Password matches OTP
+    //             console.log('OTP Verified Successfully!');
+    //             // Navigate to next screen
+              
+    //             ToastAndroid.show('OTP Verified Successfully!', ToastAndroid.SHORT);
+    //             await AsyncStorage.setItem('userLoggedIn', 'true');
+    //             navigation.navigate('Personalize');
+    //         } else {
+    //             // Invalid OTP
+    //             console.log('Invalid OTP!');
+    //             ToastAndroid.show('Invalid OTP!', ToastAndroid.SHORT);
+    //         }
+
+    //         // Reset OTP input fields
+    //         setOtp(['', '', '', '', '']);
     //     } catch (error) {
     //         console.log('Error occurred:', error);
-    //         // Perform error handling
+    //         ToastAndroid.show('Error occurred. Please try again.', ToastAndroid.SHORT);
     //     }
     // };
+
+
+    const handleVerify = async () => {
+        try {
+
+            const endpoint = `${API_CONFIG.API_DOMAIN}${API_CONFIG.loginUrl}?phno=${encodeURIComponent(phoneNumber)}`;
+
+            const response2 = await fetch(endpoint);
+            const data = await response2.json();
+
+            if (data.code === 1) {
+                const correctOTP = data.data.password.toString();
+                const enteredOTP = otp.join('');
+
+                console.log(correctOTP);
+                console.log(enteredOTP);
+
+                if (enteredOTP === correctOTP) {
+                    console.log('OTP Verified Successfully!');
+
+                    await AsyncStorage.setItem('userLoggedIn', 'true');
+                    await AsyncStorage.setItem('isregistered', data.data.isregistered.toString());
+                    await AsyncStorage.setItem('status', data.data.status.toString());
+                    await AsyncStorage.setItem('pr_id', String(data.data.pr_id));
+                    const pr_id = await AsyncStorage.getItem('pr_id');
+                    console.log(pr_id);
+
+                    ToastAndroid.show('OTP Verified Successfully!', ToastAndroid.SHORT);
+
+                    console.log("Status:", data.data.status);
+                    console.log("IsRegistered:", data.data.isregistered);
+
+                    if (parseInt(data.data.status) === 0) {
+                        navigation.replace('SelectCategory'); 
+                    } else if (parseInt(data.data.status) === 1) {
+                        navigation.replace('HomeScreen');
+                    } 
+                    else {
+                        console.log('WaitingScreen2');
+                        navigation.replace('WaitingScreen', { phoneNumber: phoneNumber });
+                    }
+                } else {
+                    console.log('Invalid OTP!');
+                    ToastAndroid.show('Invalid OTP!', ToastAndroid.SHORT);
+                    // Perform invalid OTP action
+                }
+            } else {
+                console.log('Failed to retrieve OTP. Please try again.');
+                ToastAndroid.show(
+                    'Failed to retrieve OTP. Please try again.',
+                    ToastAndroid.SHORT,
+                );
+                // Perform OTP retrieval failure action
+            }
+
+            setOtp(['', '', '', '', '']); // Reset OTP input fields
+        } catch (error) {
+            console.log('Error occurred:', error);
+            // Perform error handling
+        }
+    };
 
 
     const focusPreviousInput = index => {

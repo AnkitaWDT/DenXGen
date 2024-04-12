@@ -148,7 +148,7 @@ const MyProfile = ({ navigation }) => {
                     <ScrollView style={styles.subContainer} showsVerticalScrollIndicator={false}>
                         <View>
 
-                                <TouchableOpacity
+                                {/* <TouchableOpacity
                                     activeOpacity={0.8}
                                     // onPress={() => navigation.navigate('PersonalProfile')}                            
                                  style={styles.profileRowContainer}>
@@ -161,7 +161,7 @@ const MyProfile = ({ navigation }) => {
                                             marginVertical: 3,
                                         }]} numberOfLines={1} ellipsizeMode="tail">MDS,BDS ┃ Prosthodontics ┃ 10+ years exp</Text>
                                     </View>
-                                </TouchableOpacity>
+                                </TouchableOpacity> */}
 
                                 <TouchableOpacity
                                     onPress={() => {

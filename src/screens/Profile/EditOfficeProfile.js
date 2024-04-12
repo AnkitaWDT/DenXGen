@@ -38,7 +38,7 @@ const EditOfficeProfile = ({ navigation, route }) => {
                             style={commonStyles.icon}
                         />
                     </TouchableOpacity>
-                    <Text style={commonStyles.backText}>Edit Clinic Profile</Text>
+                    <Text style={commonStyles.backText}>Edit Office Profile</Text>
                     <TouchableOpacity style={commonStyles.backContainer1}
 
                         activeOpacity={0.8}>
@@ -163,7 +163,7 @@ const EditOfficeProfile = ({ navigation, route }) => {
                     onYesPress={() => {
                         setShowPopup0(false);
                         //navigation.navigate('EClinicProfileCompletion1');
-                        navigation.navigate('EClinicProfileCompletion1', { off_id: off_id });
+                        navigation.navigate('EOfficeProfileCompletion1', { off_id: off_id });
                     }}
                 />
 
@@ -218,7 +218,7 @@ const EditOfficeProfile = ({ navigation, route }) => {
                     noLabel="No"
                     onYesPress={() => {
                         setShowPopup1(false);
-                        navigation.navigate('EClinicProfileCompletion2', { off_id: off_id });
+                        navigation.navigate('EOfficeProfileCompletion2', { off_id: off_id });
                     }}
                 />
 
@@ -322,7 +322,7 @@ const EditOfficeProfile = ({ navigation, route }) => {
                     noLabel="No"
                     onYesPress={() => {
                         setShowPopup1(false);
-                        navigation.navigate('EClinicProfileCompletion5', { off_id: off_id });
+                        navigation.navigate('EOfficeProfileCompletion5', { off_id: off_id });
                     }}
                 />
 
@@ -508,7 +508,7 @@ const EditOfficeProfile = ({ navigation, route }) => {
                     noLabel="No"
                     onYesPress={() => {
                         setShowPopup4(false);
-                        navigation.navigate('ProfileCompletion8');
+                        navigation.navigate('EOfficeProfileCompletion8', { off_id: off_id });
                     }}
                 />
 
@@ -575,7 +575,7 @@ const EditOfficeProfile = ({ navigation, route }) => {
                     noLabel="No"
                     onYesPress={() => {
                         setShowPopup5(false);
-                        navigation.navigate('EClinicProfileCompletion3', { off_id: off_id });
+                        navigation.navigate('EOfficeProfileCompletion3', { off_id: off_id });
                     }}
                 />
 
@@ -643,7 +643,7 @@ const EditOfficeProfile = ({ navigation, route }) => {
                     noLabel="No"
                     onYesPress={() => {
                         setShowPopup6(false);
-                        navigation.navigate('EClinicProfileCompletion7', { off_id: off_id });
+                        navigation.navigate('EOfficeProfileCompletion7', { off_id: off_id });
                     }}
                 />
 
