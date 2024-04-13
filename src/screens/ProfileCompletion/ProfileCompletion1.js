@@ -150,10 +150,12 @@ const ProfileCompletion1 = ({ navigation }) => {
         //     navigation.navigate('LoginScreen');
         // }
         const pr_id = await AsyncStorage.getItem('pr_id');
+        console.log(pr_id);
         const id = parseInt(pr_id);
          const pr_ty_id = await AsyncStorage.getItem('pr_ty_id');
 
         const userData = {
+            isregistered: 0,
             pr_ty_id: parseInt(pr_ty_id),
             pr_id: id,
             name: selectedName,

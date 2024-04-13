@@ -395,7 +395,8 @@ const ProfileCompletion3 = ({ navigation }) => {
                         </TouchableOpacity>
 
                         <TouchableOpacity style={[commonStyles.button1, { marginBottom: height * 0.05, marginTop: height * 0.001, }]}
-                            activeOpacity={0.8}>
+                            activeOpacity={0.8}
+                            >
                             <Text style={commonStyles.buttonText1}>Skip</Text>
                         </TouchableOpacity>
 

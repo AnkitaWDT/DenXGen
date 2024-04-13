@@ -158,7 +158,7 @@ const OTPScreen = ({ navigation, route }) => {
                     await AsyncStorage.setItem('userLoggedIn', 'true');
                     await AsyncStorage.setItem('isregistered', data.data.isregistered.toString());
                     await AsyncStorage.setItem('status', data.data.status.toString());
-                    await AsyncStorage.setItem('pr_id', String(data.data.pr_id));
+                    await AsyncStorage.setItem('pr_id', String(data.data.id));
                     const pr_id = await AsyncStorage.getItem('pr_id');
                     console.log(pr_id);
 
@@ -167,9 +167,9 @@ const OTPScreen = ({ navigation, route }) => {
                     console.log("Status:", data.data.status);
                     console.log("IsRegistered:", data.data.isregistered);
 
-                    if (parseInt(data.data.status) === 0) {
+                    if (parseInt(data.data.isregistered) === 0) {
                         navigation.replace('SelectCategory'); 
-                    } else if (parseInt(data.data.status) === 1) {
+                    } else if (parseInt(data.data.isregistered) === 1) {
                         navigation.replace('HomeScreen');
                     } 
                     else {

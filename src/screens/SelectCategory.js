@@ -29,12 +29,14 @@ const SelectCategory = ({ navigation }) => {
         let pr_ty_id;
         if (option === 'Dental Professional') {
             pr_ty_id = '1';
+            navigation.navigate('ProfileCompletion1');
         } else if (option === 'Non-Dental Professional') {
             pr_ty_id = '2';
+            navigation.navigate('ProfileCompletion1');
         }
         try {
             await AsyncStorage.setItem('pr_ty_id', pr_ty_id); // Removed the space before 'pr_ty_id'
-            console.log(pr_ty_id);
+            console.log('pr_ty_id', pr_ty_id);
         } catch (error) {
             console.error('Error setting category ID in AsyncStorage:', error);
         }
@@ -47,7 +49,7 @@ const SelectCategory = ({ navigation }) => {
             console.log('Dental Professional');
         } else if (selectedOption === 'Non-Dental Professional') {
             navigation.navigate('ProfileCompletion1');
-            console.log('Non- Dental Professional');
+            console.log('Non-Dental Professional');
         } else {
             ToastAndroid.show('Please select one option!', ToastAndroid.SHORT);
             console.log('No option selected');

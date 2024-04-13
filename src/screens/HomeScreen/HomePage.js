@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity, Image, TextInput, Modal, Dimensions, ScrollView, ToastAndroid, PermissionsAndroid, PixelRatio, Platform, FlatList } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import commonStyles from '../../components/CommonStyles';
 import CustomPopup from '../../components/CustomPopup';
 import Svg, { Image as SvgImage } from 'react-native-svg';
@@ -59,11 +59,48 @@ const HomePage = ({ navigation, route }) => {
 
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const images = [
-    require('../../../assets/img/BannerHome.jpg'),
-    require('../../../assets/img/BannerHome.jpg'),
-    require('../../../assets/img/BannerHome.jpg'),
-  ];
+  // const images = [
+  //   require('../../../assets/img/BannerHome.jpg'),
+  //   require('../../../assets/img/BannerHome.jpg'),
+  //   require('../../../assets/img/BannerHome.jpg'),
+  // ];
+
+  const [images, setImages] = useState([]);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/gethomebanner1-ax.php');
+        const data = await response.json();
+        if (data && data.code === 1) {
+          setImages(data.data.map(item => item.banner));
+        }
+      } catch (error) {
+        console.error('Error fetching images:', error);
+      }
+    };
+
+    fetchImages();
+  }, []);
+
+  const [images2, setImages2] = useState([]);
+
+  useEffect(() => {
+    const fetchImages2 = async () => {
+      try {
+        const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/gethomebanner2-ax.php');
+        const data = await response.json();
+        if (data && data.code === 1) {
+          setImages2(data.data.map(item => item.banner));
+        }
+      } catch (error) {
+        console.error('Error fetching images:', error);
+      }
+    };
+
+    fetchImages2();
+  }, []);
+
   const numDots = images.length;
 
   useEffect(() => {
@@ -146,7 +183,26 @@ const HomePage = ({ navigation, route }) => {
       console.error('Error fetching default name:', error);
     }
   };
-  
+
+  const scrollViewRef = useRef(null);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (scrollViewRef.current) {
+
+
+
+        const currentOffset = scrollViewRef.current.contentOffset;
+        if (currentOffset) {
+          scrollViewRef.current.scrollTo({
+            x: currentOffset.x + width,
+            animated: true,
+          });
+        }
+      }
+    }, 3000); // Adjust the interval time as needed
+
+    return () => clearInterval(interval);
+  }, []);
 
   // useEffect(() => {
   //   // Immediately show the popup when the component mounts
@@ -413,18 +469,30 @@ const HomePage = ({ navigation, route }) => {
 
   const [imageDimensions, setImageDimensions] = useState([]);
 
-  const handleImageLoad = (event, index) => {
+ const handleImageLoad = (event, index) => {
     const { width: imgWidth, height: imgHeight } = event.nativeEvent.source;
     const aspectRatio = imgHeight / imgWidth;
     setImageDimensions(prevState => {
       const updatedDimensions = [...prevState];
       updatedDimensions[index] = {
-        width: '100%',
-        height: (width) * aspectRatio,
+        width: width - 32,
+        height: (width - 32) * aspectRatio, // Dynamically calculate height based on aspect ratio
       };
       return updatedDimensions;
     });
   };
+  // const handleImageLoad = (event, index) => {
+  //   const { width: imgWidth, height: imgHeight } = event.nativeEvent.source;
+  //   const aspectRatio = imgHeight / imgWidth;
+  //   setImageDimensions(prevState => {
+  //     const updatedDimensions = [...prevState];
+  //     updatedDimensions[index] = {
+  //       width: width - 32,
+  //       height: (width) * aspectRatio,
+  //     };
+  //     return updatedDimensions;
+  //   });
+  // };
 
     const truncateText1 = (text, maxWidth, fontSize) => {
         const ellipsisWidth = 30; // Width of the ellipsis
@@ -462,6 +530,24 @@ const HomePage = ({ navigation, route }) => {
         const charWidth = fontSize * 0.6; // Adjust this factor based on your font and styling
         return charWidth;
     };
+
+  const [specialtiesData, setSpecialtiesData] = useState([]);
+
+  useEffect(() => {
+    fetchSpecialitiesData();
+  }, []);
+
+  const fetchSpecialitiesData = async () => {
+    try {
+      const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getspeclist-ax.php');
+      const data = await response.json();
+      const storedId = await AsyncStorage.getItem('pr_ty_id');
+      const filteredData = data.data.filter(item => item.pr_ty_id === storedId);
+      setSpecialtiesData(filteredData);
+    } catch (error) {
+      console.error('Error fetching key forte data:', error);
+    }
+  };
 
 
   return (
@@ -515,10 +601,26 @@ const HomePage = ({ navigation, route }) => {
 
               </TouchableOpacity>
               <TouchableOpacity style={commonStyles.profileIcon} onPress={() => setModalVisible(true)}>
-                <Image
-                  source={require('../../../assets/img/ProfileHome.png')}
-                  style={commonStyles.icon}
-                />
+                    {profilePic ? (
+                      <Image
+                        source={{ uri: profilePic }}
+                        style={styles.accountImage}
+                      />
+                    ) : (
+                      <View style={[styles.accountImage, {
+                        width: 42,
+                        height: 42,
+                        borderRadius: 36,
+                        backgroundColor: '#E8F8FF',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }]}>
+                          <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#289EF5' }}>
+                          {activeItem ? activeItem.charAt(0).toUpperCase() :
+                            (defaultName && defaultName.name) ? defaultName.name.charAt(0).toUpperCase() : ''}
+                        </Text>
+                      </View>
+                    )}
               </TouchableOpacity>
               {/* <TouchableOpacity style={commonStyles.profileIcon} onPress={() => setModalVisible(true)}>
                 <SvgXml
@@ -626,7 +728,7 @@ const HomePage = ({ navigation, route }) => {
                             justifyContent: 'center',
                             alignItems: 'center',
                           }]}>
-                            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>
+                              <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#289EF5' }}>
                               {defaultName.name ? defaultName.name.charAt(0).toUpperCase() : ''}
                             </Text>
                           </View>
@@ -708,7 +810,7 @@ const HomePage = ({ navigation, route }) => {
                                 justifyContent: 'center',
                                 alignItems: 'center',
                               }]}>
-                                    <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>{office.name.charAt(0).toUpperCase()}</Text>
+                                    <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#289EF5' }}>{office.name.charAt(0).toUpperCase()}</Text>
                               </View>
                             )}
                             
@@ -790,7 +892,7 @@ const HomePage = ({ navigation, route }) => {
                                 justifyContent: 'center',
                                 alignItems: 'center',
                               }]}>
-                                <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>{clinic.name.charAt(0).toUpperCase()}</Text>
+                                    <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#289EF5' }}>{clinic.name.charAt(0).toUpperCase()}</Text>
                               </View>
                             )}
                             <Text style={[commonStyles.headerText2BL, { marginHorizontal: height * 0.02 }]}>
@@ -964,7 +1066,7 @@ const HomePage = ({ navigation, route }) => {
                           justifyContent: 'center',
                           alignItems: 'center',
                         }]}>
-                          <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>
+                            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#289EF5' }}>
                             {activeItem ? activeItem.charAt(0).toUpperCase() :
                               (defaultName && defaultName.name) ? defaultName.name.charAt(0).toUpperCase() : ''}
                           </Text>
@@ -1009,7 +1111,33 @@ const HomePage = ({ navigation, route }) => {
                   </TouchableOpacity>
                 </View>
 
+                <ScrollView
+                  ref={scrollViewRef}
+                  horizontal
+                  pagingEnabled
+                  showsHorizontalScrollIndicator={false}
+                  style={{ height: 'auto' }}
+                  contentContainerStyle={{ paddingHorizontal: 0 }} // Adjust spacing between images
+                  onMomentumScrollEnd={(event) => {
+                    // If we've scrolled past the end, jump back to the start
+                    if (event.nativeEvent.contentOffset.x >= (images.length - 1) * width) {
+                      scrollViewRef.current.scrollTo({ x: 0, animated: false });
+                    }
+                  }}
+                >
+                  {images.map((image, index) => (
+                    <View key={index} style={{ width: width - 32, height: 'auto', borderRadius: 8, overflow: 'hidden', }}>
+                      <Image
+                        source={{ uri: image }}
+                        style={[{ width: '100%', aspectRatio: 16 / 6 }, imageDimensions[index]]}
+                        resizeMode="cover"
+                        onLoad={event => handleImageLoad(event, index)}
+                      />
+                    </View>
+                  ))}
+                </ScrollView>
 
+{/* 
                 <ScrollView
                   horizontal
                   pagingEnabled
@@ -1028,7 +1156,7 @@ const HomePage = ({ navigation, route }) => {
                       </View>
                     </View>
                   ))}
-                </ScrollView>
+                </ScrollView> */}
                 {/* <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 8 }}>
                   {images.map((_, index) => (
                     <View
@@ -1173,7 +1301,7 @@ const HomePage = ({ navigation, route }) => {
                   </View>
                 </View>
 
-                <View style={{ width: width - moderateScale(32), height: 'auto', marginBottom: height * 0.015 }}>
+                {/* <View style={{ width: width - moderateScale(32), height: 'auto', marginBottom: height * 0.015 }}>
                   <View style={{ borderRadius: 8, overflow: 'hidden' }}>
                     <Image
                       source={require('../../../assets/img/BannerHome.jpg')}
@@ -1182,7 +1310,26 @@ const HomePage = ({ navigation, route }) => {
 
                     />
                   </View>
-                </View>
+                </View> */}
+
+                <ScrollView
+                  horizontal
+                  pagingEnabled
+                  showsHorizontalScrollIndicator={false}
+                  style={{ height: 'auto' }}
+                  contentContainerStyle={{ paddingHorizontal: 0 }} // Adjust spacing between images
+                >
+                  {images2.map((image, index) => (
+                    <View key={index} style={{ width: width - 32, height: 'auto', borderRadius: 8, overflow: 'hidden', }}>
+                      <Image
+                        source={{ uri: image }}
+                        style={[{ width: '100%', aspectRatio: 16 / 6 }, imageDimensions[index]]}
+                        resizeMode="cover"
+                        onLoad={event => handleImageLoad(event, index)}
+                      />
+                    </View>
+                  ))}
+                </ScrollView>
 
                 {/* <View style={{ width: width * 0.903, height: width * 0.36,  marginBottom: height * 0.015}}>
                   <Image
@@ -1192,13 +1339,11 @@ const HomePage = ({ navigation, route }) => {
                   />
                 </View> */}
 
-                <View style={{ marginBottom: height * 0.01 }}>
+                {/* <View style={{ marginBottom: height * 0.01 }}>
                   <View style={styles.headerContainer1}>
                     <Text style={[commonStyles.headerText11BL, {}]}>Connect by Specialities</Text>
-                    {/* <Text style={[commonStyles.headerText4G]}>See All</Text> */}
                   </View>
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                    {/* Button 1 */}
                     <TouchableOpacity
                       activeOpacity={0.8}
                       style={styles.buttonCommonStyles}
@@ -1207,7 +1352,7 @@ const HomePage = ({ navigation, route }) => {
                       <Text style={styles.textCommonStyles}>Endodontist</Text>
                     </TouchableOpacity>
 
-                    {/* Button 2 */}
+                 
                     <TouchableOpacity
                       activeOpacity={0.8}
                       style={styles.buttonCommonStyles}
@@ -1233,7 +1378,6 @@ const HomePage = ({ navigation, route }) => {
                     </TouchableOpacity>
 
 
-                    {/* Button 2 */}
                     <TouchableOpacity
                       activeOpacity={0.8}
                       style={styles.buttonCommonStyles}
@@ -1250,7 +1394,7 @@ const HomePage = ({ navigation, route }) => {
                       <Text style={styles.textCommonStyles}>Oral Medicine</Text>
                     </TouchableOpacity>
 
-                    {/* Button 2 */}
+              
                     <TouchableOpacity
                       activeOpacity={0.8}
                       style={styles.buttonCommonStyles}
@@ -1276,6 +1420,25 @@ const HomePage = ({ navigation, route }) => {
                     >
                       <Text style={styles.textCommonStyles}>Oral and Maxillofacial Radiologist</Text>
                     </TouchableOpacity>
+                  </View>
+                </View> */}
+
+                <View style={{ marginBottom: height * 0.01 }}>
+                  <View style={styles.headerContainer1}>
+                    <Text style={[commonStyles.headerText11BL, {}]}>Connect by Specialities</Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                    {specialtiesData.map(specialty => (
+                      <TouchableOpacity
+                        key={specialty.id} // Assuming you have an id field in your data
+                        activeOpacity={0.8}
+                        style={styles.buttonCommonStyles}
+                        onPress={() => navigation.navigate('Explore')}
+                        //onPress={() => navigation.navigate('Explore', { specialtyId: specialty.id })}
+                      >
+                        <Text style={styles.textCommonStyles}>{specialty.speciality}</Text>
+                      </TouchableOpacity>
+                    ))}
                   </View>
                 </View>
 

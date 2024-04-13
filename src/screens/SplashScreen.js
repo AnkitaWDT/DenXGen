@@ -54,21 +54,21 @@ const SplashScreen = ({ navigation }) => {
                     const apiData = await response.json();
 
                     // Update the userData object with new values
-                    userData.status = apiData.data.status;
+                    userData.isregistered = apiData.data.isregistered;
                     //userData.isregistered = apiData.data.isregistered.toString(); // Convert to string
 
                     // Save the updated userData object back to AsyncStorage
-                    await AsyncStorage.setItem('status', userData.status);
+                    await AsyncStorage.setItem('isregistered', userData.isregistered);
 
-                    console.log("Status:", userData.status);
+                    console.log("Status:", userData.isregistered);
 
                     // Compare the current and new userData.status values
-                   if (parseInt(userData.status) === 1) {
+                    if (parseInt(userData.isregistered) === 1) {
 
                         console.log('HomeScreen');
                         showHomeScreen();
                     }
-                    else if (parseInt(userData.status) === 0) {
+                    else if (parseInt(userData.isregistered) === 0) {
                         console.log('SelectCategory');
                        showSelectCategoryScreen();
                         //showSelectCategoryScreen();

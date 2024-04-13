@@ -479,7 +479,7 @@ const ProfileCompletion2 = ({ navigation }) => {
         const id = parseInt(pr_id);
 
         const userData = {
-            pr_id: id,
+            pr_id: parseInt(pr_id),
             about: textareaValues.aboutYourself,
             serv_id: selectedServices,
             spec_id: selectedSpecialties,
@@ -495,12 +495,13 @@ const ProfileCompletion2 = ({ navigation }) => {
 
             console.log('dataresponse', response.data);
             ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
+            navigation.navigate('NDProfileCompletion3');
             //console.log('Data Added to database');
         } catch (error) {
             console.error('An error occurred:', error);
         }
 
-        navigation.navigate('NDProfileCompletion3');
+        //navigation.navigate('NDProfileCompletion3');
     };
 
 

@@ -146,6 +146,10 @@ const NDProfileCompletion3 = ({ navigation }) => {
         }
     };
 
+    const handleSkip = () => {
+        navigation.navigate('ProfileCompletion4');
+    };
+
 
     const pickImage = async (type) => {
         try {
@@ -369,7 +373,8 @@ const NDProfileCompletion3 = ({ navigation }) => {
                             </TouchableOpacity>
 
                             <TouchableOpacity style={[commonStyles.button1, { marginBottom: height * 0.05, marginTop: height * 0.001, }]}
-                                activeOpacity={0.8}>
+                                activeOpacity={0.8}
+                                 onPress={handleSkip} >
                                 <Text style={commonStyles.buttonText1}>Skip</Text>
                             </TouchableOpacity>
 

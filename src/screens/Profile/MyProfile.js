@@ -275,7 +275,7 @@ const MyProfile = ({ navigation }) => {
                             >
                                 {/* Left side content */}
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Image source={require('../../../assets/img/About.png')} style={{ width: 24, height: 24, marginRight: 15 }} />
+                                    <Image source={require('../../../assets/img/AboutUs.png')} style={{ width: 24, height: 24, marginRight: 15 }} />
                                     <Text style={styles.leftText}>About Us</Text>
                                     {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 250 }}>
                                 <Text style={{ fontSize: 17, fontWeight: '400', color: 'black', fontFamily: 'Mukta-Regular' }}>Receive Request</Text>
@@ -366,7 +366,7 @@ const MyProfile = ({ navigation }) => {
                             >
                                 {/* Left side content */}
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Image source={require('../../../assets/img/HelpSupport.png')} style={{ width: 24, height: 24, marginRight: 15 }} />
+                                    <Image source={require('../../../assets/img/SupportHelp.png')} style={{ width: 24, height: 24, marginRight: 15 }} />
                                     <Text style={styles.leftText}>Help and Support</Text>
                                     {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 250 }}>
                                 <Text style={{ fontSize: 17, fontWeight: '400', color: 'black', fontFamily: 'Mukta-Regular' }}>Receive Request</Text>
