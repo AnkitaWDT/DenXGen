@@ -79,6 +79,7 @@ import EOfficeProfileCompletion5 from './OfficeProfile/EOfficeProfileCompletion5
 import EOfficeProfileCompletion7 from './OfficeProfile/EOfficeProfileCompletion7';
 import EClinicProfileCompletion8 from './ClinicProfile/EClinicProfileCompletion8';
 import EOfficeProfileCompletion8 from './OfficeProfile/EOfficeProfileCompletion8';
+import OfficeProfile from './Profile/OfficeProfile';
 
 const Stack = createStackNavigator();
 
@@ -394,6 +395,11 @@ const Navigation = () => {
                 <Stack.Screen
                     name="ClinicProfile"
                     component={ClinicProfile}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="OfficeProfile"
+                    component={OfficeProfile}
                     options={{ headerShown: false }}
                 /> 
                 <Stack.Screen

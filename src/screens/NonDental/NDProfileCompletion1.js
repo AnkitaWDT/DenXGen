@@ -199,6 +199,7 @@ const NDProfileCompletion1 = ({ navigation }) => {
         const pr_ty_id = await AsyncStorage.getItem('pr_ty_id');
 
         const userData = {
+            isregistered: 0,
             pr_ty_id: parseInt(pr_ty_id),
             pr_id: id,
             name: selectedName,

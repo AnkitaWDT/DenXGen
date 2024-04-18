@@ -46,10 +46,10 @@ const ReadMoreText = ({ text, initialLimit }) => {
     );
 };
 
-const ClinicProfile = ({ navigation, route }) => {
+const OfficeProfile = ({ navigation, route }) => {
 
-    const { cl_id } = route.params;
-    console.log(cl_id);
+    const { off_id } = route.params;
+    console.log(off_id);
 
     const [refreshing, setRefreshing] = useState(false);
 
@@ -111,27 +111,6 @@ const ClinicProfile = ({ navigation, route }) => {
 
 
     const [clinicData, setClinicData] = useState([]);
-
-    const [buttonState, setButtonState] = useState('Connect');
-    const [showPopup, setShowPopup] = useState(false);
-    const [showPopup1, setShowPopup1] = useState(false);
-
-    const handleConnectPress = () => {
-        if (buttonState === 'Connect') {
-            setButtonState('Options');
-        } else {
-            setButtonState('Connect');
-        }
-    };
-
-    const handleOptionPress = (option) => {
-        if (option === 'Empanel') {
-            setButtonState('Remove');
-        } else {
-            // Handle Message button press
-        }
-    };
-
 
     useEffect(() => {
         const fetchClinicData = async () => {
@@ -231,9 +210,30 @@ const ClinicProfile = ({ navigation, route }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [buttonState, setButtonState] = useState('Connect');
+    const [showPopup, setShowPopup] = useState(false);
+    const [showPopup1, setShowPopup1] = useState(false);
+
+    const handleConnectPress = () => {
+        if (buttonState === 'Connect') {
+            setButtonState('Options');
+        } else {
+            setButtonState('Connect');
+        }
+    };
+
+    const handleOptionPress = (option) => {
+        if (option === 'Empanel') {
+            setButtonState('Remove');
+        } else {
+            // Handle Message button press
+        }
+    };
+
+
     const fetchData = async () => {
         try {
-            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getclinicvic-ax.php?cl_id=${cl_id}`);
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getofficevic-ax.php?off_id=${off_id}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
@@ -276,7 +276,6 @@ const ClinicProfile = ({ navigation, route }) => {
     // const keyForteData = profileData ? profileData.keyfList.map(item => item.keyforte) : [];
     // const languages = profileData ? profileData.langList.map(lang => lang.language).join(', ') : null;
 
-  
 
     const renderTabContent = () => {
         switch (selectedTab) {
@@ -641,14 +640,14 @@ const ClinicProfile = ({ navigation, route }) => {
 
                             }]}>Vikhroli, Prosthodntic Care, Mumbai</Text>
                         </View>
-                        {/* <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}>
                             <Image source={require('../../../assets/img/languages.png')} style={{ width: 15, height: 15, }} />
-                            <Text style={[commonStyles.headerText5BL, {
+                            {/* <Text style={[commonStyles.headerText5BL, {
                                 paddingHorizontal: 8,
                                 lineHeight: 15
 
-                            }]}>{languages}</Text>
-                        </View> */}
+                            }]}>{languages}</Text> */}
+                        </View>
                         <View>
 
                         </View>
@@ -687,13 +686,84 @@ const ClinicProfile = ({ navigation, route }) => {
 
 
                     <View style={styles.horizontalLine}></View>
+                    {/* <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <View style={{ flexDirection: 'row', marginVertical: height * 0.005 }}>
+                            <TouchableOpacity
+                                style={[commonStyles.buttonS, { marginRight: height * 0.01 }]}
+                                activeOpacity={0.8}
+                                onPress={() => navigation.navigate('EditOfficeProfile', { off_id: off_id })}
+                            //     navigation.navigate('ClinicProfileCompletion7', { off_id: off_id });
+                            >
+                                <Text style={commonStyles.buttonTextS}>Edit profile</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[commonStyles.buttonS, {}]}
+                                activeOpacity={0.8}
+                                onPress={() => navigation.navigate('Explore')}
+                            >
+                                <Text style={commonStyles.buttonTextS}>Discover</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => setModalConnectVisible(true)}>
+                                <Image source={require('../../../assets/img/connections.png')} style={{ width: 20, height: 20 }} />
+                            </TouchableOpacity>
+                            <Popover
+                                placement={PopoverPlacement.LEFT}
+                                from={(
+                                    <TouchableOpacity
+                                        style={commonStyles.backContainer1}
+                                    >
+                                        <Image
+                                            source={require('../../../assets/img/Option.png')}
+                                            style={{ width: 20, height: 20, marginLeft: width * 0.02 }}
+                                        />
+                                    </TouchableOpacity>
+                                )}>
+                                <View style={styles.popover}>
+                                    <TouchableOpacity>
+                                        <View style={styles.popoverItemContainer}>
+                                            <Image
+                                                source={require('../../../assets/img/Bookmark.png')}
+                                                style={styles.popoverItemIcon}
+                                            />
+                                            <Text style={styles.popoverItemText}>Save PDF</Text>
+                                        </View>
+                                    </TouchableOpacity>
 
-                    {/* <TouchableOpacity
-            style={styles.button}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.buttonText}>Connect</Text>
-          </TouchableOpacity> */}
+                                    <TouchableOpacity>
+                                        <View style={styles.popoverItemContainer}>
+                                            <Image
+                                                source={require('../../../assets/img/SaveCon.png')}
+                                                style={styles.popoverItemIcon}
+                                            />
+                                            <Text style={styles.popoverItemText}>Save Contact</Text>
+                                        </View>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity>
+                                        <View style={styles.popoverItemContainer}>
+                                            <Image
+                                                source={require('../../../assets/img/Spam.png')}
+                                                style={styles.popoverItemIcon}
+                                            />
+                                            <Text style={styles.popoverItemText}>Report Spam</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity>
+                                        <View style={styles.popoverItemContainer}>
+                                            <Image
+                                                source={require('../../../assets/img/Link.png')}
+                                                style={styles.popoverItemIcon}
+                                            />
+                                            <Text style={styles.popoverItemText}>Copy Link</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                </View>
+                            </Popover>
+                        
+                        </View>
+                    </View> */}
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <View style={{ flexDirection: 'row', marginVertical: height * 0.005 }}>
                             <View>
@@ -895,7 +965,7 @@ const ClinicProfile = ({ navigation, route }) => {
                                     {profileData?.socialList?.map((social, index) => (
                                         Object.entries(social).map(([platform, username]) => (
                                             // Exclude pr_id field and empty usernames
-                                            platform !== 'cl_id' && username.trim() !== '' &&
+                                            platform !== 'off_id' && username.trim() !== '' &&
                                             <SocialLink key={platform} platform={platform} username={username} />
                                         ))
                                     ))}
@@ -1616,6 +1686,7 @@ const ClinicProfile = ({ navigation, route }) => {
 
             </ScrollView>
 
+
             {showImage && (
                 <TouchableOpacity
                     onPress={handleImageClick}
@@ -2213,4 +2284,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ClinicProfile;
+export default OfficeProfile

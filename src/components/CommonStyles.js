@@ -148,7 +148,8 @@ marginRight: 12
         fontSize: 15,
         color: '#121212',
         fontFamily: 'DMSans-Medium',
-        lineHeight: height * 0.022, //28
+        lineHeight: height * 0.022, 
+        width: '90%'
     },
     backContainerSearch: {
         height: 18,

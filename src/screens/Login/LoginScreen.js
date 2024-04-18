@@ -34,7 +34,7 @@ const LoginScreen = ({navigation, route}) => {
                 await AsyncStorage.setItem('pr_id', String(data.data.id));
                 await AsyncStorage.setItem('phoneno', data.data.phoneno);
                 await AsyncStorage.setItem('password', String(data.data.password));
-                await AsyncStorage.setItem('name', data.data.name);
+                //await AsyncStorage.setItem('name', data.data.name);
 
                 const pr_id = await AsyncStorage.getItem('pr_id');
                 const id = parseInt(pr_id);

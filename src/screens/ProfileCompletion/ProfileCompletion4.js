@@ -256,7 +256,7 @@ const ProfileCompletion4 = ({ navigation }) => {
 
         // Form data
         const formData = {
-            id: locationId,
+          
             pr_id: id,
             loc_one: houseNumber,
             loc_two: area,
@@ -297,6 +297,7 @@ const ProfileCompletion4 = ({ navigation }) => {
 
 
         const updateData = {
+            id: locationId,
             pr_id: id,
             loc_one: houseNumber,
             loc_two: area,

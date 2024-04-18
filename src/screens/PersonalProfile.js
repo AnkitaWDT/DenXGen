@@ -1011,6 +1011,78 @@ const PersonalProfile = ({ navigation, route }) => {
                                             Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
                                         </Text>
 
+                                        {clinicData && clinicData.length > 0 ? (
+                                            clinicData.map((clinic) => (
+                                                <TouchableOpacity
+                                                    key={clinic.cl_id}
+                                                    style={{
+                                                        paddingHorizontal: 9,
+                                                        borderWidth: 0.5,
+                                                        borderRadius: 8,
+                                                        borderColor: '#979797',
+                                                        marginBottom: 16,
+                                                        flexDirection: 'row',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'space-between',
+                                                        paddingVertical: 8,
+                                                        backgroundColor: '#FEFCFC'
+                                                    }}
+                                                    activeOpacity={0.8}
+                                                    onPress={() => navigation.navigate('MyClinic', { cl_id: clinic.cl_id })}
+                                                >
+
+                                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                        {clinic.profile_pic ? (
+                                                            <Image
+                                                                source={{ uri: clinic.profile_pic }}
+                                                                style={styles.profileImage}
+                                                            />
+                                                        ) : (
+                                                            <View style={[styles.profileImage, {
+                                                                width: height * 0.09,
+                                                                height: height * 0.09,
+                                                                borderRadius: 36,
+                                                                backgroundColor: '#E8F8FF',
+                                                                justifyContent: 'center',
+                                                                alignItems: 'center',
+                                                            }]}>
+                                                                <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>
+                                                                    {clinic.name ? clinic.name.charAt(0).toUpperCase() : ''}
+                                                                </Text>
+                                                            </View>
+                                                        )}
+                                                        {/* <Image source={{ uri: clinic.profile_pic || 'default_image_url' }} style={styles.profileImage} /> */}
+                                                        <View style={{ flex: 1 }}>
+                                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                <Text style={[commonStyles.headerText2BL, { lineHeight: 20 }]} numberOfLines={1}>{clinic.name}</Text>
+                                                            </View>
+
+                                                            <Text style={[commonStyles.headerText5G, { marginVertical: height * 0.01 }]} numberOfLines={1}>Implants to Cosmetics</Text>
+
+                                                            <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                                    <Image source={require('../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
+                                                                    <Text style={[commonStyles.headerText5BL, { marginLeft: 4 }]} numberOfLines={1}>Ghatkopar, India</Text>
+                                                                </View>
+                                                            </View>
+                                                        </View>
+                                                    </View>
+                                                </TouchableOpacity>
+                                            ))
+                                        ) : (
+                                            <Text>No clinics available</Text>
+                                        )}
+                                    </ScrollView>
+
+                                    {/* <ScrollView>
+                                        <View style={styles.horizontalLineM}></View>
+                                        <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
+                                            My Clinics
+                                        </Text>
+                                        <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
+                                            Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
+                                        </Text>
+
                                         {clinicData.map(clinic => (
                                             <TouchableOpacity
                                                 key={clinic.cl_id}
@@ -1050,7 +1122,6 @@ const PersonalProfile = ({ navigation, route }) => {
                                                             </Text>
                                                         </View>
                                                     )}
-                                                    {/* <Image source={{ uri: clinic.profile_pic || 'default_image_url' }} style={styles.profileImage} /> */}
                                                     <View style={{ flex: 1 }}>
                                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                                             <Text style={[commonStyles.headerText2BL, { lineHeight: 20 }]} numberOfLines={1}>{clinic.name}</Text>
@@ -1068,7 +1139,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                                 </View>
                                             </TouchableOpacity>
                                         ))}
-                                    </ScrollView>
+                                    </ScrollView> */}
                                 </TouchableOpacity>
                             </TouchableOpacity>
                         </Modal>

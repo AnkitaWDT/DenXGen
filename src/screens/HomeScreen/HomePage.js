@@ -494,6 +494,33 @@ const HomePage = ({ navigation, route }) => {
   //   });
   // };
 
+  const [completionData, setCompletionData] = useState(null);
+
+  useEffect(() => {
+    fetchCompletionData();
+  }, []);
+
+  const fetchCompletionData = async () => {
+    try {
+
+      const pr_id = await AsyncStorage.getItem('pr_id');
+      // Parse pr_id to an integer
+      const id = parseInt(pr_id);
+      
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersprofilecount-ax.php?pr_id=${id}`);
+      const json = await response.json();
+      if (json.code === 1) {
+        setCompletionData(json.data);
+        console.log('completionData', completionData);
+      } else {
+        // Handle error
+      }
+    } catch (error) {
+      // Handle error
+      console.error(error);
+    }
+  };
+
     const truncateText1 = (text, maxWidth, fontSize) => {
         const ellipsisWidth = 30; // Width of the ellipsis
         const maxTextWidth = maxWidth - ellipsisWidth;
@@ -546,6 +573,33 @@ const HomePage = ({ navigation, route }) => {
       setSpecialtiesData(filteredData);
     } catch (error) {
       console.error('Error fetching key forte data:', error);
+    }
+  };
+
+  const navigateToScreen = () => {
+    // if (!completionData || !completionData.gotosteps) return;
+
+    const gotosteps = parseFloat(completionData.gotosteps);
+    let screenName = '';
+
+    if (gotosteps >= 2 && gotosteps < 3) {
+      screenName = 'ProfileCompletion2';
+    } else if (gotosteps >= 3 && gotosteps < 4) {
+      screenName = 'NDProfileCompletion3';
+    } else if (gotosteps >= 4 && gotosteps < 5) {
+      screenName = 'ProfileCompletion4';
+    } else if (gotosteps >= 5 && gotosteps < 6) {
+      screenName = 'ProfileCompletion5';
+    } else if (gotosteps >= 6 && gotosteps < 7) {
+      screenName = 'ProfileCompletion6';
+    } else if (gotosteps >= 7 && gotosteps < 8) {
+      screenName = 'ProfileCompletion7';
+    } else if (gotosteps >= 8 && gotosteps < 9) {
+      screenName = 'ProfileCompletion8';
+    }
+
+    if (screenName) {
+      navigation.navigate(screenName);
     }
   };
 
@@ -608,8 +662,8 @@ const HomePage = ({ navigation, route }) => {
                       />
                     ) : (
                       <View style={[styles.accountImage, {
-                        width: 42,
-                        height: 42,
+                        width: 33,
+                        height: 33,
                         borderRadius: 36,
                         backgroundColor: '#E8F8FF',
                         justifyContent: 'center',
@@ -648,6 +702,7 @@ const HomePage = ({ navigation, route }) => {
                 placeholderTextColor="grey"
                 value={searchQuery}
                 onChangeText={handleSearch}
+                    numberOfLines={1}
               />
             </View>
 
@@ -774,7 +829,7 @@ const HomePage = ({ navigation, route }) => {
                           onPress={() => {
                             if (office.status === "0") {
                               // If clinic status is 0 (Drafts), navigate to ClinicProfileCompletion with cl_id
-                              navigation.navigate('ClinicProfileCompletion1', { off_id: office.off_id });
+                              navigation.navigate('OfficeProfileCompletion1', { off_id: office.off_id });
                             } else {
                               // If clinic status is 1, do something else (not specified in the provided code)
                               // You can add navigation logic or any other action here
@@ -1049,6 +1104,7 @@ const HomePage = ({ navigation, route }) => {
                 </View>
 
                 {/* White box with shadow */}
+                {completionData && completionData.gotosteps !== null ? (
                 <View style={styles.boxContainer}>
                   <View style={{ flexDirection: 'row' }}>
                     <View style={styles.imageRow}>
@@ -1079,7 +1135,10 @@ const HomePage = ({ navigation, route }) => {
                       </Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Image source={require('../../../assets/img/clock.png')} style={styles.image1} />
-                        <Text style={[commonStyles.headerText5G]}>75% completed</Text>
+                        <Text style={[commonStyles.headerText5G]}>
+                          {completionData && completionData.count ? `${completionData.count}% completed` : 'Completed'}
+                        </Text>
+
                       </View>
                     </View>
                   </View>
@@ -1097,7 +1156,8 @@ const HomePage = ({ navigation, route }) => {
                       position: 'absolute',
                       right: width * 0.02,
                     }}
-                    onPress={() => navigation.navigate('ProfileCompletion2')}
+                    // onPress={() => navigation.navigate('ProfileCompletion2')}
+                    onPress={() => navigateToScreen()}
                   >
                     <Text style={{
                       fontSize: responsiveFontSize(14),
@@ -1110,6 +1170,7 @@ const HomePage = ({ navigation, route }) => {
                     }}>Complete</Text>
                   </TouchableOpacity>
                 </View>
+                ) : null}
 
                 <ScrollView
                   ref={scrollViewRef}

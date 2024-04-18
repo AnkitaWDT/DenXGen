@@ -134,15 +134,39 @@ const Explore = ({navigation, route}) => {
     setSelectedTab(initialTab || 0);
   }, [initialTab]);
 
+  // const handleSearch = (query) => {
+  //   setSearchQuery(query); // Update search query state
+  //   const filtered = data.filter((item) =>
+  //     item.name.toLowerCase().includes(query.toLowerCase()) 
+  //     //||
+  //     // item.description.toLowerCase().includes(query.toLowerCase()) ||
+  //     // item.location.toLowerCase().includes(query.toLowerCase())
+  //   );
+  //   setFilteredData(filtered); // Update filtered data state
+  // };
+
   const handleSearch = (query) => {
     setSearchQuery(query); // Update search query state
-    const filtered = data.filter((item) =>
-      item.title.toLowerCase().includes(query.toLowerCase()) ||
-      item.description.toLowerCase().includes(query.toLowerCase()) ||
-      item.location.toLowerCase().includes(query.toLowerCase())
-    );
-    setFilteredData(filtered); // Update filtered data state
+    if (selectedTab === 0) {
+      const filtered = professionalsData.filter((item) =>
+        item.name && item.name.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredData(filtered); // Update filtered professionals data state
+    } else if (selectedTab === 1) {
+      const filtered = clinicsData.filter((item) =>
+        item.name && item.name.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredData(filtered); // Update filtered clinics data state
+    }
+    else if (selectedTab === 2) {
+      const filtered = officeData.filter((item) =>
+        item.name && item.name.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+    else{}
   };
+
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
@@ -153,10 +177,68 @@ const Explore = ({navigation, route}) => {
   };
 
 
-  const servicesData = ["Service 1", "Service 2", "Service 3"]; // Sample data for services
-
   const renderDefaultImage = (gender) => {
-    return gender === 1 ? defaultMaleImage : defaultFemaleImage;
+    return gender === "Male" ? defaultMaleImage : defaultFemaleImage;
+  };
+
+  const [professionalsData, setProfessionalsData] = useState([]);
+  useEffect(() => {
+    fetchProfessionalsData();
+  }, [selectedTab]);
+
+  const fetchProfessionalsData = async () => {
+    try {
+      const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getprofessionallist-ax.php');
+      const json = await response.json();
+      if (json.code === 1) {
+        setProfessionalsData(json.data);
+      } else {
+        // Handle error
+      }
+    } catch (error) {
+      // Handle error
+      console.error(error);
+    }
+  };
+
+  const [clinicsData, setClinicsData] = useState([]);
+  useEffect(() => {
+    fetchClinicsData();
+  }, [selectedTab]);
+
+  const fetchClinicsData = async () => {
+    try {
+      const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getcliniclistall-ax.php');
+      const json = await response.json();
+      if (json.code === 1) {
+        setClinicsData(json.data);
+      } else {
+        // Handle error
+      }
+    } catch (error) {
+      // Handle error
+      console.error(error);
+    }
+  };
+
+  const [officeData, setOfficeData] = useState([]);
+  useEffect(() => {
+    fetchOfficeData();
+  }, [selectedTab]);
+
+  const fetchOfficeData = async () => {
+    try {
+      const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getofficelistall-ax.php');
+      const json = await response.json();
+      if (json.code === 1) {
+        setOfficeData(json.data);
+      } else {
+        // Handle error
+      }
+    } catch (error) {
+      // Handle error
+      console.error(error);
+    }
   };
 
   const renderTabContent = () => {
@@ -167,109 +249,209 @@ const Explore = ({navigation, route}) => {
           <ScrollView nestedScrollEnabled={true}
             contentContainerStyle={{ paddingBottom: height * 0.5 }}
             showsVerticalScrollIndicator={false}>
-            {/* List of items */}
-            {filteredData.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                style={{
-                  paddingHorizontal: 9,
-                  borderWidth: 0.5,
-                  borderRadius: 8,
-                  borderColor: '#979797',
-                  marginBottom: 16,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  //height: 80,
-                  paddingVertical: 8,
-                  backgroundColor: '#FEFCFC'
-                }}
-                activeOpacity={0.8}
-                onPress={() => navigation.navigate('ProfileScreen')}
-              >
-                {/* Left side image and text */}
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  {item.img ? (
-                    <Image source={{ uri: item.img }} style={styles.profileImage} />
-                  ) : (
-                    <Image source={renderDefaultImage(item.gender)} style={styles.profileImage} />
-                  )}
-                  <View style={{ flex: 1, }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
-                      <Text style={[commonStyles.headerText4BL, { lineHeight: 24, }]} numberOfLines={1}>{item.title}</Text>
-                      <Popover
-                        placement={PopoverPlacement.LEFT}
-                        from={(
-                          <TouchableOpacity
-                          >
-                            <Image
-                              source={require('../../../assets/img/ViewM.png')}
-                              style={{ width: 3, height: 13, marginRight: 5 }}
-                            />
-                          </TouchableOpacity>
-                        )}>
-                        <View style={commonStyles.popover}>
-                          <TouchableOpacity>
-                            <View style={commonStyles.popoverItemContainer}>
+            {searchQuery !== '' ? (
+              filteredData.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={{
+                    paddingHorizontal: 9,
+                    borderWidth: 0.5,
+                    borderRadius: 8,
+                    borderColor: '#979797',
+                    marginBottom: 16,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    //height: 80,
+                    paddingVertical: 8,
+                    backgroundColor: '#FEFCFC'
+                  }}
+                  activeOpacity={0.8}
+                  onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.id })}
+                >
+                  {/* Left side image and text */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {item.profile_pic ? (
+                      <Image source={{ uri: item.profile_pic }} style={styles.profileImage} />
+                    ) : (
+                      <Image source={renderDefaultImage(item.gender)} style={styles.profileImage} />
+                    )}
+                    <View style={{ flex: 1, }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
+                        <Text style={[commonStyles.headerText4BL, { lineHeight: 24, }]} numberOfLines={1}>{item.name}</Text>
+                        <Popover
+                          placement={PopoverPlacement.LEFT}
+                          from={(
+                            <TouchableOpacity
+                            >
                               <Image
-                                source={require('../../../assets/img/Bookmark.png')}
-                                style={commonStyles.popoverItemIcon}
+                                source={require('../../../assets/img/ViewM.png')}
+                                style={{ width: 3, height: 13, marginRight: 5 }}
                               />
-                              <Text style={commonStyles.popoverItemText}>Save PDF</Text>
-                            </View>
-                          </TouchableOpacity>
+                            </TouchableOpacity>
+                          )}>
+                          <View style={commonStyles.popover}>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Bookmark.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Save PDF</Text>
+                              </View>
+                            </TouchableOpacity>
 
-                          <TouchableOpacity>
-                            <View style={commonStyles.popoverItemContainer}>
-                              <Image
-                                source={require('../../../assets/img/SaveCon.png')}
-                                style={commonStyles.popoverItemIcon}
-                              />
-                              <Text style={commonStyles.popoverItemText}>Save Contact</Text>
-                            </View>
-                          </TouchableOpacity>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/SaveCon.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Save Contact</Text>
+                              </View>
+                            </TouchableOpacity>
 
-                          <TouchableOpacity>
-                            <View style={commonStyles.popoverItemContainer}>
-                              <Image
-                                source={require('../../../assets/img/Spam.png')}
-                                style={commonStyles.popoverItemIcon}
-                              />
-                              <Text style={commonStyles.popoverItemText}>Report Spam</Text>
-                            </View>
-                          </TouchableOpacity>
-                          <TouchableOpacity>
-                            <View style={commonStyles.popoverItemContainer}>
-                              <Image
-                                source={require('../../../assets/img/Link.png')}
-                                style={commonStyles.popoverItemIcon}
-                              />
-                              <Text style={commonStyles.popoverItemText}>Copy Link</Text>
-                            </View>
-                          </TouchableOpacity>
-                        </View>
-                      </Popover>
-                    </View>
-
-                    <Text style={[commonStyles.headerText5G, {
-                      lineHeight: 22, marginRight: 50, 
-                    }]} numberOfLines={1}>{item.description}</Text>
-
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
-
-                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                        <Text style={[commonStyles.headerText5BL, {
-                          marginLeft: 4, lineHeight: 22
-                        }]} numberOfLines={1}>{item.location}</Text>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Spam.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Report Spam</Text>
+                              </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Link.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Copy Link</Text>
+                              </View>
+                            </TouchableOpacity>
+                          </View>
+                        </Popover>
                       </View>
+                      {/* Render specialty */}
+                      <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                        {item.specList.length > 0 ? item.specList[0].speciality : 'No specialty'}
+                      </Text>
+                      {/* Render location */}
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
+                          <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
+                            {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
+                          </Text>
+                        </View>
+                      </View>
+                      {/* Add more texts or components if needed */}
                     </View>
-
-                    {/* Add more texts or components if needed */}
                   </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+                </TouchableOpacity>
+              ))
+            ) : (
+              professionalsData.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={{
+                    paddingHorizontal: 9,
+                    borderWidth: 0.5,
+                    borderRadius: 8,
+                    borderColor: '#979797',
+                    marginBottom: 16,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    //height: 80,
+                    paddingVertical: 8,
+                    backgroundColor: '#FEFCFC'
+                  }}
+                  activeOpacity={0.8}
+                  onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.id })}
+                >
+                  {/* Left side image and text */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {item.profile_pic ? (
+                      <Image source={{ uri: item.profile_pic }} style={styles.profileImage} />
+                    ) : (
+                      <Image source={renderDefaultImage(item.gender)} style={styles.profileImage} />
+                    )}
+                    <View style={{ flex: 1, }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
+                        <Text style={[commonStyles.headerText4BL, { lineHeight: 24, }]} numberOfLines={1}>{item.name}</Text>
+                        <Popover
+                          placement={PopoverPlacement.LEFT}
+                          from={(
+                            <TouchableOpacity
+                            >
+                              <Image
+                                source={require('../../../assets/img/ViewM.png')}
+                                style={{ width: 3, height: 13, marginRight: 5 }}
+                              />
+                            </TouchableOpacity>
+                          )}>
+                          <View style={commonStyles.popover}>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Bookmark.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Save PDF</Text>
+                              </View>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/SaveCon.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Save Contact</Text>
+                              </View>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Spam.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Report Spam</Text>
+                              </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Link.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Copy Link</Text>
+                              </View>
+                            </TouchableOpacity>
+                          </View>
+                        </Popover>
+                      </View>
+                      {/* Render specialty */}
+                      <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                        {item.specList.length > 0 ? item.specList[0].speciality : 'No specialty'}
+                      </Text>
+                      {/* Render location */}
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
+                          <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
+                            {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
+                          </Text>
+                        </View>
+                      </View>
+                      {/* Add more texts or components if needed */}
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))
+            )}
           </ScrollView>
         );
       case 1:
@@ -277,109 +459,209 @@ const Explore = ({navigation, route}) => {
           <ScrollView nestedScrollEnabled={true}
             contentContainerStyle={{ paddingBottom: height * 0.5 }}
             showsVerticalScrollIndicator={false}>
-            {/* List of items */}
-            {filteredData.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                style={{
-                  paddingHorizontal: 9,
-                  borderWidth: 0.5,
-                  borderRadius: 8,
-                  borderColor: '#979797',
-                  marginBottom: 16,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  //height: 80,
-                  paddingVertical: 8,
-                  backgroundColor: '#FEFCFC'
-                }}
-                activeOpacity={0.8}
-                onPress={() => navigation.navigate('ProfileScreen')}
-              >
-                {/* Left side image and text */}
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  {item.img ? (
-                    <Image source={{ uri: item.img }} style={styles.profileImage} />
-                  ) : (
-                    <Image source={renderDefaultImage(item.gender)} style={styles.profileImage} />
-                  )}
-                  <View style={{ flex: 1, }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
-                      <Text style={[commonStyles.headerText4BL, { lineHeight: 24, }]} numberOfLines={1}>{item.title}</Text>
-                      <Popover
-                        placement={PopoverPlacement.LEFT}
-                        from={(
-                          <TouchableOpacity
-                          >
-                            <Image
-                              source={require('../../../assets/img/ViewM.png')}
-                              style={{ width: 3, height: 13, marginRight: 5 }}
-                            />
-                          </TouchableOpacity>
-                        )}>
-                        <View style={commonStyles.popover}>
-                          <TouchableOpacity>
-                            <View style={commonStyles.popoverItemContainer}>
+            {searchQuery !== '' ? (
+              filteredData.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={{
+                    paddingHorizontal: 9,
+                    borderWidth: 0.5,
+                    borderRadius: 8,
+                    borderColor: '#979797',
+                    marginBottom: 16,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    //height: 80,
+                    paddingVertical: 8,
+                    backgroundColor: '#FEFCFC'
+                  }}
+                  activeOpacity={0.8}
+                  onPress={() => navigation.navigate('ClinicProfile', { cl_id: item.cl_id })}
+                >
+                  {/* Left side image and text */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {item.profile_pic ? (
+                      <Image source={{ uri: item.profile_pic }} style={styles.profileImage} />
+                    ) : (
+                      <Image source={renderDefaultImage(item.gender)} style={styles.profileImage} />
+                    )}
+                    <View style={{ flex: 1, }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
+                        <Text style={[commonStyles.headerText4BL, { lineHeight: 24, }]} numberOfLines={1}>{item.name}</Text>
+                        <Popover
+                          placement={PopoverPlacement.LEFT}
+                          from={(
+                            <TouchableOpacity
+                            >
                               <Image
-                                source={require('../../../assets/img/Bookmark.png')}
-                                style={commonStyles.popoverItemIcon}
+                                source={require('../../../assets/img/ViewM.png')}
+                                style={{ width: 3, height: 13, marginRight: 5 }}
                               />
-                              <Text style={commonStyles.popoverItemText}>Save PDF</Text>
-                            </View>
-                          </TouchableOpacity>
+                            </TouchableOpacity>
+                          )}>
+                          <View style={commonStyles.popover}>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Bookmark.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Save PDF</Text>
+                              </View>
+                            </TouchableOpacity>
 
-                          <TouchableOpacity>
-                            <View style={commonStyles.popoverItemContainer}>
-                              <Image
-                                source={require('../../../assets/img/SaveCon.png')}
-                                style={commonStyles.popoverItemIcon}
-                              />
-                              <Text style={commonStyles.popoverItemText}>Save Contact</Text>
-                            </View>
-                          </TouchableOpacity>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/SaveCon.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Save Contact</Text>
+                              </View>
+                            </TouchableOpacity>
 
-                          <TouchableOpacity>
-                            <View style={commonStyles.popoverItemContainer}>
-                              <Image
-                                source={require('../../../assets/img/Spam.png')}
-                                style={commonStyles.popoverItemIcon}
-                              />
-                              <Text style={commonStyles.popoverItemText}>Report Spam</Text>
-                            </View>
-                          </TouchableOpacity>
-                          <TouchableOpacity>
-                            <View style={commonStyles.popoverItemContainer}>
-                              <Image
-                                source={require('../../../assets/img/Link.png')}
-                                style={commonStyles.popoverItemIcon}
-                              />
-                              <Text style={commonStyles.popoverItemText}>Copy Link</Text>
-                            </View>
-                          </TouchableOpacity>
-                        </View>
-                      </Popover>
-                    </View>
-
-                    <Text style={[commonStyles.headerText5G, {
-                      lineHeight: 22, marginRight: 50,
-                    }]} numberOfLines={1}>{item.description}</Text>
-
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
-
-                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                        <Text style={[commonStyles.headerText5BL, {
-                          marginLeft: 4, lineHeight: 22
-                        }]} numberOfLines={1}>{item.location}</Text>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Spam.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Report Spam</Text>
+                              </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Link.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Copy Link</Text>
+                              </View>
+                            </TouchableOpacity>
+                          </View>
+                        </Popover>
                       </View>
+                      {/* Render specialty */}
+                      <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                        {item.servList.length > 0 ? item.servList[0].service : 'No service'}
+                      </Text>
+                      {/* Render location */}
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
+                          <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
+                            {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
+                          </Text>
+                        </View>
+                      </View>
+                      {/* Add more texts or components if needed */}
                     </View>
-
-                    {/* Add more texts or components if needed */}
                   </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+                </TouchableOpacity>
+              ))
+            ) : (
+                clinicsData.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={{
+                    paddingHorizontal: 9,
+                    borderWidth: 0.5,
+                    borderRadius: 8,
+                    borderColor: '#979797',
+                    marginBottom: 16,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    //height: 80,
+                    paddingVertical: 8,
+                    backgroundColor: '#FEFCFC'
+                  }}
+                  activeOpacity={0.8}
+                    onPress={() => navigation.navigate('ClinicProfile', { cl_id: item.cl_id })}
+                >
+                  {/* Left side image and text */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {item.profile_pic ? (
+                      <Image source={{ uri: item.profile_pic }} style={styles.profileImage} />
+                    ) : (
+                      <Image source={renderDefaultImage(item.gender)} style={styles.profileImage} />
+                    )}
+                    <View style={{ flex: 1, }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
+                        <Text style={[commonStyles.headerText4BL, { lineHeight: 24, }]} numberOfLines={1}>{item.name}</Text>
+                          <Popover
+                            placement={PopoverPlacement.LEFT}
+                            from={(
+                              <TouchableOpacity
+                              >
+                                <Image
+                                  source={require('../../../assets/img/ViewM.png')}
+                                  style={{ width: 3, height: 13, marginRight: 5 }}
+                                />
+                              </TouchableOpacity>
+                            )}>
+                            <View style={commonStyles.popover}>
+                              <TouchableOpacity>
+                                <View style={commonStyles.popoverItemContainer}>
+                                  <Image
+                                    source={require('../../../assets/img/Bookmark.png')}
+                                    style={commonStyles.popoverItemIcon}
+                                  />
+                                  <Text style={commonStyles.popoverItemText}>Save PDF</Text>
+                                </View>
+                              </TouchableOpacity>
+
+                              <TouchableOpacity>
+                                <View style={commonStyles.popoverItemContainer}>
+                                  <Image
+                                    source={require('../../../assets/img/SaveCon.png')}
+                                    style={commonStyles.popoverItemIcon}
+                                  />
+                                  <Text style={commonStyles.popoverItemText}>Save Contact</Text>
+                                </View>
+                              </TouchableOpacity>
+
+                              <TouchableOpacity>
+                                <View style={commonStyles.popoverItemContainer}>
+                                  <Image
+                                    source={require('../../../assets/img/Spam.png')}
+                                    style={commonStyles.popoverItemIcon}
+                                  />
+                                  <Text style={commonStyles.popoverItemText}>Report Spam</Text>
+                                </View>
+                              </TouchableOpacity>
+                              <TouchableOpacity>
+                                <View style={commonStyles.popoverItemContainer}>
+                                  <Image
+                                    source={require('../../../assets/img/Link.png')}
+                                    style={commonStyles.popoverItemIcon}
+                                  />
+                                  <Text style={commonStyles.popoverItemText}>Copy Link</Text>
+                                </View>
+                              </TouchableOpacity>
+                            </View>
+                          </Popover>
+                      </View>
+                      {/* Render specialty */}
+                      <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                          {item.servList.length > 0 ? item.servList[0].service : 'No service'}
+                      </Text>
+                      {/* Render location */}
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
+                            <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]} numberOfLines={1}>
+                            {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
+                          </Text>
+                        </View>
+                      </View>
+                      {/* Add more texts or components if needed */}
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))
+            )}
           </ScrollView>
         );
       case 2:
@@ -387,109 +669,209 @@ const Explore = ({navigation, route}) => {
           <ScrollView nestedScrollEnabled={true}
             contentContainerStyle={{ paddingBottom: height * 0.5 }}
             showsVerticalScrollIndicator={false}>
-            {/* List of items */}
-            {filteredData.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                style={{
-                  paddingHorizontal: 9,
-                  borderWidth: 0.5,
-                  borderRadius: 8,
-                  borderColor: '#979797',
-                  marginBottom: 16,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  //height: 80,
-                  paddingVertical: 8,
-                  backgroundColor: '#FEFCFC'
-                }}
-                activeOpacity={0.8}
-                onPress={() => navigation.navigate('ProfileScreen')}
-              >
-                {/* Left side image and text */}
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  {item.img ? (
-                    <Image source={{ uri: item.img }} style={styles.profileImage} />
-                  ) : (
-                    <Image source={renderDefaultImage(item.gender)} style={styles.profileImage} />
-                  )}
-                  <View style={{ flex: 1, }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
-                      <Text style={[commonStyles.headerText4BL, { lineHeight: 24, }]} numberOfLines={1}>{item.title}</Text>
-                      <Popover
-                        placement={PopoverPlacement.LEFT}
-                        from={(
-                          <TouchableOpacity
-                          >
-                            <Image
-                              source={require('../../../assets/img/ViewM.png')}
-                              style={{ width: 3, height: 13, marginRight: 5 }}
-                            />
-                          </TouchableOpacity>
-                        )}>
-                        <View style={commonStyles.popover}>
-                          <TouchableOpacity>
-                            <View style={commonStyles.popoverItemContainer}>
+            {searchQuery !== '' ? (
+              filteredData.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={{
+                    paddingHorizontal: 9,
+                    borderWidth: 0.5,
+                    borderRadius: 8,
+                    borderColor: '#979797',
+                    marginBottom: 16,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    //height: 80,
+                    paddingVertical: 8,
+                    backgroundColor: '#FEFCFC'
+                  }}
+                  activeOpacity={0.8}
+                  onPress={() => navigation.navigate('OfficeProfile', { off_id: item.off_id })}
+                >
+                  {/* Left side image and text */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {item.profile_pic ? (
+                      <Image source={{ uri: item.profile_pic }} style={styles.profileImage} />
+                    ) : (
+                      <Image source={renderDefaultImage(item.gender)} style={styles.profileImage} />
+                    )}
+                    <View style={{ flex: 1, }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
+                        <Text style={[commonStyles.headerText4BL, { lineHeight: 24, }]} numberOfLines={1}>{item.name}</Text>
+                        <Popover
+                          placement={PopoverPlacement.LEFT}
+                          from={(
+                            <TouchableOpacity
+                            >
                               <Image
-                                source={require('../../../assets/img/Bookmark.png')}
-                                style={commonStyles.popoverItemIcon}
+                                source={require('../../../assets/img/ViewM.png')}
+                                style={{ width: 3, height: 13, marginRight: 5 }}
                               />
-                              <Text style={commonStyles.popoverItemText}>Save PDF</Text>
-                            </View>
-                          </TouchableOpacity>
+                            </TouchableOpacity>
+                          )}>
+                          <View style={commonStyles.popover}>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Bookmark.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Save PDF</Text>
+                              </View>
+                            </TouchableOpacity>
 
-                          <TouchableOpacity>
-                            <View style={commonStyles.popoverItemContainer}>
-                              <Image
-                                source={require('../../../assets/img/SaveCon.png')}
-                                style={commonStyles.popoverItemIcon}
-                              />
-                              <Text style={commonStyles.popoverItemText}>Save Contact</Text>
-                            </View>
-                          </TouchableOpacity>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/SaveCon.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Save Contact</Text>
+                              </View>
+                            </TouchableOpacity>
 
-                          <TouchableOpacity>
-                            <View style={commonStyles.popoverItemContainer}>
-                              <Image
-                                source={require('../../../assets/img/Spam.png')}
-                                style={commonStyles.popoverItemIcon}
-                              />
-                              <Text style={commonStyles.popoverItemText}>Report Spam</Text>
-                            </View>
-                          </TouchableOpacity>
-                          <TouchableOpacity>
-                            <View style={commonStyles.popoverItemContainer}>
-                              <Image
-                                source={require('../../../assets/img/Link.png')}
-                                style={commonStyles.popoverItemIcon}
-                              />
-                              <Text style={commonStyles.popoverItemText}>Copy Link</Text>
-                            </View>
-                          </TouchableOpacity>
-                        </View>
-                      </Popover>
-                    </View>
-
-                    <Text style={[commonStyles.headerText5G, {
-                      lineHeight: 22, marginRight: 50,
-                    }]} numberOfLines={1}>{item.description}</Text>
-
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
-
-                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                        <Text style={[commonStyles.headerText5BL, {
-                          marginLeft: 4, lineHeight: 22
-                        }]} numberOfLines={1}>{item.location}</Text>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Spam.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Report Spam</Text>
+                              </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Link.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Copy Link</Text>
+                              </View>
+                            </TouchableOpacity>
+                          </View>
+                        </Popover>
                       </View>
+                      {/* Render specialty */}
+                      <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                        {item.servList.length > 0 ? item.servList[0].service : 'No service'}
+                      </Text>
+                      {/* Render location */}
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
+                          <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
+                            {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
+                          </Text>
+                        </View>
+                      </View>
+                      {/* Add more texts or components if needed */}
                     </View>
-
-                    {/* Add more texts or components if needed */}
                   </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+                </TouchableOpacity>
+              ))
+            ) : (
+              officeData.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={{
+                    paddingHorizontal: 9,
+                    borderWidth: 0.5,
+                    borderRadius: 8,
+                    borderColor: '#979797',
+                    marginBottom: 16,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    //height: 80,
+                    paddingVertical: 8,
+                    backgroundColor: '#FEFCFC'
+                  }}
+                  activeOpacity={0.8}
+                  onPress={() => navigation.navigate('OfficeProfile', { off_id: item.off_id })}
+                >
+                  {/* Left side image and text */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {item.profile_pic ? (
+                      <Image source={{ uri: item.profile_pic }} style={styles.profileImage} />
+                    ) : (
+                      <Image source={renderDefaultImage(item.gender)} style={styles.profileImage} />
+                    )}
+                    <View style={{ flex: 1, }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
+                        <Text style={[commonStyles.headerText4BL, { lineHeight: 24, }]} numberOfLines={1}>{item.name}</Text>
+                        <Popover
+                          placement={PopoverPlacement.LEFT}
+                          from={(
+                            <TouchableOpacity
+                            >
+                              <Image
+                                source={require('../../../assets/img/ViewM.png')}
+                                style={{ width: 3, height: 13, marginRight: 5 }}
+                              />
+                            </TouchableOpacity>
+                          )}>
+                          <View style={commonStyles.popover}>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Bookmark.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Save PDF</Text>
+                              </View>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/SaveCon.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Save Contact</Text>
+                              </View>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Spam.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Report Spam</Text>
+                              </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Link.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Copy Link</Text>
+                              </View>
+                            </TouchableOpacity>
+                          </View>
+                        </Popover>
+                      </View>
+                      {/* Render specialty */}
+                      <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                        {item.servList.length > 0 ? item.servList[0].service : 'No service'}
+                      </Text>
+                      {/* Render location */}
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
+                          <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]} numberOfLines={1}>
+                            {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
+                          </Text>
+                        </View>
+                      </View>
+                      {/* Add more texts or components if needed */}
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))
+            )}
           </ScrollView>
         );
       case 3:
@@ -772,6 +1154,7 @@ const Explore = ({navigation, route}) => {
                 placeholderTextColor='grey'
                 value={searchQuery}
                 onChangeText={handleSearch}
+                    numberOfLines={1}
               />
             </View>
 
