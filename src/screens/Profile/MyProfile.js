@@ -408,7 +408,7 @@ const MyProfile = ({ navigation }) => {
                         </View> */}
                             </TouchableOpacity>
 
-                            <AlertPopup
+                            <AlertPopup 
                                 visible={showPopup}
                                 onRequestClose={() => setShowPopup(false)}
                                 title="LogOut"
@@ -417,8 +417,9 @@ const MyProfile = ({ navigation }) => {
                                 noLabel="No"
                                 onYesPress={async () => {
                                     setShowPopup(false);
-                                    // console.log('Logged Out');
-                                    // await AsyncStorage.setItem('userLoggedIn', 'false');
+                                    console.log('Logged Out');
+                                    await AsyncStorage.setItem('userLoggedIn', 'false');
+                                    await AsyncStorage.removeItem('phoneno');
                                     navigation.navigate('LoginScreen'); 
                                     
                                     
