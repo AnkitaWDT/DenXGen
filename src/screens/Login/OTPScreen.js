@@ -158,7 +158,7 @@ const OTPScreen = ({ navigation, route }) => {
                     await AsyncStorage.setItem('userLoggedIn', 'true');
                     await AsyncStorage.setItem('isregistered', data.data.isregistered.toString());
                     await AsyncStorage.setItem('status', data.data.status.toString());
-                    await AsyncStorage.setItem('pr_id', String(data.data.id));
+                    await AsyncStorage.setItem('pr_id', data.data.id);
                     const pr_id = await AsyncStorage.getItem('pr_id');
                     console.log(pr_id);
 

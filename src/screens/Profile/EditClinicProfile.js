@@ -89,37 +89,37 @@ const EditClinicProfile = ({ navigation, route }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/nameE.png')}
+                                        source={require('../../../assets/img/nameP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
                                 <View style={{ marginLeft: 10, alignSelf: 'center' }}>
-                                    <Text style={[commonStyles.headerText4BL]}>Mitali Walawalkar</Text>
-                                    <Text style={[commonStyles.headerText5G]}>Name</Text>
-                                </View>
-                            </View>
-                            <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                                <View style={styles.imgC}>
-                                    <Image
-                                        source={require('../../../assets/img/conP.png')}
-                                        style={commonStyles.icon}
-                                    />
-                                </View>
-                                <View style={{ marginLeft: 10, alignSelf: 'center' }}>
-                                    <Text style={[commonStyles.headerText4BL]}>+91 9876543210</Text>
+                                    <Text style={[commonStyles.headerText4BL]}>Name</Text>
                                     <Text style={[commonStyles.headerText5G]}>Add/Edit</Text>
                                 </View>
                             </View>
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/mailE.png')}
+                                        source={require('../../../assets/img/callP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
                                 <View style={{ marginLeft: 10, alignSelf: 'center' }}>
-                                    <Text style={[commonStyles.headerText4BL]}>mitali.wdt@gmail.com</Text>
-                                    <Text style={[commonStyles.headerText5G]}>Email Address</Text>
+                                    <Text style={[commonStyles.headerText4BL]}>Contact Number</Text>
+                                    <Text style={[commonStyles.headerText5G]}>Add/Edit</Text>
+                                </View>
+                            </View>
+                            <View style={{ flexDirection: 'row', marginTop: 10 }}>
+                                <View style={styles.imgC}>
+                                    <Image
+                                        source={require('../../../assets/img/mailP.png')}
+                                        style={commonStyles.icon}
+                                    />
+                                </View>
+                                <View style={{ marginLeft: 10, alignSelf: 'center' }}>
+                                    <Text style={[commonStyles.headerText4BL]}>Email Address</Text>
+                                    <Text style={[commonStyles.headerText5G]}>Add/Edit</Text>
                                 </View>
                             </View>
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
@@ -247,7 +247,7 @@ const EditClinicProfile = ({ navigation, route }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/mailPP.png')}
+                                        source={require('../../../assets/img/homeVP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -272,7 +272,7 @@ const EditClinicProfile = ({ navigation, route }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/serP.png')}
+                                        source={require('../../../assets/img/servicesP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -296,7 +296,7 @@ const EditClinicProfile = ({ navigation, route }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/keyP.png')}
+                                        source={require('../../../assets/img/paymentP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -446,7 +446,7 @@ const EditClinicProfile = ({ navigation, route }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/genderP.png')}
+                                        source={require('../../../assets/img/videoP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -458,7 +458,7 @@ const EditClinicProfile = ({ navigation, route }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/mailPP.png')}
+                                        source={require('../../../assets/img/awardsP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -470,7 +470,7 @@ const EditClinicProfile = ({ navigation, route }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/mailPP.png')}
+                                        source={require('../../../assets/img/blogP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -482,7 +482,7 @@ const EditClinicProfile = ({ navigation, route }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/nameP.png')}
+                                        source={require('../../../assets/img/socialP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -537,7 +537,7 @@ const EditClinicProfile = ({ navigation, route }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/genderP.png')}
+                                        source={require('../../../assets/img/imageP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -549,7 +549,7 @@ const EditClinicProfile = ({ navigation, route }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/mailPP.png')}
+                                        source={require('../../../assets/img/imageP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -558,7 +558,6 @@ const EditClinicProfile = ({ navigation, route }) => {
                                     <Text style={[commonStyles.headerText5G]}>Add/Edit</Text>
                                 </View>
                             </View>
-
                             <View style={{ marginBottom: height * 0.015, }}></View>
                         </View>
 
@@ -601,11 +600,10 @@ const EditClinicProfile = ({ navigation, route }) => {
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.horizontalLine}></View>
-
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/genderP.png')}
+                                        source={require('../../../assets/img/vidP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>
@@ -617,7 +615,7 @@ const EditClinicProfile = ({ navigation, route }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/mailPP.png')}
+                                        source={require('../../../assets/img/galleryP.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>

@@ -180,6 +180,10 @@ const ProfileCompletion1 = ({ navigation }) => {
             console.error('An error occurred:', error);
         }
 
+        await AsyncStorage.setItem('selected_id', id.toString());
+        await AsyncStorage.setItem('selected_name', selectedName);
+        await AsyncStorage.setItem('selected_type', 'My Account');
+
         navigation.navigate('LocationScreen');
     };
 

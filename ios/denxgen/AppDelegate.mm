@@ -128,6 +128,10 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
   return RCTAppSetupDefaultModuleFromClass(moduleClass);
 }
 
+    if (@available(iOS 13.0, *)) {
+        rootView.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
+    }
+
 #endif
 
 @end

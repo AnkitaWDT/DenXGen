@@ -92,8 +92,8 @@ const EditProfile = ({ navigation }) => {
                                     />
                                 </View>
                                 <View style={{ marginLeft: 10, alignSelf: 'center' }}>
-                                    <Text style={[commonStyles.headerText4BL]}>Mitali Walawalkar</Text>
-                                    <Text style={[commonStyles.headerText5G]}>Name</Text>
+                                    <Text style={[commonStyles.headerText4BL]}>Name</Text>
+                                    <Text style={[commonStyles.headerText5G]}>Add/Edit</Text>
                                 </View>
                             </View>
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
@@ -104,7 +104,7 @@ const EditProfile = ({ navigation }) => {
                                     />
                                 </View>
                                 <View style={{ marginLeft: 10, alignSelf: 'center' }}>
-                                    <Text style={[commonStyles.headerText4BL]}>+91 9876543210</Text>
+                                    <Text style={[commonStyles.headerText4BL]}>Contact Number</Text>
                                     <Text style={[commonStyles.headerText5G]}>Add/Edit</Text>
                                 </View>
                             </View>                       
@@ -116,8 +116,8 @@ const EditProfile = ({ navigation }) => {
                                     />
                                 </View>
                                 <View style={{ marginLeft: 10, alignSelf: 'center' }}>
-                                    <Text style={[commonStyles.headerText4BL]}>mitali.wdt@gmail.com</Text>
-                                    <Text style={[commonStyles.headerText5G]}>Email Address</Text>
+                                    <Text style={[commonStyles.headerText4BL]}>Email Address</Text>
+                                    <Text style={[commonStyles.headerText5G]}>Add/Edit</Text>
                                 </View>
                             </View>
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
@@ -128,8 +128,8 @@ const EditProfile = ({ navigation }) => {
                                     />
                                 </View>
                                 <View style={{ marginLeft: 10, alignSelf: 'center' }}>
-                                    <Text style={[commonStyles.headerText4BL]}>Female</Text>
-                                    <Text style={[commonStyles.headerText5G]}>Gender</Text>
+                                    <Text style={[commonStyles.headerText4BL]}>Gender</Text>
+                                    <Text style={[commonStyles.headerText5G]}>Add/Edit</Text>
                                 </View>
                             </View>
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
@@ -140,8 +140,8 @@ const EditProfile = ({ navigation }) => {
                                     />
                                 </View>
                                 <View style={{ marginLeft: 10, alignSelf: 'center' }}>
-                                    <Text style={[commonStyles.headerText4BL]}>Student Profession</Text>
-                                    <Text style={[commonStyles.headerText5G]}>You Are A</Text>
+                                    <Text style={[commonStyles.headerText4BL]}>Profession</Text>
+                                    <Text style={[commonStyles.headerText5G]}>Add/Edit</Text>
                                 </View>
                             </View>
                             <View style={{ marginBottom: height * 0.015, }}></View>

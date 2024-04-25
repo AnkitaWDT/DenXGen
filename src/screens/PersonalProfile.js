@@ -233,6 +233,20 @@ const PersonalProfile = ({ navigation, route }) => {
     };
 
     const [selectedTab, setSelectedTab] = useState(0);
+    useEffect(() => {
+        if (!galleryList.length && !profileData.profile_video) {
+            setSelectedTab(1);
+        } else if (!servicesData.length) {
+            setSelectedTab(2);
+        } else if (!specialityData.length) {
+            setSelectedTab(3);
+        } else if (!keyForteData.length) {
+            setSelectedTab(4);
+        } else if (!profileData.pubList.length) {
+            setSelectedTab(5);
+        }
+    }, [galleryList, profileData, servicesData, specialityData, keyForteData, profileData.pubList]);
+
     const [showPlayButton, setShowPlayButton] = useState(false);
 
     const [modalConnectVisible, setModalConnectVisible] = useState(false);
@@ -311,6 +325,9 @@ const PersonalProfile = ({ navigation, route }) => {
     const renderTabContent = () => {
         switch (selectedTab) {
             case 0:
+                if (galleryList.length === 0 && !profileData.profile_video) {
+                    return null; // Don't render anything if both galleryList and profile_video are empty
+                }
                 return (
                     <View>
                         <Video
@@ -385,6 +402,9 @@ const PersonalProfile = ({ navigation, route }) => {
                     </View>
                 );
             case 1:
+                if (!servicesData) {
+                    return null; // Don't render anything if both galleryList and profile_video are empty
+                }
                 return (
                     <View>
                         <FlatList
@@ -404,6 +424,9 @@ const PersonalProfile = ({ navigation, route }) => {
                     </View>
                 );
             case 2:
+                if (!specialityData) {
+                    return null; // Don't render anything if both galleryList and profile_video are empty
+                }
                 return (
                     <View>
                         <FlatList
@@ -423,6 +446,9 @@ const PersonalProfile = ({ navigation, route }) => {
                     </View>
                 );
             case 3:
+                if (!keyForteData) {
+                    return null; // Don't render anything if both galleryList and profile_video are empty
+                }
                 return (
                     <View>
                         <FlatList
@@ -658,9 +684,11 @@ const PersonalProfile = ({ navigation, route }) => {
                             {profileData ? profileData.name : null}
                         </Text>
 
-                        <Text style={[commonStyles.headerText2BL, {
-                            marginVertical: 3,
-                        }]} numberOfLines={1} ellipsizeMode="tail">{profileData ? profileData.profession : null} ┃ {profileData && profileData.specList.length > 0 ? profileData.specList[0].speciality : null} ┃ {profileData ? profileData.experience : null}</Text>
+                        <Text style={[commonStyles.headerText2BL, { marginVertical: 3 }]} numberOfLines={1} ellipsizeMode="tail">
+                            {profileData ? profileData.profession : null}
+                            {profileData && profileData.specList.length > 0 && profileData.specList[0].speciality ? ' ┃ ' + profileData.specList[0].speciality : ''}
+                            {profileData && profileData.experience ? ' ┃ ' + profileData.experience : ''}
+                        </Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}>
                             <Image source={require('../../assets/img/LocationHome.png')} style={{ width: 15, height: 15, }} />
                             <Text style={[commonStyles.headerText5BL, {
@@ -669,14 +697,16 @@ const PersonalProfile = ({ navigation, route }) => {
 
                             }]}>Vikhroli, Prosthodntic Care, Mumbai</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}>
-                            <Image source={require('../../assets/img/languages.png')} style={{ width: 15, height: 15, }} />
-                            <Text style={[commonStyles.headerText5BL, {
-                                paddingHorizontal: 8,
-                                lineHeight: 15
+                        {languages && (
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}>
+                                <Image source={require('../../assets/img/languages.png')} style={{ width: 15, height: 15, }} />
+                                <Text style={[commonStyles.headerText5BL, {
+                                    paddingHorizontal: 8,
+                                    lineHeight: 15
 
-                            }]}>{languages}</Text>
-                        </View>
+                                }]}>{languages}</Text>
+                            </View>
+                        )}
                         <View>
 
                         </View>
@@ -1144,27 +1174,29 @@ const PersonalProfile = ({ navigation, route }) => {
                             </TouchableOpacity>
                         </Modal>
                     </View>
-                    <View style={styles.horizontalLine}></View>
-                    <View style={styles.aboutContainer}>
-                        <Text style={[commonStyles.headerText11BL, {
-                            marginVertical: height * 0.01,
-                        }]}>About</Text>
-                        {/* <View>
+                    {profileData.about && (<View style={styles.horizontalLine}></View>)}
+                    {profileData.about && (
+                        <View style={styles.aboutContainer}>
+                            <Text style={[commonStyles.headerText11BL, {
+                                marginVertical: height * 0.01,
+                            }]}>About</Text>
+                            {/* <View>
               <Text style={[commonStyles.headerText3BL, {
                 textAlign:'justify'
               }]}>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</Text>
             </View> */}
-                        <View style={{ flex: 1, justifyContent: 'center' }}>
-                            {profileData ? (
-                                <ReadMoreText
-                                    text={profileData.about}
-                                    initialLimit={120}
-                                />
-                            ) : (
-                               null
-                            )}
+                            <View style={{ flex: 1, justifyContent: 'center' }}>
+                                {profileData ? (
+                                    <ReadMoreText
+                                        text={profileData.about}
+                                        initialLimit={120}
+                                    />
+                                ) : (
+                                    null
+                                )}
+                            </View>
                         </View>
-                    </View>
+                    )}
                     {/* <View style={styles.horizontalLine}></View> */}
                     {/* <View style={styles.aboutContainer}>
                         <Text style={[commonStyles.headerText11BL, {
@@ -1196,91 +1228,99 @@ const PersonalProfile = ({ navigation, route }) => {
                         </View>
                     </View> */}
                     <View style={styles.horizontalLine}></View>
-                    <View style={[styles.aboutContainer, { marginBottom: 10 }]}>
-                        <Text style={[commonStyles.headerText11BL, {
-                            //marginVertical: height * 0.01,
-                        }]}>Licence Number</Text>
-                        <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                           
-                            <View style={{  alignSelf: 'center' }}>
-                              
-                                <Text style={[commonStyles.headerText2BL]}>
-                                    {profileData ? profileData.license : null}
+                    {profileData.license && (
+                        <View style={[styles.aboutContainer, { marginBottom: 10 }]}>
+                            <Text style={[commonStyles.headerText11BL, {
+                                //marginVertical: height * 0.01,
+                            }]}>Licence Number</Text>
+                            <View style={{ flexDirection: 'row', marginTop: 10 }}>
+
+                                <View style={{ alignSelf: 'center' }}>
+
+                                    <Text style={[commonStyles.headerText2BL]}>
+                                        {profileData ? profileData.license : null}
                                     </Text>
-                                {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
-                            </View>
-                        </View>
-                    </View>
-                    <View style={[styles.aboutContainer, { marginBottom: 10 }]}>
-                        <Text style={[commonStyles.headerText11BL, {
-                            //marginVertical: height * 0.01,
-                        }]}>Registration Number</Text>
-                        <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                           
-                            <View style={{  alignSelf: 'center' }}>
-                                <Text style={[commonStyles.headerText2BL]}>
-                                    {profileData ? profileData.reg_no : null}
-                                </Text>
-                                {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
-                            </View>
-                        </View>
-                    </View>
-
-                    <View style={[styles.aboutContainer, {}]}>
-                        <Text style={[commonStyles.headerText11BL, {
-                            //marginVertical: height * 0.01,
-                        }]}>Payment Link</Text>
-                        <View style={{ flexDirection: 'row', marginTop: 10 }}>
-
-                            <View style={{ alignSelf: 'center' }}>
-                                <Text style={[commonStyles.headerText2BL]}>
-                                    {profileData ? profileData.payment : null}
-                                </Text>
-                                {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
-                            </View>
-                        </View>
-                    </View>
-                    <View style={styles.horizontalLine}></View>
-                    <View style={styles.aboutContainer}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text style={[commonStyles.headerText11BL, {}]}>Educational Details</Text>
-                        </View>
-
-                        {educationData && educationData.slice(0, showAll ? educationData.length : 2).map((education, index) => (
-                            <View key={index} style={{ flexDirection: 'row', marginVertical: 8 }}>
-                                <View style={styles.licenceContainer}>
-                                    <Image
-                                        source={require('../../assets/img/Education11.png')}
-                                        style={commonStyles.icon}
-                                    />
-                                </View>
-                                <View style={{ marginLeft: 20, alignSelf: 'center' }}>
-                                    <Text style={[commonStyles.headerText4BL]} adjustsFontSizeToFit>{education.licNo}</Text>
-                                    <Text style={[commonStyles.headerText5G]}>{education.licText}</Text>
+                                    {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
                                 </View>
                             </View>
-                        ))}
+                        </View>
+                    )}
+                    {profileData.reg_no && (
+                        <View style={[styles.aboutContainer, { marginBottom: 10 }]}>
+                            <Text style={[commonStyles.headerText11BL, {
+                                //marginVertical: height * 0.01,
+                            }]}>Registration Number</Text>
+                            <View style={{ flexDirection: 'row', marginTop: 10 }}>
 
-                        {!showAll && educationData && educationData.length > 2 && (
-                            <View>
-                                {/* <View style={styles.horizontalLine}></View> */}
+                                <View style={{ alignSelf: 'center' }}>
+                                    <Text style={[commonStyles.headerText2BL]}>
+                                        {profileData ? profileData.reg_no : null}
+                                    </Text>
+                                    {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
+                                </View>
+                            </View>
+                        </View>
+                    )}
+                    {profileData.payment && (
+                        <View style={[styles.aboutContainer, {}]}>
+                            <Text style={[commonStyles.headerText11BL, {
+                                //marginVertical: height * 0.01,
+                            }]}>Payment Link</Text>
+                            <View style={{ flexDirection: 'row', marginTop: 10 }}>
+                                <View style={{ alignSelf: 'center' }}>
+                                    <Text style={[commonStyles.headerText2BL]}>
+                                        {profileData.payment}
+                                    </Text>
+                                    {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
+                                </View>
+                            </View>
+                        </View>
+                    )}
+
+                    {educationData.length > 0 && (<View style={styles.horizontalLine}></View>)}
+                    {educationData.length > 0 && (
+                        <View style={styles.aboutContainer}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <Text style={[commonStyles.headerText11BL, {}]}>Educational Details</Text>
+                            </View>
+
+                            {educationData && educationData.slice(0, showAll ? educationData.length : 2).map((education, index) => (
+                                <View key={index} style={{ flexDirection: 'row', marginVertical: 8 }}>
+                                    <View style={styles.licenceContainer}>
+                                        <Image
+                                            source={require('../../assets/img/Education11.png')}
+                                            style={commonStyles.icon}
+                                        />
+                                    </View>
+                                    <View style={{ marginLeft: 20, alignSelf: 'center' }}>
+                                        <Text style={[commonStyles.headerText4BL]} adjustsFontSizeToFit>{education.licNo}</Text>
+                                        <Text style={[commonStyles.headerText5G]}>{education.licText}</Text>
+                                    </View>
+                                </View>
+                            ))}
+
+                            {!showAll && educationData && educationData.length > 2 && (
+                                <View>
+                                    {/* <View style={styles.horizontalLine}></View> */}
+                                    <TouchableOpacity style={styles.uploadButtonS} onPress={toggleShowAll} activeOpacity={0.8}>
+                                        <Text style={commonStyles.buttonText1}>Show all {educationData.length} educations</Text>
+                                        <Image source={require('../../assets/img/RightArrow.png')} style={styles.imageStyle} />
+                                    </TouchableOpacity>
+                                </View>
+                            )}
+                            {showAll && (
                                 <TouchableOpacity style={styles.uploadButtonS} onPress={toggleShowAll} activeOpacity={0.8}>
-                                    <Text style={commonStyles.buttonText1}>Show all {educationData.length} educations</Text>
+                                    <Text style={commonStyles.buttonText1}>Hide all educations</Text>
                                     <Image source={require('../../assets/img/RightArrow.png')} style={styles.imageStyle} />
                                 </TouchableOpacity>
-                            </View>
-                        )}
-                        {showAll && (
-                            <TouchableOpacity style={styles.uploadButtonS} onPress={toggleShowAll} activeOpacity={0.8}>
-                                <Text style={commonStyles.buttonText1}>Hide all educations</Text>
-                                <Image source={require('../../assets/img/RightArrow.png')} style={styles.imageStyle} />
-                            </TouchableOpacity>
-                        )}
-                    </View>
+                            )}
+                        </View>
+                    )}
 
              
-                    <View style={styles.horizontalLine}></View>
-                    <View>
+                    {experienceData.length > 0 && (<View style={styles.horizontalLine}></View>)}
+
+                    {experienceData.length > 0 && (
                         <View style={styles.aboutContainer}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                 <Text style={[commonStyles.headerText11BL, {
@@ -1321,7 +1361,7 @@ const PersonalProfile = ({ navigation, route }) => {
                             )}
                         </View>
 
-                    </View>
+                    )}
                     <View style={styles.horizontalLine}></View>
                     {/* <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.staticButtonsContainer}>
                         <TouchableOpacity
@@ -1348,46 +1388,53 @@ const PersonalProfile = ({ navigation, route }) => {
                     </ScrollView> */}
 
                     <ScrollView style={styles.tabContainer} horizontal showsHorizontalScrollIndicator={false} >
-                        <TouchableOpacity
-                            style={[styles.tabItem, selectedTab === 0 && styles.selectedTabItem]}
-                            onPress={() => setSelectedTab(0)}
-                            activeOpacity={0.8}
-                        >
+                        {galleryList.length > 0 || profileData.profile_video ? (
+                            <TouchableOpacity
+                                style={[styles.tabItem, selectedTab === 0 && styles.selectedTabItem]}
+                                onPress={() => setSelectedTab(0)}
+                                activeOpacity={0.8}>
+                                <Text style={[styles.tabText, selectedTab === 0 && styles.selectedTabText]}>Gallery</Text>
+                            </TouchableOpacity>
+                        ) : null}
+                        {servicesData.length > 0 ? (
+                            <TouchableOpacity
+                                style={[styles.tabItem, selectedTab === 1 && styles.selectedTabItem]}
+                                onPress={() => setSelectedTab(1)}
+                                activeOpacity={0.8}
+                            >
 
-                            <Text style={[styles.tabText, selectedTab === 0 && styles.selectedTabText]}>Gallery</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.tabItem, selectedTab === 1 && styles.selectedTabItem]}
-                            onPress={() => setSelectedTab(1)}
-                            activeOpacity={0.8}
-                        >
+                                <Text style={[styles.tabText, selectedTab === 1 && styles.selectedTabText]}>Services</Text>
+                            </TouchableOpacity>
+                        ) : null}
+                        {specialityData.length > 0 ? (
+                            <TouchableOpacity
+                                style={[styles.tabItem, selectedTab === 2 && styles.selectedTabItem]}
+                                onPress={() => setSelectedTab(2)}
+                                activeOpacity={0.8}
+                            >
 
-                            <Text style={[styles.tabText, selectedTab === 1 && styles.selectedTabText]}>Services</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.tabItem, selectedTab === 2 && styles.selectedTabItem]}
-                            onPress={() => setSelectedTab(2)}
-                            activeOpacity={0.8}
-                        >
+                                <Text style={[styles.tabText, selectedTab === 2 && styles.selectedTabText]}>Specialities</Text>
+                            </TouchableOpacity>
+                        ) : null}
+                        {keyForteData.length > 0 ? (
+                            <TouchableOpacity
+                                style={[styles.tabItem, selectedTab === 3 && styles.selectedTabItem]}
+                                onPress={() => setSelectedTab(3)}
+                                activeOpacity={0.8}
+                            >
 
-                            <Text style={[styles.tabText, selectedTab === 2 && styles.selectedTabText]}>Specialities</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.tabItem, selectedTab === 3 && styles.selectedTabItem]}
-                            onPress={() => setSelectedTab(3)}
-                            activeOpacity={0.8}
-                        >
-
-                            <Text style={[styles.tabText, selectedTab === 3 && styles.selectedTabText]}>Key Forte</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.tabItem, selectedTab === 4 && styles.selectedTabItem]}
-                            onPress={() => setSelectedTab(4)}
-                            activeOpacity={0.8}
-                        >
-                           
-                            <Text style={[styles.tabText, selectedTab === 4 && styles.selectedTabText]}>Publications</Text>
-                        </TouchableOpacity>
+                                <Text style={[styles.tabText, selectedTab === 3 && styles.selectedTabText]}>Key Forte</Text>
+                            </TouchableOpacity>
+                        ) : null}
+                        {profileData.pubList.length > 0 && (
+                            <TouchableOpacity
+                                style={[styles.tabItem, selectedTab === 4 && styles.selectedTabItem]}
+                                onPress={() => setSelectedTab(4)}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={[styles.tabText, selectedTab === 4 && styles.selectedTabText]}>Publications</Text>
+                            </TouchableOpacity>
+                        )}
 
                         {/* <TouchableOpacity
               style={[styles.tabItem, selectedTab === 4 && styles.selectedTabItem]}

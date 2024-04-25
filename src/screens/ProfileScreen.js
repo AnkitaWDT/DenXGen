@@ -14,6 +14,7 @@ import axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
 import Animation from '../components/Loader';
 import AlertPopup from '../components/AlertPopup';
+import LottieView from 'lottie-react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -248,6 +249,7 @@ const ProfileScreen = ({ navigation, route }) => {
   const [showAlert, setShowAlert] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
   const [showImage, setShowImage] = useState(true);
+  const [showAnimation, setShowAnimation] = useState(false);
 
   const handleImageClick = () => {
     setShowAlert(true);
@@ -255,13 +257,17 @@ const ProfileScreen = ({ navigation, route }) => {
 
   const handleConfirm = () => {
     setShowAlert(false);
-    setShowLoader(true);
+    setShowAnimation(true); // Show the animation
     setTimeout(() => {
-      setShowLoader(false);
-      setShowImage(false);
-      // Perform navigation or any other action after loading
-      // navigation.navigate('ClinicProfileCompletion3');
-    }, 2000); // Simulated loading time, replace with actual loading logic
+      setShowAnimation(false); // Hide the animation after 2 seconds
+      setShowLoader(true);
+      setTimeout(() => {
+        setShowLoader(false);
+        setShowImage(false);
+        // Perform navigation or any other action after loading
+        // navigation.navigate('ClinicProfileCompletion3');
+      }, 2000); // Simulated loading time, replace with actual loading logic
+    }, 2000); // Show the animation for 2 seconds
   };
 
   const handleCancel = () => {
@@ -269,26 +275,44 @@ const ProfileScreen = ({ navigation, route }) => {
   };
 
   const [connectionStatus, setConnectionStatus] = useState(null);
+  const [connection, setConnection] = useState(null);
+  const [prid, setPrid] = useState(null);
+
   const [keyAssociateStatus, setKeyAssociateStatus] = useState(null);
+  const [keyAssociate, setKeyAssociate] = useState(null);
 
   useEffect(() => {
     fetchConnectionStatus();
+    fetchKeyAssociateStatus();
   }, []);
 
   const fetchConnectionStatus = async () => {
     try {
       const pr_id = await AsyncStorage.getItem('pr_id');
+      setPrid(prid);
       const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallconnectionlist-ax.php?pr_id=${pr_id}`);
       const data = await response.json();
+      console.log(data);
       if (data.code === 1) {
         // Check connection status
-        const connection = data.data.find(connection => connection.accid2 === professionalId);
+        const connection = data.data.find(connection => {
+          if ((connection.reciever === pr_id && connection.sender === professionalId) ||
+            (connection.sender === pr_id && connection.reciever === professionalId)) {
+            return true;
+          }
+          return false;
+        });
+
+        //console.log("Connection:", connection);
         if (connection) {
           setConnectionStatus(connection.connection);
-          if (connection.connection === '1') {
-            fetchKeyAssociateStatus();
-          }
+          setConnection(connection);
+          //console.log("Connection Status:", connection.connection);
+        } else {
+          console.log("No connection found for professional ID:", professionalId);
         }
+
+
       } else {
         // Handle error
       }
@@ -298,19 +322,34 @@ const ProfileScreen = ({ navigation, route }) => {
     }
   };
 
+
   const fetchKeyAssociateStatus = async () => {
     try {
       const pr_id = await AsyncStorage.getItem('pr_id');
       const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallkeyassoclist-ax.php?pr_id=${pr_id}`);
       const data = await response.json();
       if (data.code === 1) {
-        const keyAssociate = data.data.find(key => key.accid2 === professionalId);
+        // Check connection status
+        const keyAssociate = data.data.find(keyAssociate => {
+          if ((keyAssociate.reciever === pr_id && keyAssociate.sender === professionalId) ||
+            (keyAssociate.sender === pr_id && keyAssociate.reciever === professionalId)) {
+            return true;
+          }
+          return false;
+        });
+
+        //console.log("KeyAssociate:", keyAssociate);
         if (keyAssociate) {
           setKeyAssociateStatus(keyAssociate.keyassociate);
+          setKeyAssociate(keyAssociate);
+          //console.log("Connection Status:", connection.connection);
+        } else {
+          console.log("No connection found for professional ID:", professionalId);
         }
-      } else {
-        // Handle error
+
+
       }
+
     } catch (error) {
       // Handle error
       console.error(error);
@@ -320,6 +359,9 @@ const ProfileScreen = ({ navigation, route }) => {
   const [buttonState, setButtonState] = useState('StatusReq');
   const [showPopup, setShowPopup] = useState(false);
   const [showPopup1, setShowPopup1] = useState(false);
+  const [showPopup2, setShowPopup2] = useState(false);
+  const [showPopup4, setShowPopup4] = useState(false);
+  const [selectedProfessionalId, setSelectedProfessionalId] = useState(null);
 
   const handleConnectPress = () => {
     if (buttonState === 'Connect') {
@@ -342,7 +384,7 @@ const ProfileScreen = ({ navigation, route }) => {
       const pr_id = await AsyncStorage.getItem('pr_id');
       const id = parseInt(pr_id);
       
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}`);
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=connection`);
       const data = await response.json();
       // Check if the request was successful, and update UI accordingly
       if (data.code === 1) {
@@ -356,6 +398,36 @@ const ProfileScreen = ({ navigation, route }) => {
       // Handle error
       console.error(error);
     }
+  };
+
+  const cancelKeyAssociateRequest = async () => {
+    try {
+      const pr_id = await AsyncStorage.getItem('pr_id');
+      const id = parseInt(pr_id);
+
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=keyassociate`);
+      const data = await response.json();
+      // Check if the request was successful, and update UI accordingly
+      if (data.code === 1) {
+        setButtonState('KeyAssociate');
+        console.log('sent req');
+        console.log(response);
+        console.log(data);
+      } else {
+        // Handle error
+      }
+    } catch (error) {
+      // Handle error
+      console.error(error);
+    }
+  };
+
+  const handleAcceptPress = () => {
+    // Show the popup
+    console.log('huhdei');
+    setShowPopup2(true);
+    // Set the selected professional's id to state
+    setSelectedProfessionalId(professionalId);
   };
 
 
@@ -387,9 +459,10 @@ const ProfileScreen = ({ navigation, route }) => {
 
       const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=keyassociate`);
       const data = await response.json();
+      console.log(data);
       // Check if the request was successful, and update UI accordingly
       if (data.code === 1) {
-        // Update UI as needed
+        setButtonState('RemoveKey');
       } else {
         // Handle error
       }
@@ -400,7 +473,24 @@ const ProfileScreen = ({ navigation, route }) => {
   };
 
 
-  const [selectedTab, setSelectedTab] = useState(0);
+  const determineInitialTab = () => {
+    if ((!galleryList || !galleryList.length) || (!profileData.profile_video)) {
+      return 1;
+    } else if (!servicesData || !servicesData.length) {
+      return 2;
+    } else if (!specialityData || !specialityData.length) {
+      return 3;
+    } else if (!keyForteData || !keyForteData.length) {
+      return 4;
+    } else if (!profileData || !profileData.pubList || !profileData.pubList.length) {
+      return 5;
+    } else {
+      return 0; // All tabs have data, default to the first tab
+    }
+  };
+
+  const [selectedTab, setSelectedTab] = useState(determineInitialTab());
+
   const [showPlayButton, setShowPlayButton] = useState(false);
 
   const [modalConnectVisible, setModalConnectVisible] = useState(false);
@@ -479,6 +569,9 @@ const ProfileScreen = ({ navigation, route }) => {
   const renderTabContent = () => {
     switch (selectedTab) {
       case 0:
+        if (galleryList.length === 0 && !profileData.profile_video) {
+          return null; // Don't render anything if both galleryList and profile_video are empty
+        }
         return (
           <View>
             <Video
@@ -553,6 +646,9 @@ const ProfileScreen = ({ navigation, route }) => {
           </View>
         );
       case 1:
+        if (!servicesData) {
+          return null; // Don't render anything if both galleryList and profile_video are empty
+        }
         return (
           <View>
             <FlatList
@@ -572,6 +668,9 @@ const ProfileScreen = ({ navigation, route }) => {
           </View>
         );
       case 2:
+        if (!specialityData) {
+          return null; // Don't render anything if both galleryList and profile_video are empty
+        }
         return (
           <View>
             <FlatList
@@ -591,6 +690,9 @@ const ProfileScreen = ({ navigation, route }) => {
           </View>
         );
       case 3:
+        if (!keyForteData) {
+          return null; // Don't render anything if both galleryList and profile_video are empty
+        }
         return (
           <View>
             <FlatList
@@ -705,6 +807,12 @@ const ProfileScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+
+      {showAnimation && (
+        <View style={styles.animationContainer}>
+          <Animation />
+        </View>
+      )}
 
       {/* SubContainer with Banner-like Image */}
       <ScrollView style={styles.subContainer} showsVerticalScrollIndicator={false}>
@@ -826,9 +934,15 @@ const ProfileScreen = ({ navigation, route }) => {
               {profileData ? profileData.name : null}
             </Text>
 
-            <Text style={[commonStyles.headerText2BL, {
+            {/* <Text style={[commonStyles.headerText2BL, {
               marginVertical: 3,
-            }]} numberOfLines={1} ellipsizeMode="tail">{profileData ? profileData.profession : null} ┃ {profileData && profileData.specList.length > 0 ? profileData.specList[0].speciality : null} ┃ {profileData ? profileData.experience : null}</Text>
+            }]} numberOfLines={1} ellipsizeMode="tail">{profileData ? profileData.profession : null} ┃ {profileData && profileData.specList.length > 0 ? profileData.specList[0].speciality : null} ┃ {profileData ? profileData.experience : null}</Text> */}
+            <Text style={[commonStyles.headerText2BL, { marginVertical: 3 }]} numberOfLines={1} ellipsizeMode="tail">
+              {profileData ? profileData.profession : null}
+              {profileData && profileData.specList.length > 0 && profileData.specList[0].speciality ? ' ┃ ' + profileData.specList[0].speciality : ''}
+              {profileData && profileData.experience ? ' ┃ ' + profileData.experience : ''}
+            </Text>
+
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}>
               <Image source={require('../../assets/img/LocationHome.png')} style={{ width: 15, height: 15, }} />
               <Text style={[commonStyles.headerText5BL, {
@@ -837,14 +951,16 @@ const ProfileScreen = ({ navigation, route }) => {
 
               }]}>Vikhroli, Prosthodntic Care, Mumbai</Text>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}>
-              <Image source={require('../../assets/img/languages.png')} style={{ width: 15, height: 15, }} />
-              <Text style={[commonStyles.headerText5BL, {
-                paddingHorizontal: 8,
-                lineHeight: 15
+            {languages && (
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}>
+                <Image source={require('../../assets/img/languages.png')} style={{ width: 15, height: 15, }} />
+                <Text style={[commonStyles.headerText5BL, {
+                  paddingHorizontal: 8,
+                  lineHeight: 15
 
-              }]}>{languages}</Text>
-            </View>
+                }]}>{languages}</Text>
+              </View>
+            )}
             <View>
 
             </View>
@@ -903,14 +1019,56 @@ const ProfileScreen = ({ navigation, route }) => {
                     <Text style={commonStyles.buttonTextS}>Connect</Text>
                   </TouchableOpacity>
                 )}
+                {buttonState === 'KeyAssociate' && (
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                   <>
+                          <TouchableOpacity
+                            style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01 }]}
+                            onPress={() => setShowPopup4(true)}
+                            activeOpacity={0.8}
+                          >
+                            <Text style={commonStyles.buttonTextS}>Connected</Text>
+                          </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
+                        onPress={() => setShowPopup(true)}
+                        activeOpacity={0.8}
+                      >
+                        <Text style={commonStyles.buttonTextS}>Key Associated</Text>
+                      </TouchableOpacity>
+                        </>
+                        </View>
+              
+                )}
                 {buttonState === 'Remove' && (
                   <TouchableOpacity
-                    style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, }]}
-                    onPress={cancelConnectionRequest}
+                    style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, }]}
+                    onPress={() => setShowPopup2(true)}
                     activeOpacity={0.8}
                   >
-                    <Text style={commonStyles.buttonTextS}>Cancel Req.</Text>
+                    <Text style={commonStyles.buttonTextS1}>Cancel Req.</Text>
                   </TouchableOpacity>
+                )}
+                {buttonState === 'RemoveKey' && (
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                   <>
+                          <TouchableOpacity
+                            style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01 }]}
+                            onPress={() => setShowPopup4(true)}
+                            activeOpacity={0.8}
+                          >
+                            <Text style={commonStyles.buttonTextS}>Connected</Text>
+                          </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
+                      onPress={() => setShowPopup2(true)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={commonStyles.buttonTextS1}>Cancel Req.</Text>
+                    </TouchableOpacity>
+                        </>
+                        </View>
+                 
                 )}
                 {buttonState === 'Options' && (
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: height * 0.01 }}>
@@ -935,58 +1093,71 @@ const ProfileScreen = ({ navigation, route }) => {
 
                 {buttonState === 'StatusReq' && (
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    {connectionStatus === '1' ? (
+                    {connectionStatus === '2' ? (
                       <>
-                        {keyAssociateStatus === '0' && (
-                          <TouchableOpacity
-                            style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, }]}
-                            onPress={() => {
-                              // Handle key associate request
-                              setShowPopup(true);
-                            }}
-                            activeOpacity={0.8}
-                          >
-                            <Text style={commonStyles.buttonTextS}>Key Associate</Text>
-                          </TouchableOpacity>
-                        )}
-                        {keyAssociateStatus === '1' && (
-                          <TouchableOpacity
-                            style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, }]}
-                            onPress={cancelConnectionRequest}
-                            activeOpacity={0.8}
-                          >
-                            <Text style={commonStyles.buttonTextS}>Cancel Req.</Text>
-                          </TouchableOpacity>
-                        )}
-                        {keyAssociateStatus === '2' && (
+                        {prid === connection.sender && (
                           <TouchableOpacity
                             style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, }]}
-                            onPress={() => {
-                            
-                              //cancelKeyAssociate();
-                            }}
+                            onPress={() => setShowPopup2(true)}
                             activeOpacity={0.8}
                           >
-                            <Text style={commonStyles.buttonTextS1}>Cancel Ass.</Text>
+                            <Text style={commonStyles.buttonTextS1}>Cancel Req.</Text>
+                          </TouchableOpacity>
+                        )}
+                        {prid === connection.reciever && (
+                          <TouchableOpacity
+                            style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, }]}
+                            onPress={() => setShowPopup2(true)}
+                            activeOpacity={0.8}
+                          >
+                            <Text style={commonStyles.buttonTextS}>Accept Req</Text>
                           </TouchableOpacity>
                         )}
                       </>
-                    ) : connectionStatus === '2' ? (
-                      <TouchableOpacity
-                        style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, }]}
-                          onPress={cancelConnectionRequest}
-                        activeOpacity={0.8}
-                      >
-                        <Text style={commonStyles.buttonTextS1}>Cancel Req.</Text>
-                      </TouchableOpacity>
-                    ) : connectionStatus === '0' ? (
-                      <TouchableOpacity
-                        style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, }]}
-                        onPress={() => setShowPopup1(true)}
-                        activeOpacity={0.8}
-                      >
-                        <Text style={commonStyles.buttonTextS}>Connect</Text>
-                      </TouchableOpacity>
+                    ) : connectionStatus === '1' ? (
+                        <>
+                          <TouchableOpacity
+                            style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01 }]}
+                            onPress={() => setShowPopup2(true)}
+                            activeOpacity={0.8}
+                          >
+                            <Text style={commonStyles.buttonTextS}>Connected</Text>
+                          </TouchableOpacity>
+                          {/* <TouchableOpacity
+                            style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
+                            onPress={() => setShowPopup(true)}
+                            activeOpacity={0.8}
+                          >
+                            <Text style={commonStyles.buttonTextS1}>Key Assoc.</Text>
+                          </TouchableOpacity> */}
+                          {keyAssociateStatus === '0' && (
+                            <TouchableOpacity
+                              style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
+                              onPress={() => setShowPopup(true)}
+                              activeOpacity={0.8}
+                            >
+                              <Text style={commonStyles.buttonTextS}>Key Assoc.</Text>
+                            </TouchableOpacity>
+                          )}
+                          {keyAssociateStatus === '2' && (
+                            <TouchableOpacity
+                              style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
+                              onPress={() => setShowPopup4(true)}
+                              activeOpacity={0.8}
+                            >
+                              <Text style={commonStyles.buttonTextS1}>Cancel Req.</Text>
+                            </TouchableOpacity>
+                          )}
+                          {keyAssociateStatus === '1' && (
+                            <TouchableOpacity
+                              style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
+                              onPress={() => setShowPopup4(true)}
+                              activeOpacity={0.8}
+                            >
+                              <Text style={commonStyles.buttonTextS}>Key Associated</Text>
+                            </TouchableOpacity>
+                          )}
+                        </>
                     ) : (
                       <TouchableOpacity
                         style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, }]}
@@ -998,6 +1169,7 @@ const ProfileScreen = ({ navigation, route }) => {
                     )}
                   </View>
                 )}
+
 
               </View>
               {/* <TouchableOpacity
@@ -1073,7 +1245,7 @@ const ProfileScreen = ({ navigation, route }) => {
             visible={showPopup1}
             onRequestClose={() => setShowPopup1(false)}
             title="Connection Request"
-            message="Do you send connection request? "
+            message="Do you want to send connection request? "
             yesLabel="Send"
             noLabel="Cancel"
             onYesPress={() => {
@@ -1088,7 +1260,7 @@ const ProfileScreen = ({ navigation, route }) => {
             visible={showPopup}
             onRequestClose={() => setShowPopup(false)}
             title="Key Associate Request"
-            message="Do you send key associate request? "
+            message="Do you want to send key associate request? "
             yesLabel="Send"
             noLabel="Cancel"
             onYesPress={() => {
@@ -1096,6 +1268,36 @@ const ProfileScreen = ({ navigation, route }) => {
               // handleOptionPress('Empanel');
               setShowPopup(false);
               sendKeyAssociateRequest();
+            }}
+          />
+
+          <AlertPopup
+            visible={showPopup2}
+            onRequestClose={() => setShowPopup2(false)}
+            title="Key Associate Request"
+            message="Do you want to cancel connection request? "
+            yesLabel="Send"
+            noLabel="Cancel"
+            onYesPress={() => {
+              // setShowPopup(false);
+              // handleOptionPress('Empanel');
+              setShowPopup2(false);
+              cancelConnectionRequest();
+            }}
+          />
+
+          <AlertPopup
+            visible={showPopup4}
+            onRequestClose={() => setShowPopup4(false)}
+            title="Key Associate Request"
+            message="Do you want to cancel key associate request? "
+            yesLabel="Send"
+            noLabel="Cancel"
+            onYesPress={() => {
+              // setShowPopup(false);
+              // handleOptionPress('Empanel');
+              setShowPopup4(false);
+              cancelKeyAssociateRequest();
             }}
           />
           {/* <Modal visible={modalConnectVisible} transparent 
@@ -1372,27 +1574,29 @@ const ProfileScreen = ({ navigation, route }) => {
               </TouchableOpacity>
             </Modal>
           </View>
-          <View style={styles.horizontalLine}></View>
-          <View style={styles.aboutContainer}>
-            <Text style={[commonStyles.headerText11BL, {
-              marginVertical: height * 0.01,
-            }]}>About</Text>
-            {/* <View>
+          {profileData.about && (<View style={styles.horizontalLine}></View>)}
+          {profileData.about && (
+            <View style={styles.aboutContainer}>
+              <Text style={[commonStyles.headerText11BL, {
+                marginVertical: height * 0.01,
+              }]}>About</Text>
+              {/* <View>
               <Text style={[commonStyles.headerText3BL, {
                 textAlign:'justify'
               }]}>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</Text>
             </View> */}
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-              {profileData ? (
-                <ReadMoreText
-                  text={profileData.about}
-                  initialLimit={120}
-                />
-              ) : (
-                null
-              )}
+              <View style={{ flex: 1, justifyContent: 'center' }}>
+                {profileData ? (
+                  <ReadMoreText
+                    text={profileData.about}
+                    initialLimit={120}
+                  />
+                ) : (
+                  null
+                )}
+              </View>
             </View>
-          </View>
+          )}
           {/* <View style={styles.horizontalLine}></View> */}
           {/* <View style={styles.aboutContainer}>
                         <Text style={[commonStyles.headerText11BL, {
@@ -1424,91 +1628,99 @@ const ProfileScreen = ({ navigation, route }) => {
                         </View>
                     </View> */}
           <View style={styles.horizontalLine}></View>
-          <View style={[styles.aboutContainer, { marginBottom: 10 }]}>
-            <Text style={[commonStyles.headerText11BL, {
-              //marginVertical: height * 0.01,
-            }]}>Licence Number</Text>
-            <View style={{ flexDirection: 'row', marginTop: 10 }}>
+          {profileData.license && (
+            <View style={[styles.aboutContainer, { marginBottom: 10 }]}>
+              <Text style={[commonStyles.headerText11BL, {
+                //marginVertical: height * 0.01,
+              }]}>Licence Number</Text>
+              <View style={{ flexDirection: 'row', marginTop: 10 }}>
 
-              <View style={{ alignSelf: 'center' }}>
+                <View style={{ alignSelf: 'center' }}>
 
-                <Text style={[commonStyles.headerText2BL]}>
-                  {profileData ? profileData.license : null}
-                </Text>
-                {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
-              </View>
-            </View>
-          </View>
-          <View style={[styles.aboutContainer, { marginBottom: 10 }]}>
-            <Text style={[commonStyles.headerText11BL, {
-              //marginVertical: height * 0.01,
-            }]}>Registration Number</Text>
-            <View style={{ flexDirection: 'row', marginTop: 10 }}>
-
-              <View style={{ alignSelf: 'center' }}>
-                <Text style={[commonStyles.headerText2BL]}>
-                  {profileData ? profileData.reg_no : null}
-                </Text>
-                {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
-              </View>
-            </View>
-          </View>
-
-          <View style={[styles.aboutContainer, {}]}>
-            <Text style={[commonStyles.headerText11BL, {
-              //marginVertical: height * 0.01,
-            }]}>Payment Link</Text>
-            <View style={{ flexDirection: 'row', marginTop: 10 }}>
-
-              <View style={{ alignSelf: 'center' }}>
-                <Text style={[commonStyles.headerText2BL]}>
-                  {profileData ? profileData.payment : null}
-                </Text>
-                {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
-              </View>
-            </View>
-          </View>
-          <View style={styles.horizontalLine}></View>
-          <View style={styles.aboutContainer}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={[commonStyles.headerText11BL, {}]}>Educational Details</Text>
-            </View>
-
-            {educationData && educationData.slice(0, showAll ? educationData.length : 2).map((education, index) => (
-              <View key={index} style={{ flexDirection: 'row', marginVertical: 8 }}>
-                <View style={styles.licenceContainer}>
-                  <Image
-                    source={require('../../assets/img/Education11.png')}
-                    style={commonStyles.icon}
-                  />
-                </View>
-                <View style={{ marginLeft: 20, alignSelf: 'center' }}>
-                  <Text style={[commonStyles.headerText4BL]} adjustsFontSizeToFit>{education.licNo}</Text>
-                  <Text style={[commonStyles.headerText5G]}>{education.licText}</Text>
+                  <Text style={[commonStyles.headerText2BL]}>
+                    {profileData ? profileData.license : null}
+                  </Text>
+                  {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
                 </View>
               </View>
-            ))}
+            </View>
+          )}
+          {profileData.reg_no && (
+            <View style={[styles.aboutContainer, { marginBottom: 10 }]}>
+              <Text style={[commonStyles.headerText11BL, {
+                //marginVertical: height * 0.01,
+              }]}>Registration Number</Text>
+              <View style={{ flexDirection: 'row', marginTop: 10 }}>
 
-            {!showAll && educationData && educationData.length > 2 && (
-              <View>
-                {/* <View style={styles.horizontalLine}></View> */}
+                <View style={{ alignSelf: 'center' }}>
+                  <Text style={[commonStyles.headerText2BL]}>
+                    {profileData ? profileData.reg_no : null}
+                  </Text>
+                  {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
+                </View>
+              </View>
+            </View>
+          )}
+
+          {profileData.payment && (
+            <View style={[styles.aboutContainer, {}]}>
+              <Text style={[commonStyles.headerText11BL, {
+                //marginVertical: height * 0.01,
+              }]}>Payment Link</Text>
+              <View style={{ flexDirection: 'row', marginTop: 10 }}>
+                <View style={{ alignSelf: 'center' }}>
+                  <Text style={[commonStyles.headerText2BL]}>
+                    {profileData.payment}
+                  </Text>
+                  {/* <Text style={styles.licText}>Andhra Pradesh State Dental Council</Text> */}
+                </View>
+              </View>
+            </View>
+          )}
+
+          {educationData.length > 0 && (<View style={styles.horizontalLine}></View>)}
+          {educationData.length > 0 && (
+            <View style={styles.aboutContainer}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Text style={[commonStyles.headerText11BL, {}]}>Educational Details</Text>
+              </View>
+
+              {educationData && educationData.slice(0, showAll ? educationData.length : 2).map((education, index) => (
+                <View key={index} style={{ flexDirection: 'row', marginVertical: 8 }}>
+                  <View style={styles.licenceContainer}>
+                    <Image
+                      source={require('../../assets/img/Education11.png')}
+                      style={commonStyles.icon}
+                    />
+                  </View>
+                  <View style={{ marginLeft: 20, alignSelf: 'center' }}>
+                    <Text style={[commonStyles.headerText4BL]} adjustsFontSizeToFit>{education.licNo}</Text>
+                    <Text style={[commonStyles.headerText5G]}>{education.licText}</Text>
+                  </View>
+                </View>
+              ))}
+
+              {!showAll && educationData && educationData.length > 2 && (
+                <View>
+                  {/* <View style={styles.horizontalLine}></View> */}
+                  <TouchableOpacity style={styles.uploadButtonS} onPress={toggleShowAll} activeOpacity={0.8}>
+                    <Text style={commonStyles.buttonText1}>Show all {educationData.length} educations</Text>
+                    <Image source={require('../../assets/img/RightArrow.png')} style={styles.imageStyle} />
+                  </TouchableOpacity>
+                </View>
+              )}
+              {showAll && (
                 <TouchableOpacity style={styles.uploadButtonS} onPress={toggleShowAll} activeOpacity={0.8}>
-                  <Text style={commonStyles.buttonText1}>Show all {educationData.length} educations</Text>
+                  <Text style={commonStyles.buttonText1}>Hide all educations</Text>
                   <Image source={require('../../assets/img/RightArrow.png')} style={styles.imageStyle} />
                 </TouchableOpacity>
-              </View>
-            )}
-            {showAll && (
-              <TouchableOpacity style={styles.uploadButtonS} onPress={toggleShowAll} activeOpacity={0.8}>
-                <Text style={commonStyles.buttonText1}>Hide all educations</Text>
-                <Image source={require('../../assets/img/RightArrow.png')} style={styles.imageStyle} />
-              </TouchableOpacity>
-            )}
-          </View>
+              )}
+            </View>
+          )}
 
+          {experienceData.length > 0 && (<View style={styles.horizontalLine}></View>)}
 
-          <View style={styles.horizontalLine}></View>
-          <View>
+          {experienceData.length > 0 && (
             <View style={styles.aboutContainer}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Text style={[commonStyles.headerText11BL, {
@@ -1549,7 +1761,7 @@ const ProfileScreen = ({ navigation, route }) => {
               )}
             </View>
 
-          </View>
+          )}
           <View style={styles.horizontalLine}></View>
           {/* <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.staticButtonsContainer}>
                         <TouchableOpacity
@@ -1576,46 +1788,53 @@ const ProfileScreen = ({ navigation, route }) => {
                     </ScrollView> */}
 
           <ScrollView style={styles.tabContainer} horizontal showsHorizontalScrollIndicator={false} >
-            <TouchableOpacity
-              style={[styles.tabItem, selectedTab === 0 && styles.selectedTabItem]}
-              onPress={() => setSelectedTab(0)}
-              activeOpacity={0.8}
-            >
+            {galleryList.length > 0 || profileData.profile_video ? (
+              <TouchableOpacity
+                style={[styles.tabItem, selectedTab === 0 && styles.selectedTabItem]}
+                onPress={() => setSelectedTab(0)}
+                activeOpacity={0.8}>
+                <Text style={[styles.tabText, selectedTab === 0 && styles.selectedTabText]}>Gallery</Text>
+              </TouchableOpacity>
+            ) : null}
+            {servicesData.length > 0 ? (
+              <TouchableOpacity
+                style={[styles.tabItem, selectedTab === 1 && styles.selectedTabItem]}
+                onPress={() => setSelectedTab(1)}
+                activeOpacity={0.8}
+              >
 
-              <Text style={[styles.tabText, selectedTab === 0 && styles.selectedTabText]}>Gallery</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tabItem, selectedTab === 1 && styles.selectedTabItem]}
-              onPress={() => setSelectedTab(1)}
-              activeOpacity={0.8}
-            >
+                <Text style={[styles.tabText, selectedTab === 1 && styles.selectedTabText]}>Services</Text>
+              </TouchableOpacity>
+            ) : null}
+            {specialityData.length > 0 ? (
+              <TouchableOpacity
+                style={[styles.tabItem, selectedTab === 2 && styles.selectedTabItem]}
+                onPress={() => setSelectedTab(2)}
+                activeOpacity={0.8}
+              >
 
-              <Text style={[styles.tabText, selectedTab === 1 && styles.selectedTabText]}>Services</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tabItem, selectedTab === 2 && styles.selectedTabItem]}
-              onPress={() => setSelectedTab(2)}
-              activeOpacity={0.8}
-            >
+                <Text style={[styles.tabText, selectedTab === 2 && styles.selectedTabText]}>Specialities</Text>
+              </TouchableOpacity>
+            ) : null}
+            {keyForteData.length > 0 ? (
+              <TouchableOpacity
+                style={[styles.tabItem, selectedTab === 3 && styles.selectedTabItem]}
+                onPress={() => setSelectedTab(3)}
+                activeOpacity={0.8}
+              >
 
-              <Text style={[styles.tabText, selectedTab === 2 && styles.selectedTabText]}>Specialities</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tabItem, selectedTab === 3 && styles.selectedTabItem]}
-              onPress={() => setSelectedTab(3)}
-              activeOpacity={0.8}
-            >
-
-              <Text style={[styles.tabText, selectedTab === 3 && styles.selectedTabText]}>Key Forte</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tabItem, selectedTab === 4 && styles.selectedTabItem]}
-              onPress={() => setSelectedTab(4)}
-              activeOpacity={0.8}
-            >
-
-              <Text style={[styles.tabText, selectedTab === 4 && styles.selectedTabText]}>Publications</Text>
-            </TouchableOpacity>
+                <Text style={[styles.tabText, selectedTab === 3 && styles.selectedTabText]}>Key Forte</Text>
+              </TouchableOpacity>
+            ) : null}
+            {profileData.pubList.length > 0 && (
+              <TouchableOpacity
+                style={[styles.tabItem, selectedTab === 4 && styles.selectedTabItem]}
+                onPress={() => setSelectedTab(4)}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.tabText, selectedTab === 4 && styles.selectedTabText]}>Publications</Text>
+              </TouchableOpacity>
+            )}
 
             {/* <TouchableOpacity
               style={[styles.tabItem, selectedTab === 4 && styles.selectedTabItem]}
@@ -1725,6 +1944,7 @@ const ProfileScreen = ({ navigation, route }) => {
         </TouchableOpacity>
       )}
 
+
       <AlertPopup
         visible={showAlert}
         onRequestClose={() => setShowAlert(false)}
@@ -1735,6 +1955,7 @@ const ProfileScreen = ({ navigation, route }) => {
         onYesPress={handleConfirm}
         onNoPress={handleCancel}
       />
+
       {/* {showLoader && (
         <View style={styles.animationContainer}>
           <LottieView
@@ -1753,6 +1974,16 @@ const ProfileScreen = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
+  animationContainer: {
+    ...StyleSheet.absoluteFillObject, // Cover the entire screen
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Background blur effect
+  },
+  animation: {
+    width: 150, // Adjust the width and height based on your animation's dimensions
+    height: 150,
+  },
   staticButtonsContainer: {
     flex: 1,
     flexDirection: 'row',
@@ -1851,7 +2082,8 @@ const styles = StyleSheet.create({
   },
   container1: {
     paddingHorizontal: 20,
-    marginTop: 10
+    marginTop: 10,
+    backgroundColor: 'transparent',
   },
   subContainer: {
     //marginTop: 6,

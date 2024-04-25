@@ -77,47 +77,96 @@ const ProfileCompletion3 = ({ navigation }) => {
 
     const uploadProfileImage = async (profile_pic) => {
         try {
-            // Check if profile image is selected
+            // const response = await ImagePicker.openPicker({
+            //     mediaType: 'photo',
+            // });
+
             if (profile_pic) {
-                // Create formData object
                 const formData = new FormData();
-                // Append image data to formData
                 formData.append('profile_pic', {
                     uri: profile_pic.path,
-                    type: profile_pic.mime,
+                    type: 'image/jpeg',
                     name: 'image.jpg',
                 });
 
                 const pr_id = await AsyncStorage.getItem('pr_id');
-                const id = parseInt(pr_id);
-                console.log(id);
-                console.log(pr_id);
-                if (id) {
-                    console.log(id);
-                    formData.append('pr_id', id);
+                if (pr_id) {
+                    formData.append('pr_id', parseInt(pr_id));
                 }
-                console.log(formData);
-                // Send formData to the server for profile image upload
-                const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls31-ax.php', {
+
+                const uploadResponse = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls31-ax.php', {
                     method: 'POST',
                     body: formData,
                     headers: {
                         'Content-Type': 'multipart/form-data',
-                        // Add any additional headers if required
                     },
                 });
-                if (!response.ok) {
-                    throw new Error('Profile image upload failed');
-                }
-                // Log the response to debug
-                //setProfileImage(profile_pic);
-                const responseData = await response.text();
-                console.log('Response from server:', responseData);
+
+                console.log(uploadResponse);
+                setProfileImage(profile_pic);
+
+                // if (!uploadResponse.ok) {
+                //     throw new Error('Upload failed');
+                // }
+
+                // const responseData = await uploadResponse.json();
+
+                // console.log(responseData);
+                // if (responseData && responseData.data && responseData.data.pr_gal_id) {
+                //     setProfileImage(profile_pic.path);
+                // } else {
+                //     throw new Error('Invalid response format');
+                // }
             }
         } catch (error) {
-            ToastAndroid.show('Error uploading profile image', ToastAndroid.SHORT);
+            console.error('Error uploading image:', error);
+            ToastAndroid.show('Error uploading image. Please try again.', ToastAndroid.SHORT);
         }
     };
+
+    // const uploadProfileImage = async (profile_pic) => {
+    //     try {
+    //         // Check if profile image is selected
+    //         if (profile_pic) {
+    //             // Create formData object
+    //             const formData = new FormData();
+    //             // Append image data to formData
+    //             formData.append('profile_pic', {
+    //                 uri: profile_pic.path,
+    //                 type: profile_pic.mime,
+    //                 name: 'image.jpg',
+    //             });
+
+    //             const pr_id = await AsyncStorage.getItem('pr_id');
+    //             const id = parseInt(pr_id);
+    //             console.log(id);
+    //             console.log(pr_id);
+    //             if (id) {
+    //                 console.log(id);
+    //                 formData.append('pr_id', id);
+    //             }
+    //             console.log(formData);
+    //             // Send formData to the server for profile image upload
+    //             const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls31-ax.php', {
+    //                 method: 'POST',
+    //                 body: formData,
+    //                 headers: {
+    //                     'Content-Type': 'multipart/form-data',
+    //                     // Add any additional headers if required
+    //                 },
+    //             });
+    //             if (!response.ok) {
+    //                 throw new Error('Profile image upload failed');
+    //             }
+    //             // Log the response to debug
+    //             //setProfileImage(profile_pic);
+    //             const responseData = await response.text();
+    //             console.log('Response from server:', responseData);
+    //         }
+    //     } catch (error) {
+    //         ToastAndroid.show('Error uploading profile image', ToastAndroid.SHORT);
+    //     }
+    // };
 
     const handleBannerUpload = async () => {
         // Call pickImage function with type 'banner'
@@ -310,7 +359,7 @@ const ProfileCompletion3 = ({ navigation }) => {
         //         });
         // }
 
-        navigation.navigate('ProfileCompletion4');
+        navigation.navigate('EditProfile')
         console.log('ProfileCompletion4');
     };
 

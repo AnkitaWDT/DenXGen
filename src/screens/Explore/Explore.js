@@ -12,6 +12,7 @@ import { useRoute } from '@react-navigation/native';
 import { moderateScale } from 'react-native-size-matters';
 import defaultMaleImage from '../../../assets/img/defaultM.png';
 import defaultFemaleImage from '../../../assets/img/defaultF.png';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 const responsiveFontSize = (size) => {
@@ -188,10 +189,17 @@ const Explore = ({navigation, route}) => {
 
   const fetchProfessionalsData = async () => {
     try {
+
+      const pr_id = await AsyncStorage.getItem('pr_id');
+      const id = parseInt(pr_id);
+
       const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getprofessionallist-ax.php');
       const json = await response.json();
+      
       if (json.code === 1) {
-        setProfessionalsData(json.data);
+        const filteredData = json.data.filter(professional => parseInt(professional.id) !== id);
+        console.log(filteredData);
+        setProfessionalsData(filteredData);
       } else {
         // Handle error
       }

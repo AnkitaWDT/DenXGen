@@ -1104,7 +1104,7 @@ const HomePage = ({ navigation, route }) => {
                 </View>
 
                 {/* White box with shadow */}
-                {completionData && completionData.gotosteps !== null ? (
+                {/* {completionData && completionData.gotosteps !== null ? (
                 <View style={styles.boxContainer}>
                   <View style={{ flexDirection: 'row' }}>
                     <View style={styles.imageRow}>
@@ -1142,7 +1142,6 @@ const HomePage = ({ navigation, route }) => {
                       </View>
                     </View>
                   </View>
-                  {/* Button */}
                   <TouchableOpacity
                     activeOpacity={0.8}
                     style={{
@@ -1170,7 +1169,72 @@ const HomePage = ({ navigation, route }) => {
                     }}>Complete</Text>
                   </TouchableOpacity>
                 </View>
-                ) : null}
+                ) : null} */}
+
+                <View style={styles.boxContainer}>
+                  <View style={{ flexDirection: 'row' }}>
+                    <View style={styles.imageRow}>
+                      {profilePic ? (
+                        <Image
+                          source={{ uri: profilePic }}
+                          style={styles.accountImage}
+                        />
+                      ) : (
+                        <View style={[styles.accountImage, {
+                          width: 42,
+                          height: 42,
+                          borderRadius: 36,
+                          backgroundColor: '#E8F8FF',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }]}>
+                          <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#289EF5' }}>
+                            {activeItem ? activeItem.charAt(0).toUpperCase() :
+                              (defaultName && defaultName.name) ? defaultName.name.charAt(0).toUpperCase() : ''}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                    <View style={styles.textColumn}>
+                      <Text style={[commonStyles.headerText4BL, { marginBottom: height * 0.005 }]}>
+                        {truncateText1('Complete Profile', width * 0.4, 10)}
+                      </Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Image source={require('../../../assets/img/clock.png')} style={styles.image1} />
+                        <Text style={[commonStyles.headerText5G]}>
+                          {completionData && completionData.count ? `${completionData.count}% completed` : 'Completed'}
+                        </Text>
+
+                      </View>
+                    </View>
+                  </View>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    style={{
+                      paddingVertical: 4,
+                      paddingHorizontal: width * 0.02,
+                      borderRadius: 24,
+                      borderColor: '#289EF5',
+                      borderWidth: 1,
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      position: 'absolute',
+                      right: width * 0.02,
+                    }}
+                    // onPress={() => navigation.navigate('ProfileCompletion2')}
+                    onPress={() => navigateToScreen()}
+                  >
+                    <Text style={{
+                      fontSize: responsiveFontSize(14),
+                      alignSelf: 'center',
+                      color: '#289EF5',
+                      paddingHorizontal: 5,
+                      textAlign: 'center',
+                      fontFamily: 'DMSans-Medium',
+                      lineHeight: height * 0.028 //28
+                    }}>Complete</Text>
+                  </TouchableOpacity>
+                </View>
 
                 <ScrollView
                   ref={scrollViewRef}

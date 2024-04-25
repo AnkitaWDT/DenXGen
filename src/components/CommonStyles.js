@@ -186,7 +186,7 @@ marginRight: 12
         fontSize: 15,
         color: '#121212',
         fontFamily: 'DMSans-Medium',
-        lineHeight: height * 0.022, //28
+        lineHeight: 22, //28
         marginHorizontal: 10,
         alignSelf: 'center',
     },
