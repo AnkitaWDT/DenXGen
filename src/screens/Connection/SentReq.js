@@ -24,7 +24,7 @@ const responsiveFontSize = (size) => {
 const SentReq = ({ navigation }) => {
     const [activeTab, setActiveTab] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
-    const tabs = ['Professionals', 'Clinics', 'Others', 'Office'];
+    const tabs = ['Professionals', 'Key Associates', 'Clinics', 'Office'];
     
 
     const data = [
@@ -197,6 +197,8 @@ const SentReq = ({ navigation }) => {
     ];
 
     const [professionals, setProfessionals] = useState([]);
+    const [keyAssociates, setKeyAssociates] = useState([]);
+
 
     useEffect(() => {
         const fetchProfessionalsData = async () => {
@@ -215,6 +217,26 @@ const SentReq = ({ navigation }) => {
         };
 
         fetchProfessionalsData();
+    }, []);
+
+
+    useEffect(() => {
+        const fetchKeyAssociatesData = async () => {
+            try {
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                const id = parseInt(pr_id);
+
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getperskeysentreqlist-ax.php?pr_id=${id}`);
+                const data = await response.json();
+                setKeyAssociates(data.data);
+                setIsLoading(false);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                setIsLoading(false);
+            }
+        };
+
+        fetchKeyAssociatesData();
     }, []);
 
     const [animationLoaded, setAnimationLoaded] = useState(false);
@@ -344,7 +366,7 @@ const SentReq = ({ navigation }) => {
             console.log('huhdei');
             setShowPopup1(true);
             // Set the selected professional's id to state
-            setSelectedProfessionalId(item.accid2);
+            setSelectedProfessionalId(item.pr_id);
         };
 
         return (
@@ -352,7 +374,7 @@ const SentReq = ({ navigation }) => {
                 {/* Content row with text and button */}
                 <TouchableOpacity
                     activeOpacity={0.8}
-                    onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.accid2 })}
+                    onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.pr_id })}
                     style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10 }}
                 >
                     {/* Left side text and image */}
@@ -530,12 +552,39 @@ const SentReq = ({ navigation }) => {
                     <FlatList
                         data={professionals}
                         renderItem={renderItem}
-                        keyExtractor={(item) => item.accid2.toString()}
+                        keyExtractor={(item) => item.id.toString()}
                         refreshing={isLoading}
                     />
                 );
             }
-        } else {
+        }
+        else if (activeTab === 1) {
+            if (keyAssociates.length === 0) {
+                return (
+                    <View style={styles.animationContainer}>
+                        <LottieView
+                            ref={animationRef}
+                            source={require('../../../assets/img/NoData.json')}
+                            style={styles.animation}
+                            autoPlay={true}
+                            loop={true}
+                            onLoad={() => setAnimationLoaded(true)}
+                        />
+                        <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
+                    </View>
+                );
+            } else {
+                return (
+                    <FlatList
+                        data={keyAssociates}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item.id.toString()}
+                        refreshing={isLoading}
+                    />
+                );
+            }
+        } 
+         else {
             // Return manual data for other tabs
             return (
                 <FlatList

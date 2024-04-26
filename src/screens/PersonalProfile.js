@@ -90,12 +90,20 @@ const PersonalProfile = ({ navigation, route }) => {
                 const pr_id = await AsyncStorage.getItem('pr_id');
                 const id = parseInt(pr_id);
 
-                const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getcliniclist-ax.php?pr_id=${id}`);
-                setClinicData(response.data.data);
+                const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getcliniclist-ax.php?pr_id=${pr_id}`);
+
+                if (response.data && response.data.data) {
+                    setClinicData(response.data.data);
+                } else {
+                    console.log('Empty response or missing data:', response.data);
+                    // Handle empty response or missing data
+                }
             } catch (error) {
                 console.error('Error fetching clinic data:', error);
+                // Handle error
             }
         };
+
 
         fetchClinicData();
     }, []);
@@ -232,20 +240,23 @@ const PersonalProfile = ({ navigation, route }) => {
         setShowAllExp(!showAllExp);
     };
 
-    const [selectedTab, setSelectedTab] = useState(0);
-    useEffect(() => {
-        if (!galleryList.length && !profileData.profile_video) {
-            setSelectedTab(1);
-        } else if (!servicesData.length) {
-            setSelectedTab(2);
-        } else if (!specialityData.length) {
-            setSelectedTab(3);
-        } else if (!keyForteData.length) {
-            setSelectedTab(4);
-        } else if (!profileData.pubList.length) {
-            setSelectedTab(5);
+    const determineInitialTab = () => {
+        if ((!galleryList || !galleryList.length) || (!profileData.profile_video)) {
+            return 1;
+        } else if (!servicesData || !servicesData.length) {
+            return 2;
+        } else if (!specialityData || !specialityData.length) {
+            return 3;
+        } else if (!keyForteData || !keyForteData.length) {
+            return 4;
+        } else if (!profileData || !profileData.pubList || !profileData.pubList.length) {
+            return 5;
+        } else {
+            return 0; // All tabs have data, default to the first tab
         }
-    }, [galleryList, profileData, servicesData, specialityData, keyForteData, profileData.pubList]);
+    };
+
+    const [selectedTab, setSelectedTab] = useState(determineInitialTab());
 
     const [showPlayButton, setShowPlayButton] = useState(false);
 

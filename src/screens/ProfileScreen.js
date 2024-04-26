@@ -292,7 +292,7 @@ const ProfileScreen = ({ navigation, route }) => {
       setPrid(prid);
       const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallconnectionlist-ax.php?pr_id=${pr_id}`);
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
       if (data.code === 1) {
         // Check connection status
         const connection = data.data.find(connection => {
@@ -309,7 +309,7 @@ const ProfileScreen = ({ navigation, route }) => {
           setConnection(connection);
           //console.log("Connection Status:", connection.connection);
         } else {
-          console.log("No connection found for professional ID:", professionalId);
+          //console.log("No connection found for professional ID:", professionalId);
         }
 
 
@@ -361,6 +361,7 @@ const ProfileScreen = ({ navigation, route }) => {
   const [showPopup1, setShowPopup1] = useState(false);
   const [showPopup2, setShowPopup2] = useState(false);
   const [showPopup4, setShowPopup4] = useState(false);
+  const [showPopupBlock, setShowPopupBlock] = useState(false);
   const [selectedProfessionalId, setSelectedProfessionalId] = useState(null);
 
   const handleConnectPress = () => {
@@ -430,6 +431,22 @@ const ProfileScreen = ({ navigation, route }) => {
     setSelectedProfessionalId(professionalId);
   };
 
+  const sendBlockRequest = async () => {
+    try {
+      const pr_id = await AsyncStorage.getItem('pr_id');
+      const id = parseInt(pr_id);
+
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=blocked`);
+      const data = await response.json();
+      // Check if the request was successful, and update UI accordingly
+      console.log('block account');
+      console.log(response);
+      console.log(data);
+    } catch (error) {
+      // Handle error
+      console.error(error);
+    }
+  };
 
   const sendConnectionRequest = async () => {
     try {
@@ -1217,13 +1234,15 @@ const ProfileScreen = ({ navigation, route }) => {
                     </View>
                   </TouchableOpacity>
 
-                  <TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setShowPopupBlock(true)}
+                    >
                     <View style={styles.popoverItemContainer}>
                       <Image
                         source={require('../../assets/img/Spam.png')}
                         style={styles.popoverItemIcon}
                       />
-                      <Text style={styles.popoverItemText}>Report Spam</Text>
+                      <Text style={styles.popoverItemText}>Block Account</Text>
                     </View>
                   </TouchableOpacity>
                   <TouchableOpacity>
@@ -1240,6 +1259,21 @@ const ProfileScreen = ({ navigation, route }) => {
               {/* <Image source={require('../../assets/img/Option.png')} style={{ width: 20, height: 20, marginLeft: width * 0.02 }} /> */}
             </View>
           </View>
+
+          <AlertPopup
+            visible={showPopupBlock}
+            onRequestClose={() => setShowPopupBlock(false)}
+            title="Block Account"
+            message="Are you sure you want to block this account? "
+            yesLabel="Block"
+            noLabel="Cancel"
+            onYesPress={() => {
+              // setShowPopup1(false);
+              // handleConnectPress();
+              setShowPopupBlock(false);
+              sendBlockRequest();
+            }}
+          />
 
           <AlertPopup
             visible={showPopup1}
@@ -2475,7 +2509,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#121212',
     fontFamily: 'DMSans-Medium',
-    lineHeight: height * 0.022, //28
+    lineHeight: 22, //28
     marginHorizontal: 10,
     alignSelf: 'center',
   },

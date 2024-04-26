@@ -308,6 +308,7 @@ const ReceivedReq = ({ navigation }) => {
     };
 
     const [showPopup1, setShowPopup1] = useState(false);
+    const [showPopup2, setShowPopup2] = useState(false);
     const [selectedProfessionalId, setSelectedProfessionalId] = useState(null);
 
 
@@ -328,8 +329,21 @@ const ReceivedReq = ({ navigation }) => {
             // Show the popup
             console.log('huhdei');
             //console.log(sender);
-            setShowPopup1(true);
+           
             // Set the selected professional's id to state
+           
+            console.log(selectedProfessionalId);
+
+            if (activeTab === 0) {
+                // Logic for the first tab
+                setShowPopup1(true);
+            } else if (activeTab === 1) {
+                // Logic for the second tab
+                setShowPopup2(true);
+            } else {
+                // Logic for other tabs if needed
+            }
+
             setSelectedProfessionalId(sender);
             console.log(selectedProfessionalId);
         };
@@ -351,7 +365,7 @@ const ReceivedReq = ({ navigation }) => {
                 {/* Content row with text and button */}
                 <TouchableOpacity
                     activeOpacity={0.8}
-                    onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.sender })}
+                    onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.pr_id })}
                     style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10 }}
                 >
                     {/* Left side text and image */}
@@ -373,7 +387,7 @@ const ReceivedReq = ({ navigation }) => {
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <TouchableOpacity
                             style={{ marginRight: 10 }}
-                            onPress={() => handleAcceptPress(item.sender)} 
+                            onPress={() => handleAcceptPress(item.pr_id)} 
                         >
                             <Image
                                 source={require('../../../assets/img/Accept.png')}
@@ -401,10 +415,19 @@ const ReceivedReq = ({ navigation }) => {
                     visible={showPopup1}
                     onRequestClose={() => setShowPopup1(false)}
                     title="Connection Request"
-                    message="Do you want to send a connection request?"
+                    message="Do you want to accept connection request?"
                     yesLabel="Yes"
                     noLabel="No"
                     onYesPress={sendConnectionRequest}
+                />
+                <AlertPopup
+                    visible={showPopup2}
+                    onRequestClose={() => setShowPopup2(false)}
+                    title="Connection Request"
+                    message="Do you want to accept a key associate request?"
+                    yesLabel="Yes"
+                    noLabel="No"
+                    onYesPress={sendKeyAssociateRequest}
                 />
             </ScrollView>
         );
@@ -428,6 +451,24 @@ const ReceivedReq = ({ navigation }) => {
         }
     };
 
+
+    const sendKeyAssociateRequest = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersacceptconn-ax.php?accid1=${selectedProfessionalId}&accid2=${pr_id}&action=keyassociate`);
+            const data = await response.json();
+            // Handle response data as needed
+            console.log(response);
+            console.log(data);
+            console.log('connected')
+            setShowPopup1(false); // Close the popup after making the API call
+        } catch (error) {
+            console.error('Error sending connection request:', error);
+            // Handle error
+        }
+    };
+
+    
 
 
     const flatListRef = useRef();

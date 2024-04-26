@@ -7,6 +7,8 @@ import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-m
 import Contacts from 'react-native-contacts';
 import Animation from '../../components/Loader';
 import Popover, { PopoverPlacement } from 'react-native-popover-view';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import LottieView from 'lottie-react-native';
 
 const { width, height } = Dimensions.get('window');
 const responsiveFontSize = (size) => {
@@ -191,6 +193,57 @@ const BlockAcc = ({ navigation }) => {
 
     ];
 
+    const [professionals, setProfessionals] = useState([]);
+    const [keyAssociates, setKeyAssociates] = useState([]);
+
+    useEffect(() => {
+        const fetchProfessionalsData = async () => {
+            try {
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                const id = parseInt(pr_id);
+
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersblockedconnlist-ax.php?pr_id=${id}`);
+                const data = await response.json();
+                setProfessionals(data.data);
+                console.log(data);
+                setIsLoading(false);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                setIsLoading(false);
+            }
+        };
+
+        fetchProfessionalsData();
+    }, []);
+
+    useEffect(() => {
+        const fetchKeyAssociatesData = async () => {
+            try {
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                const id = parseInt(pr_id);
+
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getperskeypendreqlist-ax.php?pr_id=${id}`);
+                const data = await response.json();
+                setKeyAssociates(data.data);
+                setIsLoading(false);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                setIsLoading(false);
+            }
+        };
+
+        fetchKeyAssociatesData();
+    }, []);
+
+    const [animationLoaded, setAnimationLoaded] = useState(false);
+    const animationRef = useRef(null);
+
+    useEffect(() => {
+        if (animationLoaded) {
+            animationRef.current?.play();
+        }
+    }, [animationLoaded]);
+
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -257,9 +310,9 @@ const BlockAcc = ({ navigation }) => {
 
     const renderItem = ({ item, index }) => {
 
-        const truncatedTitle = truncateText(item.title, width * 0.65, 17);
+        const truncatedTitle = truncateText(item.name, width * 0.65, 17);
         const truncatedDescription = truncateText(item.description, width * 0.65, 15);
-
+        // const truncatedDescription = truncateText(item.specList[0].speciality, width * 0.85, 15);
 
         // console.log('Original title:', item.title);
         // console.log('Truncated title:', truncatedTitle);
@@ -268,8 +321,8 @@ const BlockAcc = ({ navigation }) => {
         // console.log('Truncated description:', truncatedDescription);
 
         let imageUrl;
-        if (item.image) {
-            imageUrl = item.image;
+        if (item.profile_pic) {
+            imageUrl = item.profile_pic;
         } else {
             if (item.gender === 1) {
                 imageUrl = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJQAlwMBIgACEQEDEQH/xAAbAAEBAAMBAQEAAAAAAAAAAAAAAQIEBQMGB//EADAQAAIBAwMEAQEFCQAAAAAAAAABAgMEEQUhMRJBUWETcSJSYoHwJCUyNDZCU5Gx/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AP3DkoAAGLeSoCgACMJFAAEyEAwUACNk5MgAAJkA1kJYKAAAAGLZkAIlgoIwDYSCQYEnOMIuU2kly2aFfU4ReKMer29ka17dzrSlDZU4vjyagHtUuq9RvNRpS5S2RIXFaCSjVnhcLJ5ADajqFzHmal6aRs2+pKc8VoqK+8vJzBwB9JGSlFNPKfdFOLp9x8NXpk/sz2+h2WA5CWAkUARsNhICgAAgCN4AoIkUAa1/UVO1m+7WF+ZsNmlqv8rv95YA5AAAAIAABnwAzud2wmp2tNrOyw8+ThHZ0t/si9SYG4CNlAiRQRvADJTHGQBWwl5GCgARsIBg09WTdqsLiSybppatKStkovGZYYHHHIAAFIAYQAA7OmbWi9ybOMdjSm3bYfEZNIDcSKAAIkUAAAAI2UncCLcyBGwDNXUl1Wk/TTX+zaPG8g521SMVltbAcEFaxzyQCZyVDAABsZ3AA7emx6bOHvLZxDvWkXC1pxfPSB7NhLyEu5QABjyBU8gJYKBEUEbAoIuSgADHkDiX8ei7qLs31L8zXOpqtHMI1UuNpHMAgGQAADA2NPh13UE1lLdndOdpNBxhKrLmey+h0QADInkA0UAADEAVvBFuXBQABMgHuVAAScVOLjJZT2aPn7in8NedJPKi9mfQTajFtvCXJ8/WqfLVnPtJ5QHmAADPW1o/PXhTb2fJ5HrbVPirwn2T3+gHfilGKjFYSWEikTUkmuHwNwJyzIAAYmQAiQKAOdb3VSWtXVrKWadOlCUV08Zznc6JyrX+or3Z7W9P+7bl9v12OowHJUa1S9oUnhzy/EdzWqar/jpZ9tgdI8a1xTorM5Jeu5yat/cVOJ9K/Ca27eW8sDbu72Vf7MV00/HdmoAAfAQKAJkMcgblleyo4hPMqfbyjq0q1Oss05JnzxU2nlNp+gPo8kOLTv7iDx19S/Esm1T1RcVKT+sWB0ga9O9oVOJ4fiSwezeeOAMsgiQA51vP9+XMOhJujBuW2ZLtnbtv379jHU7luXwwey/i9+jzhOnS1y8l0S61bwbk2999kv13Zpybk3JvLbywIAUCABgMgJAAAAGNwAAAzuAAAAM6WmXLz8NR5+63/wAOaZQk4SUlynlAfRgwpzU6cZriSyAONd01DULuom8zp00+OzNVlAAAAHwRFAFIABCgAUxZQAAABhAAAAB2tOfVawz2ygAB/9k='; // Replace DEFAULT_MALE_IMAGE_URL with the URL of your default male image
@@ -283,7 +336,7 @@ const BlockAcc = ({ navigation }) => {
                 {/* Content row with text and button */}
                 <TouchableOpacity
                     activeOpacity={0.8}
-                    onPress={() => navigation.navigate('ProfileScreen')}
+                    onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.pr_id })}
                     style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10 }}
                 >
                     {/* Left side text and image */}
@@ -311,7 +364,7 @@ const BlockAcc = ({ navigation }) => {
                             borderWidth: 1,
                             justifyContent: 'space-between',
                             alignItems: 'center',
-                            width: width * 0.2,
+                            //width: width * 0.2,
                         }}
                         onPress={() => {
                             // Handle button press logic here
@@ -405,26 +458,44 @@ const BlockAcc = ({ navigation }) => {
     const scrollViewRef = useRef();
 
     const renderTabContent = (index) => {
-        // Render content for each tab using data[index]
-        return (
-            // <FlatList
-            //     data={data[index]}
-            //     renderItem={renderItem}
-            //     keyExtractor={(item) => item.id.toString()}
-            // />
-            <FlatList
-                ref={flatListRef}
-                data={data[activeTab]}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id.toString()}
-                refreshing={isLoading}
-            // onRefresh={() => {
-            //     setIsLoading(true);
-            //     setIsLoading(false);
-            // }}
-            />
-
-        );
+        if (activeTab === 0) {
+            if (professionals.length === 0) {
+                return (
+                    <View style={styles.animationContainer}>
+                        <LottieView
+                            ref={animationRef}
+                            source={require('../../../assets/img/NoData.json')}
+                            style={styles.animation}
+                            autoPlay={true}
+                            loop={true}
+                            onLoad={() => setAnimationLoaded(true)}
+                        />
+                        <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
+                    </View>
+                );
+            } else {
+                return (
+                    <FlatList
+                        data={professionals}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item.pr_id.toString()}
+                        refreshing={isLoading}
+                    />
+                );
+            }
+        }
+        else {
+            // Return manual data for other tabs
+            return (
+                <FlatList
+                    ref={flatListRef}
+                    data={data[activeTab]}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id.toString()}
+                    refreshing={isLoading}
+                />
+            );
+        }
     };
 
     // const renderTabContent = (tabIndex) => {
@@ -608,6 +679,17 @@ const BlockAcc = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+    animationContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: height * 0.75,
+        width: width
+    },
+    animation: {
+        width: 150, // Adjust the width and height based on your animation's dimensions
+        height: 150,
+    },
     subContainer: {
         // marginBottom: 100,
         // paddingBottom: 50,

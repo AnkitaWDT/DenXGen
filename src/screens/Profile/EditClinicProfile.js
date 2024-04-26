@@ -192,7 +192,7 @@ const EditClinicProfile = ({ navigation, route }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={styles.imgC}>
                                     <Image
-                                        source={require('../../../assets/img/nameE.png')}
+                                        source={require('../../../assets/img/Timings.png')}
                                         style={commonStyles.icon}
                                     />
                                 </View>

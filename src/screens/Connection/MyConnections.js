@@ -216,7 +216,10 @@ const MyConnections = ({ navigation }) => {
 
                 const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getperskeymyconnlist-ax.php?pr_id=${id}`);
                 const data = await response.json();
-                setKeyAssociates(data.data);
+
+                const filteredData = data.data.filter(item => parseInt(item.pr_id) !== id);
+
+                setKeyAssociates(filteredData);
                 setIsLoading(false);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -323,7 +326,7 @@ const MyConnections = ({ navigation }) => {
                     <FlatList
                         data={professionals}
                         renderItem={renderItem}
-                        keyExtractor={(item) => item.accid2.toString()}
+                        keyExtractor={(item) => item.pr_id.toString()}
                         refreshing={isLoading}
                     />
                 );
@@ -349,7 +352,7 @@ const MyConnections = ({ navigation }) => {
                     <FlatList
                         data={keyAssociates}
                         renderItem={renderItem}
-                        keyExtractor={(item) => item.id.toString()}
+                        keyExtractor={(item) => item.pr_id.toString()}
                         refreshing={isLoading}
                     />
                 );
