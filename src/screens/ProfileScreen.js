@@ -14,6 +14,7 @@ import axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
 import Animation from '../components/Loader';
 import AlertPopup from '../components/AlertPopup';
+import CustomDropCard from '../components/CustomDropCard';
 import LottieView from 'lottie-react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -113,6 +114,33 @@ const ProfileScreen = ({ navigation, route }) => {
     fetchClinicData();
   }, []);
 
+  const [endorsementData, setEndorsementData] = useState([]);
+
+
+  useEffect(() => {
+    const fetchEndorsementData = async () => {
+      try {
+        const pr_id = await AsyncStorage.getItem('pr_id');
+        const id = parseInt(pr_id);
+
+        const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getpersendorsviclist-ax.php?pr_id=${professionalId}`);
+
+        if (response.data && response.data.data) {
+          setEndorsementData(response.data.data);
+          console.log(endorsementData);
+        } else {
+          console.log('Empty response or missing data:', response.data);
+          // Handle empty response or missing data
+        }
+      } catch (error) {
+        console.error('Error fetching clinic data:', error);
+        // Handle error
+      }
+    };
+
+
+    fetchEndorsementData();
+  }, []);
 
   const toggleModalB = () => {
     setModalVisible(!modalVisible);
@@ -257,17 +285,18 @@ const ProfileScreen = ({ navigation, route }) => {
 
   const handleConfirm = () => {
     setShowAlert(false);
-    setShowAnimation(true); // Show the animation
+    //setShowAnimation(true); // Show the animation
     setTimeout(() => {
-      setShowAnimation(false); // Hide the animation after 2 seconds
+      //setShowAnimation(false); // Hide the animation after 2 seconds
       setShowLoader(true);
       setTimeout(() => {
         setShowLoader(false);
+        sendDropCardRequest();
         setShowImage(false);
         // Perform navigation or any other action after loading
         // navigation.navigate('ClinicProfileCompletion3');
-      }, 2000); // Simulated loading time, replace with actual loading logic
-    }, 2000); // Show the animation for 2 seconds
+      }, 1000); // Simulated loading time, replace with actual loading logic
+    }, 1000); // Show the animation for 2 seconds
   };
 
   const handleCancel = () => {
@@ -277,6 +306,7 @@ const ProfileScreen = ({ navigation, route }) => {
   const [connectionStatus, setConnectionStatus] = useState(null);
   const [connection, setConnection] = useState(null);
   const [prid, setPrid] = useState(null);
+  console.log('prid', connection);
 
   const [keyAssociateStatus, setKeyAssociateStatus] = useState(null);
   const [keyAssociate, setKeyAssociate] = useState(null);
@@ -289,7 +319,7 @@ const ProfileScreen = ({ navigation, route }) => {
   const fetchConnectionStatus = async () => {
     try {
       const pr_id = await AsyncStorage.getItem('pr_id');
-      setPrid(prid);
+      setPrid(pr_id);
       const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallconnectionlist-ax.php?pr_id=${pr_id}`);
       const data = await response.json();
       //console.log(data);
@@ -303,14 +333,10 @@ const ProfileScreen = ({ navigation, route }) => {
           return false;
         });
 
-        //console.log("Connection:", connection);
-        if (connection) {
-          setConnectionStatus(connection.connection);
-          setConnection(connection);
-          //console.log("Connection Status:", connection.connection);
-        } else {
-          //console.log("No connection found for professional ID:", professionalId);
-        }
+        console.log("Connection:", connection);
+        setConnectionStatus(connection.connection);
+        setConnection(connection);
+        console.log("Connection Status:", connection.connection);
 
 
       } else {
@@ -362,6 +388,7 @@ const ProfileScreen = ({ navigation, route }) => {
   const [showPopup2, setShowPopup2] = useState(false);
   const [showPopup4, setShowPopup4] = useState(false);
   const [showPopupBlock, setShowPopupBlock] = useState(false);
+  const [showPopupEndorse, setShowPopupEndorse] = useState(false);
   const [selectedProfessionalId, setSelectedProfessionalId] = useState(null);
 
   const handleConnectPress = () => {
@@ -431,12 +458,46 @@ const ProfileScreen = ({ navigation, route }) => {
     setSelectedProfessionalId(professionalId);
   };
 
+  const sendDropCardRequest = async () => {
+    try {
+      const pr_id = await AsyncStorage.getItem('pr_id');
+      const id = parseInt(pr_id);
+
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=dropacard`);
+      const data = await response.json();
+      // Check if the request was successful, and update UI accordingly
+      console.log('drop a card account');
+      console.log(response);
+      console.log(data);
+    } catch (error) {
+      // Handle error
+      console.error(error);
+    }
+  };
+
   const sendBlockRequest = async () => {
     try {
       const pr_id = await AsyncStorage.getItem('pr_id');
       const id = parseInt(pr_id);
 
       const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=blocked`);
+      const data = await response.json();
+      // Check if the request was successful, and update UI accordingly
+      console.log('block account');
+      console.log(response);
+      console.log(data);
+    } catch (error) {
+      // Handle error
+      console.error(error);
+    }
+  };
+
+  const sendEndorseRequest = async () => {
+    try {
+      const pr_id = await AsyncStorage.getItem('pr_id');
+      const id = parseInt(pr_id);
+
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=endorsement`);
       const data = await response.json();
       // Check if the request was successful, and update UI accordingly
       console.log('block account');
@@ -511,6 +572,7 @@ const ProfileScreen = ({ navigation, route }) => {
   const [showPlayButton, setShowPlayButton] = useState(false);
 
   const [modalConnectVisible, setModalConnectVisible] = useState(false);
+  const [modalEndorseVisible, setModalEndorseVisible] = useState(false);
 
   const [profileData, setProfileData] = useState(null);
   const [galleryList, setGalleryList] = useState([]);
@@ -555,6 +617,7 @@ const ProfileScreen = ({ navigation, route }) => {
   const specialityData = profileData ? profileData.specList.map(item => item.speciality) : [];
   const keyForteData = profileData ? profileData.keyfList.map(item => item.keyforte) : [];
   const languages = profileData ? profileData.langList.map(lang => lang.language).join(', ') : null;
+  const endData = profileData ? profileData.endorsmentList.map(item => item.endorsedto) : [];
 
   const educationData = profileData ? profileData.eduList.map(edu => {
     const fromMonth = edu.start_month; // Assuming you have a function to get month name
@@ -978,6 +1041,115 @@ const ProfileScreen = ({ navigation, route }) => {
                 }]}>{languages}</Text>
               </View>
             )}
+            {endData.length > 0 ? (
+            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}
+            onPress={() => setModalEndorseVisible(true)}
+            >
+              <Image source={require('../../assets/img/EndorseB.png')} style={{ width: 15, height: 12, }} />
+              {/* <Text style={[commonStyles.headerText5BL, {
+                paddingHorizontal: 8,
+                lineHeight: 18
+
+              }]}>1 Endorsement</Text> */}
+            
+              <Text style={[commonStyles.headerText5BL, { paddingHorizontal: 8, lineHeight: 18 }]}>
+                  {endData.length} Endorsements
+              </Text>
+            
+            </TouchableOpacity>
+            ) : null}
+
+            <Modal
+              visible={modalEndorseVisible}
+              transparent
+              onRequestClose={() => setModalEndorseVisible(false)}
+            >
+              <TouchableOpacity
+                style={styles.modalContainer}
+                onPress={() => setModalEndorseVisible(false)}
+              >
+                <TouchableOpacity
+                  style={styles.modalContent}
+                  activeOpacity={1}
+                  onPress={() => { }}
+                >
+                  <ScrollView>
+                    <View style={styles.horizontalLineM}></View>
+                    <Text style={[commonStyles.headerText4BL, { marginVertical: height * 0.02 }]}>
+                      Endorsement List
+                    </Text>
+                    <Text style={[commonStyles.headerText6G, { marginBottom: height * 0.025 }]}>
+                      Note: Type services like Root Canal, Aligners, Oral Surgery, etc to show specialisation you provide.
+                    </Text>
+                    {endorsementData.map(endorsement => (
+                      <TouchableOpacity
+                        key={endorsement.id}
+                        style={{
+                          paddingHorizontal: 9,
+                          borderWidth: 0.5,
+                          borderRadius: 8,
+                          borderColor: '#979797',
+                          marginBottom: 16,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          paddingVertical: 8,
+                          backgroundColor: '#FEFCFC'
+                        }}
+                        activeOpacity={0.8}
+                        // onPress={() => {
+                        //   console.log('Button clicked!');
+                        //   console.log(endorsement.pr_id);
+                        //   setModalEndorseVisible(false)
+                        //  navigation.navigate('ProfileScreen', { professionalId: endorsement.pr_id })
+                        //  }}
+                        onPress={() => navigation.navigate('ProfileScreen', { professionalId: endorsement.pr_id })}
+                      >
+
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          {endorsement.profile_pic ? (
+                            <Image
+                              source={{ uri: endorsement.profile_pic }}
+                              style={styles.profileImage}
+                            />
+                          ) : (
+                            <View style={[styles.profileImage, {
+                              width: height * 0.09,
+                              height: height * 0.09,
+                              borderRadius: 36,
+                              backgroundColor: '#E8F8FF',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }]}>
+                              <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>
+                                  {endorsement.name ? endorsement.name.charAt(0).toUpperCase() : ''}
+                              </Text>
+                            </View>
+                          )}
+                          {/* <Image source={{ uri: clinic.profile_pic || 'default_image_url' }} style={styles.profileImage} /> */}
+                          <View style={{ flex: 1 }}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <Text style={[commonStyles.headerText2BL, { lineHeight: 20 }]} numberOfLines={1}>{endorsement.name}</Text>
+                            </View>
+
+                            {/* <Text style={[commonStyles.headerText5G, { marginVertical: height * 0.01 }]} numberOfLines={1}>Implants to Cosmetics</Text> */}
+
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                {endorsement.specList.map((speciality) => (
+                                  <Text key={speciality.spec_id} style={[commonStyles.headerText5BL, { marginTop: height * 0.01 }]}>{speciality.speciality}</Text>
+                                ))}
+                              </View>
+                            </View>
+                          </View>
+                        </View>
+                      </TouchableOpacity>
+                    ))}
+                    
+                  </ScrollView>
+                </TouchableOpacity>
+              </TouchableOpacity>
+            </Modal>
             <View>
 
             </View>
@@ -1110,11 +1282,11 @@ const ProfileScreen = ({ navigation, route }) => {
 
                 {buttonState === 'StatusReq' && (
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    {connectionStatus === '2' ? (
+                    {connectionStatus === '2' && connection ? (
                       <>
                         {prid === connection.sender && (
                           <TouchableOpacity
-                            style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, }]}
+                            style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01 }]}
                             onPress={() => setShowPopup2(true)}
                             activeOpacity={0.8}
                           >
@@ -1123,7 +1295,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         )}
                         {prid === connection.reciever && (
                           <TouchableOpacity
-                            style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, }]}
+                            style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01 }]}
                             onPress={() => setShowPopup2(true)}
                             activeOpacity={0.8}
                           >
@@ -1214,13 +1386,14 @@ const ProfileScreen = ({ navigation, route }) => {
                   </TouchableOpacity>
                 )}>
                 <View style={styles.popover}>
-                  <TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setShowPopupEndorse(true)}>
                     <View style={styles.popoverItemContainer}>
                       <Image
-                        source={require('../../assets/img/Bookmark.png')}
-                        style={styles.popoverItemIcon}
+                        source={require('../../assets/img/Endorsement.png')}
+                        style={styles.popoverItemIcon1}
                       />
-                      <Text style={styles.popoverItemText}>Save PDF</Text>
+                      <Text style={styles.popoverItemText}>Endorse</Text>
                     </View>
                   </TouchableOpacity>
 
@@ -1274,6 +1447,22 @@ const ProfileScreen = ({ navigation, route }) => {
               sendBlockRequest();
             }}
           />
+
+          <AlertPopup
+            visible={showPopupEndorse}
+            onRequestClose={() => setShowPopupEndorse(false)}
+            title="Endorse Account"
+            message="Are you sure you want to send endorsement to this account? "
+            yesLabel="Endorse"
+            noLabel="Cancel"
+            onYesPress={() => {
+              // setShowPopup1(false);
+              // handleConnectPress();
+              setShowPopupEndorse(false);
+              sendEndorseRequest();
+            }}
+          />
+
 
           <AlertPopup
             visible={showPopup1}
@@ -1979,7 +2168,14 @@ const ProfileScreen = ({ navigation, route }) => {
       )}
 
 
-      <AlertPopup
+      <CustomDropCard
+        visible={showAlert}
+        onClose={() => setShowAlert(false)}
+        onContinue={handleConfirm}
+        onSkip={handleCancel}
+      />
+
+      {/* <AlertPopup
         visible={showAlert}
         onRequestClose={() => setShowAlert(false)}
         title="Drop a Card"
@@ -1988,7 +2184,7 @@ const ProfileScreen = ({ navigation, route }) => {
         noLabel="No"
         onYesPress={handleConfirm}
         onNoPress={handleCancel}
-      />
+      /> */}
 
       {/* {showLoader && (
         <View style={styles.animationContainer}>
@@ -2500,6 +2696,13 @@ const styles = StyleSheet.create({
   },
   popoverItemIcon: {
     height: 18,
+    width: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
+  popoverItemIcon1: {
+    height: 15,
     width: 18,
     justifyContent: 'center',
     alignItems: 'center',

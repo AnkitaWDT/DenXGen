@@ -241,7 +241,7 @@ const PersonalProfile = ({ navigation, route }) => {
     };
 
     const determineInitialTab = () => {
-        if ((!galleryList || !galleryList.length) || (!profileData.profile_video)) {
+        if ((!galleryList || !galleryList.length) && (!profileData.profile_video)) {
             return 1;
         } else if (!servicesData || !servicesData.length) {
             return 2;

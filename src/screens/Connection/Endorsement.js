@@ -19,7 +19,7 @@ const responsiveFontSize = (size) => {
 };
 
 
-const DropCards = ({ navigation }) => {
+const Endorsement = ({ navigation }) => {
     const [activeTab, setActiveTab] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
     const tabs = ['Professionals', 'Clinics', 'Others', 'Office'];
@@ -203,7 +203,7 @@ const DropCards = ({ navigation }) => {
                 const pr_id = await AsyncStorage.getItem('pr_id');
                 const id = parseInt(pr_id);
 
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersdroplist-ax.php?pr_id=${id}`);
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersendorslist-ax.php?pr_id=${id}`);
                 const data = await response.json();
                 setProfessionals(data.data);
                 console.log(data);
@@ -349,7 +349,7 @@ const DropCards = ({ navigation }) => {
                 const pr_id = await AsyncStorage.getItem('pr_id');
                 const id = parseInt(pr_id);
 
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${pr_id}&accid2=${selectedProfessionalId}&action=blocked`);
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${pr_id}&accid2=${selectedProfessionalId}&action=endorsement`);
                 const data = await response.json();
                 console.log(data);
                 // Check if the request was successful, and update UI accordingly
@@ -389,7 +389,7 @@ const DropCards = ({ navigation }) => {
                     </View>
 
                     {/* Right side button */}
-                    {/* <TouchableOpacity
+                    <TouchableOpacity
                         style={{
                             paddingVertical: 4,
                             paddingHorizontal: width * 0.01,
@@ -410,8 +410,8 @@ const DropCards = ({ navigation }) => {
                             textAlign: 'center',
                             fontFamily: 'DMSans-Medium',
                             lineHeight: height * 0.028 //28
-                        }}>Unblock</Text>
-                    </TouchableOpacity> */}
+                        }}>Cancel</Text>
+                    </TouchableOpacity>
                 </TouchableOpacity>
 
                 {/* Horizontal line */}
@@ -629,7 +629,7 @@ const DropCards = ({ navigation }) => {
                                     style={commonStyles.icon}
                                 />
                             </TouchableOpacity>
-                            <Text style={commonStyles.backText}>Drop a Cards</Text>
+                            <Text style={commonStyles.backText}>Endorsement Accounts</Text>
                             <TouchableOpacity style={commonStyles.backContainer1} activeOpacity={0.8}>
                                 <Image
                                     source={require('../../../assets/img/Option.png')}
@@ -819,4 +819,4 @@ const styles = StyleSheet.create({
 
     },
 });
-export default DropCards;
+export default Endorsement;

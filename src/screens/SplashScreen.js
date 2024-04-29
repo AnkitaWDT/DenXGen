@@ -1,11 +1,70 @@
 /* eslint-disable prettier/prettier */
 import React, { useEffect, useRef } from 'react';
-import { Animated, View, Image, StyleSheet, Dimensions } from 'react-native';
+import { Animated, View, Image, StyleSheet, Dimensions, PermissionsAndroid, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG } from '../API/APIConfig';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 const SplashScreen = ({ navigation }) => {
     const fadeAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        const requestNotificationPermission = async () => {
+            try {
+                let permission;
+                if (Platform.OS === 'android') {
+                    permission = PERMISSIONS.ANDROID.ACCESS_NOTIFICATIONS;
+                } else if (Platform.OS === 'ios') {
+                    permission = PERMISSIONS.IOS.NOTIFICATIONS;
+                }
+
+                const status = await check(permission);
+
+                if (status !== RESULTS.GRANTED) {
+                    const result = await request(permission);
+
+                    if (result !== RESULTS.GRANTED) {
+                        console.log('Notification permission is denied');
+                        // Handle permission denied case, e.g., show an error message to the user
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.error('Error requesting notification permission:', err);
+                // Handle other errors, e.g., show a generic error message to the user
+            }
+        };
+
+        requestNotificationPermission();
+    }, []);
+
+    // useEffect(() => {
+    //     requestNotificationsPermission();
+    // }, []);
+
+    // const requestNotificationsPermission = async () => {
+    //     if (Platform.OS === 'android') {
+    //         try {
+    //             const granted = await PermissionsAndroid.request(
+    //                 PermissionsAndroid.PERMISSIONS.ACCESS_NOTIFICATION_POLICY,
+    //                 {
+    //                     title: 'Notification Permission',
+    //                     message: 'This app needs access to your notifications.',
+    //                 }
+    //             );
+    //             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+    //                 console.log('Notification permission granted');
+    //             } else {
+    //                 console.log('Notification permission denied');
+    //             }
+    //         } catch (err) {
+    //             console.warn(err);
+    //         }
+    //     } else if (Platform.OS === 'ios') {
+    //         // iOS doesn't require explicit permission request
+    //         console.log('Notification permission already handled on iOS');
+    //     }
+    // };
 
     useEffect(() => {
         const checkAppLaunchStatus = async () => {

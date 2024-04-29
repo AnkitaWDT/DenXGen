@@ -80,6 +80,7 @@ import EOfficeProfileCompletion7 from './OfficeProfile/EOfficeProfileCompletion7
 import EClinicProfileCompletion8 from './ClinicProfile/EClinicProfileCompletion8';
 import EOfficeProfileCompletion8 from './OfficeProfile/EOfficeProfileCompletion8';
 import OfficeProfile from './Profile/OfficeProfile';
+import Endorsement from './Connection/Endorsement';
 
 const Stack = createStackNavigator();
 
@@ -345,6 +346,11 @@ const Navigation = () => {
                     component={DropCards}
                     options={{ headerShown: false }}
                 />
+                <Stack.Screen
+                    name="Endorsement"
+                    component={Endorsement}
+                    options={{ headerShown: false }}
+                /> 
                 <Stack.Screen
                     name="PersonalProfile"
                     component={PersonalProfile}

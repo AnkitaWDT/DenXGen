@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity, Image, TextInput, Modal, Dimensions, ScrollView, ToastAndroid, PermissionsAndroid, PixelRatio, Platform, FlatList } from 'react-native';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import commonStyles from '../../components/CommonStyles';
 import CustomPopup from '../../components/CustomPopup';
 import Svg, { Image as SvgImage } from 'react-native-svg';
@@ -12,6 +12,7 @@ import { moderateScale } from 'react-native-size-matters';
 import AlertPopup from '../../components/AlertPopup';
 import axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 const { width, height } = Dimensions.get('window');
 
@@ -145,6 +146,30 @@ const HomePage = ({ navigation, route }) => {
   const [profilePic, setProfilePic] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
 
+  const requestNotificationPermission = async () => {
+    const result = await request(PERMISSIONS.POST_NOTIFICATIONS);
+    return result;
+  };
+
+  const checkNotificationPermission = async () => {
+    const result = await check(PERMISSIONS.POST_NOTIFICATIONS);
+    return result;
+  };
+
+  const requestPermission = async () => {
+    const checkPermission = await checkNotificationPermission();
+    if (checkPermission !== RESULTS.GRANTED) {
+      const requestResult = await requestNotificationPermission();
+      if (requestResult !== RESULTS.GRANTED) {
+        requestNotificationPermission();
+        console.log('Permission not granted');
+      }
+    }
+  };
+
+  useEffect(() => {
+    requestPermission();
+  }, []);
 
   useEffect(() => {
     // Fetch the selected profile picture URL from AsyncStorage when the component mounts
@@ -569,8 +594,10 @@ const HomePage = ({ navigation, route }) => {
       const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getspeclist-ax.php');
       const data = await response.json();
       const storedId = await AsyncStorage.getItem('pr_ty_id');
+      console.log('data', data)
       const filteredData = data.data.filter(item => item.pr_ty_id === storedId);
-      setSpecialtiesData(filteredData);
+      setSpecialtiesData(data.data);
+      console.log('specialtiesData', data.data)
     } catch (error) {
       console.error('Error fetching key forte data:', error);
     }

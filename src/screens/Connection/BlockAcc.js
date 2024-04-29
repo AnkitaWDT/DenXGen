@@ -9,6 +9,7 @@ import Animation from '../../components/Loader';
 import Popover, { PopoverPlacement } from 'react-native-popover-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LottieView from 'lottie-react-native';
+import AlertPopup from '../../components/AlertPopup';
 
 const { width, height } = Dimensions.get('window');
 const responsiveFontSize = (size) => {
@@ -308,6 +309,10 @@ const BlockAcc = ({ navigation }) => {
         return charWidth;
     };
 
+    const [showPopup1, setShowPopup1] = useState(false);
+    const [selectedProfessionalId, setSelectedProfessionalId] = useState(null);
+
+
     const renderItem = ({ item, index }) => {
 
         const truncatedTitle = truncateText(item.name, width * 0.65, 17);
@@ -330,6 +335,35 @@ const BlockAcc = ({ navigation }) => {
                 imageUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANcAAACUCAMAAAA3b0xFAAAAMFBMVEX29va4uLjq6uqxsbH6+vrKysrX19e1tbW8vLze3t7z8/PFxcXv7+/k5OTT09POzs6cN24OAAADy0lEQVR4nO2c23KjMAxAAQvfjf//b2tI0rRpAF8yWNrVedinbMdnZGTZFgwDwzC0gVd6D+gTwOBN1OqJnuVkB+JuYM2shBp/IZQznraYcepFaiNFTVqyZmDn8Z3VZja6iagYTDtODwxJMQh7sfp+ziRBMQgnVutkJBixSZ97jWMgJ+bOZuGGnnqPswyIWVqjmnuPtAiYRJYWudzhMrUShNZnMPlaaqHjZfOSxg1NplQsCVeCTMBsZjK8T0Tnew84E5+1JD8nIpHF+bwwfAkYlVRvCr0W23vEecxlXqOj4WXLHq8EjSIxu4Z6oELvIecAptiLxAoGBbXhHU3Cq1hrFAQSR/4W5QmF8wCQhVl+9ZoJeJU/XiQesMLi8B4w9GekYGq88O9Vcg9sXnC9x32GL9kqP9HIJ2LOKe9bsO9VlqpwpUyPe2muyoYbqDfNULil/BGwpffYj4C6rLGiMU/EitrwgUA8ESsXr3vA8HoN9VaYNyswNYQL8WalZovyA4fVq+R26A1oM2L5AdtvkB63Qd5V+T5IM32rl0aaOJrjxV6XAvXF/AbaQw4ovUj5je49/j1OG9iOw4V0Gq40zESFdPVagVC/T8F8qQItiQNxPV94YU4mYI11b+/h7/DP1oeyTWuMSL0qz0QfoO2xbDm1Wb2Q9nHYtjIKbcdeqxfWxrbm5wvpJVhhO+VfkObDzFcB9kG6fqX9V5MW2oPsxvoQ8ZVlS7gEzmy4UtWT8g3ecNVfV6ZpiDUbDnU9Xw8E4uONpvtKxF4tF0XKoX1f2zdtwNSC9UTKu/ppuL75i7Z92Zq3b2FnWYmIc/e1AYPUY7Fb+g96Qf56GwxhdqvbaqePCmGt7z/TbjYWbdL4BsAHI5dFGhPkgVgM6Wcy/Sx4Kl93uH1iI/0bDrzk7VMcFD/HcVRXYS7fzzh6z1IhPaXJ4LgMxt2Zt0sKxllPrByoJIwnYFK6P1vI3Cx7j7OQtWPvfHlWaM/WdoAlt1JUeLu9/lJygS4ClQUMvCw559DLRMAMYIqlx6N6xm6Wqt6qjmylDdZ6HsD6EFXtzlIJFzyqz5vdylc7bV9hq7TaEHqWwQ4YvkyXRmCnEIKMrlHqFjSlXZTp7022p1vKEYvT+rZBbJZ6qI3bX3QxdJqU4OP4+qW8D5Ke1Nijcc8vH4vRvlq8/OjNnBa1n0Bc2/oAEDOq2g9wdUtHa0cDTq/mhiH2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/SXuIqru1z8NNV4H33l2H+W74AIQo8Ck+dyoUAAAAASUVORK5CYII='; // Replace DEFAULT_FEMALE_IMAGE_URL with the URL of your default female image
             }
         }
+
+        const handleAcceptPress = () => {
+            // Show the popup
+            console.log('huhdei');
+            setShowPopup1(true);
+            // Set the selected professional's id to state
+            setSelectedProfessionalId(item.pr_id);
+        };
+
+        const cancelUnblockRequest = async () => {
+            try {
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                const id = parseInt(pr_id);
+
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${pr_id}&accid2=${selectedProfessionalId}&action=blocked`);
+                const data = await response.json();
+                console.log(data);
+                // Check if the request was successful, and update UI accordingly
+                if (data.code === 1) {
+                    console.log('sent req');
+                    console.log(response);
+                } else {
+                    // Handle error
+                }
+            } catch (error) {
+                // Handle error
+                console.error(error);
+            }
+        };
 
         return (
             <ScrollView>
@@ -366,9 +400,7 @@ const BlockAcc = ({ navigation }) => {
                             alignItems: 'center',
                             //width: width * 0.2,
                         }}
-                        onPress={() => {
-                            // Handle button press logic here
-                        }}
+                        onPress={handleAcceptPress}
                     >
                         <Text style={{
                             fontSize: responsiveFontSize(14),
@@ -384,6 +416,21 @@ const BlockAcc = ({ navigation }) => {
 
                 {/* Horizontal line */}
                 <View style={{ height: 1, backgroundColor: '#ccc', marginVertical: 4 }} />
+
+                <AlertPopup
+                    visible={showPopup1}
+                    onRequestClose={() => setShowPopup1(false)}
+                    title="Cancel Request"
+                    message="Are you sure you want to cancel connection request? "
+                    yesLabel="Yes"
+                    noLabel="No"
+                    onYesPress={() => {
+                        setShowPopup1(false);
+                        cancelUnblockRequest();
+                    }}
+                />
+
+
             </ScrollView>
         );
     };

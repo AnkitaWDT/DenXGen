@@ -446,6 +446,12 @@ marginRight: 12
         fontFamily: 'DMSans-Medium',
         lineHeight: 20
     },
+    headerText6BL: {
+        fontSize: 13,
+        color: '#121212',
+        fontFamily: 'DMSans-Medium',
+        lineHeight: 20
+    },
     progImage: {
         height: height * 0.009,
         width: width * 0.86,

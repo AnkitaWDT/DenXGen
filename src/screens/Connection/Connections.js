@@ -187,6 +187,28 @@ const Connections = ({ navigation }) => {
 
                             {/* Horizontal line */}
                             {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
+
+                                <TouchableOpacity
+                                    style={styles.CContainer}
+                                    onPress={() => navigation.navigate('Endorsement')}
+                                    activeOpacity={0.8}
+                                >
+                                    {/* Left side content */}
+                                    <View style={styles.leftContent}>
+                                        <Image source={require('../../../assets/img/EndorseB.png')} style={styles.imageE} />
+                                        <Text style={styles.leftText}>Endorsement</Text>
+                                    </View>
+
+                                    {/* Middle content */}
+                                    <View style={styles.middleContent}>
+                                        <Text style={styles.middleText}>(02 others)</Text>
+                                    </View>
+
+                                    {/* Right side content */}
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', flex: 1 }}>
+                                        <Image source={require('../../../assets/img/ViewAll.png')} style={{ width: 18, height: 18, marginLeft: 10 }} />
+                                    </View>
+                                </TouchableOpacity>
                         </View>
                     </ScrollView>
                 </View>
@@ -229,6 +251,11 @@ const styles = StyleSheet.create({
     imageL: {
         width: 22,
         height: 24,
+        marginRight: 15,
+    },
+    imageE: {
+        width: 22,
+        height: 20,
         marginRight: 15,
     },
     imageR: {
