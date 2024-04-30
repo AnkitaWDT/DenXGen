@@ -182,7 +182,7 @@ const HomePage = ({ navigation, route }) => {
     const fetchDefaultName = async () => {
       const name = await AsyncStorage.getItem('selected_name');
       setDefaultName({ name });
-      setActiveItem(name || 'My Account');
+      setActiveItem(name);
     };
 
     fetchProfilePic();
@@ -203,6 +203,11 @@ const HomePage = ({ navigation, route }) => {
 
       const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getvic-ax.php?prid=${id}`);
       const data = await response.json();
+      console.log(data.data);
+      await AsyncStorage.setItem('selected_id', data.data.id.toString());
+      await AsyncStorage.setItem('selected_name', data.data.name);
+      await AsyncStorage.setItem('selected_type', 'My Account');
+      await AsyncStorage.setItem('selected_profile_pic', data.data.profile_pic || '');
       setDefaultName({ name: data.data.name, profile_pic: data.data.profile_pic, id:data.data.id });
     } catch (error) {
       console.error('Error fetching default name:', error);
@@ -426,53 +431,53 @@ const HomePage = ({ navigation, route }) => {
   };
 
   const handleLocationPress = async () => {
-    // try {
-    //   const granted = await PermissionsAndroid.request(
-    //     PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-    //   );
-    //   console.log('Location Permission Granted:', granted);
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      );
+      console.log('Location Permission Granted:', granted);
 
-    //   if (granted) {
-    //     Geolocation.getCurrentPosition(
-    //       async (position) => {
-    //         console.log('Position:', position);
-    //         const { latitude, longitude } = position.coords;
-    //         console.log('Latitude:', latitude);
-    //         console.log('Longitude:', longitude);
-    //         // Store the current location in AsyncStorage
-    //         await AsyncStorage.setItem('latitude', String(latitude));
-    //         await AsyncStorage.setItem('longitude', String(longitude));
-    //         // Update initialRegion and markerPosition state with current location
-    //         setInitialRegion({
-    //           latitude: parseFloat(latitude),
-    //           longitude: parseFloat(longitude),
-    //           latitudeDelta: 0.0922,
-    //           longitudeDelta: 0.0421,
-    //         });
-    //         setMarkerPosition({
-    //           latitude: parseFloat(latitude),
-    //           longitude: parseFloat(longitude),
-    //         });
-    //         setIsLoading(false);
-    //         // Navigate to the MapScreen
-    //         navigation.navigate('MapScreen');
-    //       },
-    //       (error) => {
-    //         console.log('Error:', error);
-    //         setIsLoading(false);
-    //         ToastAndroid.show('Error getting location', ToastAndroid.SHORT);
-    //         console.error(error);
-    //       }
-    //     );
-    //   } else {
-    //     setIsLoading(false);
-    //     ToastAndroid.show('Location permission denied', ToastAndroid.SHORT);
-    //     navigation.navigate('MapScreen');
-    //   }
-    // } catch (err) {
-    //   setIsLoading(false);
-    //   console.error('Error requesting location permission:', err);
-    // }
+      if (granted) {
+        Geolocation.getCurrentPosition(
+          async (position) => {
+            console.log('Position:', position);
+            const { latitude, longitude } = position.coords;
+            console.log('Latitude:', latitude);
+            console.log('Longitude:', longitude);
+            // Store the current location in AsyncStorage
+            await AsyncStorage.setItem('latitude', String(latitude));
+            await AsyncStorage.setItem('longitude', String(longitude));
+            // Update initialRegion and markerPosition state with current location
+            setInitialRegion({
+              latitude: parseFloat(latitude),
+              longitude: parseFloat(longitude),
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            });
+            setMarkerPosition({
+              latitude: parseFloat(latitude),
+              longitude: parseFloat(longitude),
+            });
+            setIsLoading(false);
+            // Navigate to the MapScreen
+            navigation.navigate('MapScreen');
+          },
+          (error) => {
+            console.log('Error:', error);
+            setIsLoading(false);
+            ToastAndroid.show('Error getting location', ToastAndroid.SHORT);
+            console.error(error);
+          }
+        );
+      } else {
+        setIsLoading(false);
+        ToastAndroid.show('Location permission denied', ToastAndroid.SHORT);
+        navigation.navigate('MapScreen');
+      }
+    } catch (err) {
+      setIsLoading(false);
+      console.error('Error requesting location permission:', err);
+    }
   };
 
 

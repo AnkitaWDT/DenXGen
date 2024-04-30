@@ -81,6 +81,7 @@ import EClinicProfileCompletion8 from './ClinicProfile/EClinicProfileCompletion8
 import EOfficeProfileCompletion8 from './OfficeProfile/EOfficeProfileCompletion8';
 import OfficeProfile from './Profile/OfficeProfile';
 import Endorsement from './Connection/Endorsement';
+import MapScreen from './HomeScreen/MapScreen';
 
 const Stack = createStackNavigator();
 
@@ -493,6 +494,11 @@ const Navigation = () => {
                     component={EOfficeProfileCompletion8}
                     options={{ headerShown: false }}
                 /> 
+                <Stack.Screen
+                    name="MapScreen"
+                    component={MapScreen}
+                    options={{ headerShown: false }}
+                />
                 {/* <Stack.Screen
                     name="RegistrationInformation"
                     component={RegistrationInformation}
@@ -534,11 +540,7 @@ const Navigation = () => {
 
 
 
-                <Stack.Screen
-                    name="MapScreen"
-                    component={MapScreen}
-                    options={{ headerShown: false }}
-                />
+
 
                 <Stack.Screen
                     name="ClinicAccount"
