@@ -191,12 +191,13 @@ const EClinicProfileCompletion7 = ({ navigation, route }) => {
     // };
 
     const handleNext = () => {
-        if (videoPath && imagePaths.length === 5) {
-            //navigation.navigate('ProfileCompletion5');
-            navigation.navigate('EditClinicProfile', { cl_id: cl_id })
-        } else {
-            ToastAndroid.show('Please upload both video and 5 images.', ToastAndroid.SHORT);
-        }
+        // if (videoPath && imagePaths.length === 5) {
+        //     //navigation.navigate('ProfileCompletion5');
+        //     navigation.navigate('EditClinicProfile', { cl_id: cl_id })
+        // } else {
+        //     ToastAndroid.show('Please upload both video and 5 images.', ToastAndroid.SHORT);
+        // }
+        navigation.navigate('ClinicProfileCompletion8', { cl_id: cl_id });
     };
 
     const handleSkip = () => {

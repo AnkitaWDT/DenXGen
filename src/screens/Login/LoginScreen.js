@@ -17,17 +17,18 @@ const LoginScreen = ({navigation, route}) => {
 
     const handleRegistration = async () => {
         try {
-           
+            const endpoint = `https://temp.wedeveloptech.in/denxgen/appdata/reqpersonallogin-ax.php?phno=${encodeURIComponent(phoneNumber)}`;
+            const response = await fetch(endpoint);
+            console.log(response);
 
-            const endpoint = `https://temp.wedeveloptech.in/denxgen/appdata/reqpersonallogin-ax.php?phno=${encodeURIComponent(
-                phoneNumber
-            )}`;
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
 
-            const response2 = await fetch(endpoint);
-            const data = await response2.json();
+            const data = await response.json();
             console.log(data);
 
-            if (data) {
+            if (data && data.code === 1) {
                 console.log('OTP sent to phoneNumber!');
                 ToastAndroid.show('OTP sent successfully!', ToastAndroid.SHORT);
 
@@ -36,20 +37,12 @@ const LoginScreen = ({navigation, route}) => {
                 await AsyncStorage.setItem('password', String(data.data.password));
                 await AsyncStorage.setItem('name', data.data.name);
 
-                const pr_id = await AsyncStorage.getItem('pr_id');
-                const id = parseInt(pr_id);
-
-                console.log('pr_id', id)
-
                 // Navigate to OTPScreen
                 navigation.navigate('OTPScreen', { phoneNumber });
                 setPhoneNumber('');
             } else {
                 console.log('Failed to send OTP. Please try again.');
-                ToastAndroid.show(
-                    'Please Check Number and Try Again.',
-                    ToastAndroid.SHORT
-                );
+                ToastAndroid.show('Please Check Number and Try Again.', ToastAndroid.SHORT);
             }
         } catch (error) {
             console.log('Error occurred:', error);
@@ -57,6 +50,7 @@ const LoginScreen = ({navigation, route}) => {
         }
         setPhoneNumber('');
     };
+
 
     useEffect(() => {
         // Check if route and route.params are defined

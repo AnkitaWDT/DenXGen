@@ -348,8 +348,11 @@ const DropCards = ({ navigation }) => {
             try {
                 const pr_id = await AsyncStorage.getItem('pr_id');
                 const id = parseInt(pr_id);
+                const accidtyid = await AsyncStorage.getItem('selected_id');
+                const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${selectedProfessionalId}&accidty2=1&action=blocked`);
 
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${pr_id}&accid2=${selectedProfessionalId}&action=blocked`);
+                //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${pr_id}&accid2=${selectedProfessionalId}&action=blocked`);
                 const data = await response.json();
                 console.log(data);
                 // Check if the request was successful, and update UI accordingly

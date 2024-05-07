@@ -189,11 +189,12 @@ const ProfileCompletion7 = ({ navigation }) => {
     // };
 
     const handleNext = () => {
-        if (videoPath && imagePaths.length === 5) {
-            navigation.navigate('ProfileCompletion5');
-        } else {
-            ToastAndroid.show('Please upload both video and 5 images.', ToastAndroid.SHORT);
-        }
+        // if (videoPath && imagePaths.length === 5) {
+        //     navigation.navigate('ProfileCompletion5');
+        // } else {
+        //     ToastAndroid.show('Please upload both video and 5 images.', ToastAndroid.SHORT);
+        // }
+        navigation.navigate('ProfileCompletion8');
     };
 
     const handleSkip = () => {

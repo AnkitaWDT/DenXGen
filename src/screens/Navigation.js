@@ -82,12 +82,25 @@ import EOfficeProfileCompletion8 from './OfficeProfile/EOfficeProfileCompletion8
 import OfficeProfile from './Profile/OfficeProfile';
 import Endorsement from './Connection/Endorsement';
 import MapScreen from './HomeScreen/MapScreen';
+import React, { useEffect } from 'react';
+import { Linking } from 'react-native';
 
 const Stack = createStackNavigator();
 
 const Navigation = () => {
+
+    const LinkingConfig = {
+        prefixes: ['denxgen://'],
+        config: {
+            screens: {
+                Home: 'HomeScreen',
+                ProfileScreen: 'ProfileScreen', // Updated screen name
+            },
+        },
+    }
+    
     return (
-        <NavigationContainer>
+        <NavigationContainer linking={LinkingConfig}>
             <Stack.Navigator>
                 <Stack.Screen
                     name="SplashScreen"

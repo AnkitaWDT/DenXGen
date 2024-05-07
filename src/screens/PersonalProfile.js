@@ -118,6 +118,17 @@ const PersonalProfile = ({ navigation, route }) => {
         setIsModalVisible(!isModalVisible);
     };
 
+
+    const [isModalVisibleV, setIsModalVisibleV] = useState(false);
+
+    const toggleModalV = () => {
+        setIsModalVisibleV(!isModalVisibleV);
+    };
+    const closeModalV = () => {
+        setIsModalVisibleV(false);
+    };
+
+
     const closeModal = () => {
         setIsModalVisible(false);
     };
@@ -241,7 +252,7 @@ const PersonalProfile = ({ navigation, route }) => {
     };
 
     const determineInitialTab = () => {
-        if ((!galleryList || !galleryList.length) && (!profileData.profile_video)) {
+        if ((!galleryList || !galleryList.length) || (!profileData.profile_video)) {
             return 1;
         } else if (!servicesData || !servicesData.length) {
             return 2;
@@ -300,6 +311,8 @@ const PersonalProfile = ({ navigation, route }) => {
             </SafeAreaView>
         );
     }
+
+
     
     const servicesData = profileData ? profileData.servList.map(item => item.service) : [];
     const specialityData = profileData ? profileData.specList.map(item => item.speciality) : [];
@@ -334,20 +347,51 @@ const PersonalProfile = ({ navigation, route }) => {
 
 
     const renderTabContent = () => {
+        const minHeight = 200; // Define your minimum height here
+
+        // Common styles for all tabs
+        const tabContentStyle = {
+            minHeight,
+            //borderWidth: 1,
+            borderColor: 'gray',
+            //padding: 10, 
+            marginBottom: 30
+        };
         switch (selectedTab) {
             case 0:
                 if (galleryList.length === 0 && !profileData.profile_video) {
                     return null; // Don't render anything if both galleryList and profile_video are empty
                 }
                 return (
-                    <View>
-                        <Video
-                            source={profileData && profileData.profile_video ? { uri: profileData.profile_video } : { uri: 'https://www.denxgen.com/images/clinic-page/video-11.mp4' }}
-                            //source={{ uri: 'https://www.denxgen.com/images/clinic-page/video-11.mp4' }} // Replace with the actual video URL
-                            style={{ aspectRatio: 3 / 2 }}
-                            controls={false}
-                            resizeMode="contain"
-                        />
+                    <ScrollView style={tabContentStyle}>
+                        <TouchableOpacity onPress={toggleModalV}>
+                            <Video
+                                source={profileData && profileData.profile_video ? { uri: profileData.profile_video } : null}
+                                style={{ aspectRatio: 3 / 2 }}
+                                controls={false}
+                                resizeMode="contain"
+                            />
+                        </TouchableOpacity>
+                        <Modal
+                            visible={isModalVisibleV}
+                            transparent={true}
+                            onRequestClose={closeModalV}
+                        >
+                            <TouchableWithoutFeedback onPress={closeModalV}>
+                                <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)', justifyContent: 'center', alignItems: 'center' }}>
+                                    <TouchableOpacity style={{ position: 'absolute', top: 20, right: 20 }} onPress={closeModalV}>
+                                        <Text style={{ color: 'white', fontSize: 20 }}>X</Text>
+                                    </TouchableOpacity>
+
+                                    <Video
+                                        source={{ uri: profileData && profileData.profile_video ? profileData.profile_video : null }}
+                                        style={{ width: width, height: height - 40 }}
+                                        controls={true}
+                                        resizeMode="contain"
+                                    />
+                                </View>
+                            </TouchableWithoutFeedback>
+                        </Modal>
                         <View style={styles.imageGrid}>
                             {galleryList.map((image, index) => (
                                 <TouchableOpacity
@@ -366,7 +410,6 @@ const PersonalProfile = ({ navigation, route }) => {
                             ))}
                         </View>
 
-                        {/* Modal for Full Screen Image */}
                         <Modal
                             visible={isModalVisible}
                             transparent={true}
@@ -408,16 +451,64 @@ const PersonalProfile = ({ navigation, route }) => {
                                 </View>
                             </TouchableWithoutFeedback>
                         </Modal>
+                        {/* <Modal
+              visible={isModalVisible}
+              transparent
+              activeOpacity={1}
+              onRequestClose={closeModal}>
+              <TouchableOpacity
+                activeOpacity={1}
+                style={styles.modalContainer1}
+                onPress={closeModal}
+              >
+                <TouchableOpacity style={styles.modalContent1}
+                  activeOpacity={1}
+                  onPress={() => { }}>
+                  <View
+                    style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
+                    <ScrollView
+                      horizontal
+                      pagingEnabled
+                      showsHorizontalScrollIndicator={false}
+                      onMomentumScrollEnd={event => {
+                        const newIndex = Math.round(
+                          event.nativeEvent.contentOffset.x / width,
+                        );
+                        setSelectedImageIndex(newIndex);
+                      }}
+                      contentContainerStyle={{ flexGrow: 1 }}>
+                      {galleryList.map((image, index) => (
+                        <View key={index} style={{ flex: 1, width: width }}>
+                          <Image
+                            source={{ uri: image.gal_image }}
+                            style={{
+                              width: width,
+                              height: height,
+                              resizeMode: 'contain',
+                            }}
+                          />
+                        </View>
+                      ))}
+                    </ScrollView>
+                    <TouchableOpacity
+                      style={{ position: 'absolute', top: 20, right: 20 }}
+                      onPress={closeModal}>
+                      <Text style={{ color: 'FEFCFC', fontSize: 20 }}>X</Text>
+                    </TouchableOpacity>
+                  </View>
+                 </TouchableOpacity>
+              </TouchableOpacity>
+            </Modal> */}
 
 
-                    </View>
+                    </ScrollView>
                 );
             case 1:
                 if (!servicesData) {
                     return null; // Don't render anything if both galleryList and profile_video are empty
                 }
                 return (
-                    <View>
+                    <ScrollView style={tabContentStyle}>
                         <FlatList
                             data={servicesData}
                             keyExtractor={(item, index) => index.toString()}
@@ -432,14 +523,14 @@ const PersonalProfile = ({ navigation, route }) => {
                             )}
                         // renderItem={({ item }) => <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>}
                         />
-                    </View>
+                    </ScrollView>
                 );
             case 2:
                 if (!specialityData) {
                     return null; // Don't render anything if both galleryList and profile_video are empty
                 }
                 return (
-                    <View>
+                    <ScrollView style={tabContentStyle}>
                         <FlatList
                             data={specialityData}
                             keyExtractor={(item, index) => index.toString()}
@@ -454,14 +545,14 @@ const PersonalProfile = ({ navigation, route }) => {
                             )}
                         // renderItem={({ item }) => <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>}
                         />
-                    </View>
+                    </ScrollView>
                 );
             case 3:
                 if (!keyForteData) {
                     return null; // Don't render anything if both galleryList and profile_video are empty
                 }
                 return (
-                    <View>
+                    <ScrollView style={tabContentStyle}>
                         <FlatList
                             data={keyForteData}
                             keyExtractor={(item, index) => index.toString()}
@@ -476,11 +567,11 @@ const PersonalProfile = ({ navigation, route }) => {
                             )}
                         // renderItem={({ item }) => <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>}
                         />
-                    </View>
+                    </ScrollView>
                 );
             case 4:
                 return (
-                    <View style={{ marginBottom: 20 }}>
+                    <ScrollView style={tabContentStyle}>
                         <View>
                             <Text style={[commonStyles.headerText11BL, {
                                 //marginVertical: height * 0.01,
@@ -558,7 +649,7 @@ const PersonalProfile = ({ navigation, route }) => {
                                 </TouchableOpacity>
                             )}
                         </View>
-                    </View>
+                    </ScrollView>
                 );
             case 5:
                 return (
@@ -1185,7 +1276,10 @@ const PersonalProfile = ({ navigation, route }) => {
                             </TouchableOpacity>
                         </Modal>
                     </View>
-                    {profileData.about && (<View style={styles.horizontalLine}></View>)}
+                    {profileData?.about && (
+                        <View style={styles.horizontalLine}></View>
+                    )}
+
                     {profileData.about && (
                         <View style={styles.aboutContainer}>
                             <Text style={[commonStyles.headerText11BL, {

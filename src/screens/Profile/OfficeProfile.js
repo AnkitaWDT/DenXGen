@@ -1343,7 +1343,7 @@ const OfficeProfile = ({ navigation, route }) => {
                             <View>
                                 <Text style={[commonStyles.headerText4BL]}>Chief Dentist</Text>
                                 <TouchableOpacity
-                                    onPress={() => navigation.navigate('ProfileScreen')}
+                                    onPress={() => navigation.navigate('ProfileScreen', { professionalId: 1 })}
                                     activeOpacity={0.8}
                                     style={styles.contentContainer}>
                                     <Image
@@ -1360,7 +1360,7 @@ const OfficeProfile = ({ navigation, route }) => {
                                 <Text style={[commonStyles.headerText4BL, { marginTop: 10 }]}>Empanelled Dental Members</Text>
                                 <View style={{ flexDirection: 'row' }}>
                                     <TouchableOpacity
-                                        onPress={() => navigation.navigate('ProfileScreen')}
+                                        onPress={() => navigation.navigate('ProfileScreen', { professionalId: 1 })}
                                         activeOpacity={0.8}
                                         style={styles.contentContainer}>
                                         <Image
@@ -1373,7 +1373,7 @@ const OfficeProfile = ({ navigation, route }) => {
                                         </View>
                                     </TouchableOpacity>
                                     <TouchableOpacity
-                                        onPress={() => navigation.navigate('ProfileScreen')}
+                                        onPress={() => navigation.navigate('ProfileScreen', { professionalId: 1 })}
                                         activeOpacity={0.8}
                                         style={styles.contentContainer}>
                                         <Image
@@ -1386,7 +1386,7 @@ const OfficeProfile = ({ navigation, route }) => {
                                         </View>
                                     </TouchableOpacity>
                                     <TouchableOpacity
-                                        onPress={() => navigation.navigate('ProfileScreen')}
+                                        onPress={() => navigation.navigate('ProfileScreen', { professionalId: 1 })}
                                         activeOpacity={0.8}
                                         style={styles.contentContainer}>
                                         <Image

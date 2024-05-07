@@ -193,6 +193,7 @@ const HomePage = ({ navigation, route }) => {
   useFocusEffect(
     React.useCallback(() => {
       fetchData();
+      fetchCompletionData();
     }, [])
   );
 
@@ -207,8 +208,11 @@ const HomePage = ({ navigation, route }) => {
       await AsyncStorage.setItem('selected_id', data.data.id.toString());
       await AsyncStorage.setItem('selected_name', data.data.name);
       await AsyncStorage.setItem('selected_type', 'My Account');
+      await AsyncStorage.setItem('selected_profile_accidty', '1');
+      await AsyncStorage.setItem('pr_ty_id', data.data.pr_ty_id); 
       await AsyncStorage.setItem('selected_profile_pic', data.data.profile_pic || '');
       setDefaultName({ name: data.data.name, profile_pic: data.data.profile_pic, id:data.data.id });
+      setActiveItem(data.data.name);
     } catch (error) {
       console.error('Error fetching default name:', error);
     }
@@ -386,6 +390,7 @@ const HomePage = ({ navigation, route }) => {
         await AsyncStorage.setItem('selected_id', id.toString());
         await AsyncStorage.setItem('selected_name', name);
         await AsyncStorage.setItem('selected_type', type);
+        await AsyncStorage.setItem('selected_profile_accidty', '1');
         await AsyncStorage.setItem('selected_profile_pic', profilePic || ''); // Save profile pic URL, or empty string if it's null
         console.log('Selected My Account:', name, profilePic, type); // Log the selected value
         break;
@@ -393,6 +398,7 @@ const HomePage = ({ navigation, route }) => {
         await AsyncStorage.setItem('selected_id', id.toString());
         await AsyncStorage.setItem('selected_name', name);
         await AsyncStorage.setItem('selected_type', type);
+        await AsyncStorage.setItem('selected_profile_accidty', '2');
         await AsyncStorage.setItem('selected_profile_pic', profilePic || ''); // Save profile pic URL, or empty string if it's null
         console.log('Selected Clinic Account:', name, profilePic, type); // Log the selected value
         break;
@@ -400,6 +406,7 @@ const HomePage = ({ navigation, route }) => {
         await AsyncStorage.setItem('selected_id', id.toString());
         await AsyncStorage.setItem('selected_name', name);
         await AsyncStorage.setItem('selected_type', type);
+        await AsyncStorage.setItem('selected_profile_accidty', '3');
         await AsyncStorage.setItem('selected_profile_pic', profilePic || ''); // Save profile pic URL, or empty string if it's null
         console.log('Selected Office Account:', name, profilePic, type); // Log the selected value
         break;
@@ -1136,7 +1143,7 @@ const HomePage = ({ navigation, route }) => {
                 </View>
 
                 {/* White box with shadow */}
-                {/* {completionData && completionData.gotosteps !== null ? (
+                {completionData && completionData.gotosteps !== null ? (
                 <View style={styles.boxContainer}>
                   <View style={{ flexDirection: 'row' }}>
                     <View style={styles.imageRow}>
@@ -1201,9 +1208,9 @@ const HomePage = ({ navigation, route }) => {
                     }}>Complete</Text>
                   </TouchableOpacity>
                 </View>
-                ) : null} */}
+                ) : null}
 
-                <View style={styles.boxContainer}>
+                {/* <View style={styles.boxContainer}>
                   <View style={{ flexDirection: 'row' }}>
                     <View style={styles.imageRow}>
                       {profilePic ? (
@@ -1266,7 +1273,7 @@ const HomePage = ({ navigation, route }) => {
                       lineHeight: height * 0.028 //28
                     }}>Complete</Text>
                   </TouchableOpacity>
-                </View>
+                </View> */}
 
                 <ScrollView
                   ref={scrollViewRef}
@@ -1617,7 +1624,7 @@ const HomePage = ({ navigation, route }) => {
                     {/* Box 1 */}
                     <TouchableOpacity
                       style={styles.boxContainerS}
-                      onPress={() => navigation.navigate('ProfileScreen')}
+                      onPress={() => navigation.navigate('ProfileScreen', { professionalId: 1 })}
                       activeOpacity={0.8}
                     >
                       <View style={styles.contentContainer}>
@@ -1636,7 +1643,7 @@ const HomePage = ({ navigation, route }) => {
                     {/* Box 2 */}
                     <TouchableOpacity
                       style={styles.boxContainerS}
-                      onPress={() => navigation.navigate('ProfileScreen')}
+                      onPress={() => navigation.navigate('ProfileScreen', { professionalId: 1 })}
                       activeOpacity={0.8}
                     >
                       <View style={styles.contentContainer}>
@@ -1655,7 +1662,7 @@ const HomePage = ({ navigation, route }) => {
                     {/* Box 3 */}
                     <TouchableOpacity
                       style={styles.boxContainerS}
-                      onPress={() => navigation.navigate('ProfileScreen')}
+                      onPress={() => navigation.navigate('ProfileScreen', { professionalId: 1 })}
                       activeOpacity={0.8}
                     >
                       <View style={styles.contentContainer}>
@@ -1674,7 +1681,7 @@ const HomePage = ({ navigation, route }) => {
                     {/* Box 4 */}
                     <TouchableOpacity
                       style={styles.boxContainerS}
-                      onPress={() => navigation.navigate('ProfileScreen')}
+                      onPress={() => navigation.navigate('ProfileScreen', { professionalId: 1 })}
                       activeOpacity={0.8}
                     >
                       <View style={styles.contentContainer}>
@@ -1883,7 +1890,7 @@ const styles = StyleSheet.create({
 
   subContainer: {
     //marginBottom: height * 0.5, 
-    paddingHorizontal: moderateScale(16),
+    paddingHorizontal: 16,
   },
   shadowContainer: {
     flex: 1,

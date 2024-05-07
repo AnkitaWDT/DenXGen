@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView, FlatList, PixelRatio, TouchableWithoutFeedback, Dimensions, TextInput, SafeAreaView } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView, FlatList, PixelRatio, TouchableWithoutFeedback, Dimensions, TextInput, SafeAreaView, Linking } from 'react-native';
 import commonStyles from '../../components/CommonStyles';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import Contacts from 'react-native-contacts';
@@ -905,7 +905,7 @@ const Explore = ({navigation, route}) => {
                   backgroundColor: '#FEFCFC'
                 }}
                 activeOpacity={0.8}
-                onPress={() => navigation.navigate('ProfileScreen')}
+                onPress={() => navigation.navigate('ProfileScreen', { professionalId: 1 })}
               >
                 {/* Left side image and text */}
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -1014,22 +1014,29 @@ const Explore = ({navigation, route}) => {
                     alignItems: 'center',
                     width: width * 0.2,
                   }}
+                  // onPress={() => {
+                  //   const options = {
+                  //     message: 'Check out this awesome app!',
+                  //     url: 'https://play.google.com/store/apps/details?id=com.cheersbyunited',
+                  //     title: 'Download the App',
+                  //   };
+
+
+
+                  //   Share.open(options)
+                  //     .then((res) => {
+                  //       console.log(res);
+                  //     })
+                  //     .catch((err) => {
+                  //       err && console.log(err);
+                  //     });
+                  // }}
                   onPress={() => {
-                    const options = {
-                      message: 'Check out this awesome app!',
-                      url: 'https://play.google.com/store/apps/details?id=com.cheersbyunited',
-                      title: 'Download the App',
-                    };
-
-
-
-                    Share.open(options)
-                      .then((res) => {
-                        console.log(res);
-                      })
-                      .catch((err) => {
-                        err && console.log(err);
-                      });
+                    const phoneNumber = contact.phoneNumbers[0].number;
+                    const message = 'Hey, I would like to invite you to join my app! Install it from the Link: ]';
+                    const playStoreLink = 'https://play.google.com/store/apps/details?id=com.cheersbyunited'; // Replace with your app's Play Store link
+                    const smsUrl = `sms:${phoneNumber}?body=${encodeURIComponent(`${message}\n${playStoreLink}`)}`;
+                    Linking.openURL(smsUrl);
                   }}
                 >
                   <Text style={{

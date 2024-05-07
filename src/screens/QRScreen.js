@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Animated, Easing, Dimensions, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Animated, Easing, Dimensions, Modal, Linking, Platform, Share } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-gesture-handler';
 import commonStyles from '../components/CommonStyles';
@@ -9,6 +9,8 @@ import Animation from '../components/Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { moderateScale } from 'react-native-size-matters';
 import axios from 'axios';
+import { RNCamera } from 'react-native-camera';
+import QRCode from 'react-native-qrcode-svg';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
@@ -244,8 +246,105 @@ const QRScreen = ({ navigation, route }) => {
 
     };
 
-console.log('Active Item:', activeItem);
-    console.log('Active profileImage:', profilePic);
+// console.log('Active Item:', activeItem);
+//     console.log('Active profileImage:', profilePic);
+
+    const qrCodeUrl = 'https://www.denxgen.com/';
+
+    // const handleImagePress = () => {
+    //     const userId = 5; // Change this to the ID of the user you want to navigate to
+    //     const deepLink = `denxgen://ProfileScreen?professionalId=${userId}`; // Updated deep link construction
+    //     Linking.canOpenURL(deepLink).then((supported) => {
+    //         if (supported) {
+    //             Linking.openURL(deepLink);
+    //         } else {
+    //             // If the app is not installed, go to the Play Store (Android) or App Store (iOS)
+    //             const storeURL = Platform.select({
+    //                 ios: 'https://apps.apple.com/app-id', // Replace 'app-id' with your actual iOS app ID
+    //                 android: 'https://play.google.com/store/apps/details?id=com.cheersbyunited', // Replace 'com.yourpackagename' with your actual Android package name
+    //             });
+
+    //             Linking.openURL(storeURL);
+    //         }
+    //     });
+    // };
+
+    const handleImagePress = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            if (!pr_id) {
+                console.error('No pr_id found in AsyncStorage');
+                return;
+            }
+
+            const deepLink = `denxgen://ProfileScreen?professionalId=${pr_id}`;
+
+            // Share the deep link
+            Share.share({
+                message: `Check out my profile: ${deepLink}`,
+                url: deepLink,
+                title: 'My Profile',
+            }).then(result => {
+                // Check if sharing was successful
+                if (result.action === Share.sharedAction) {
+                    // Shared successfully
+                    console.log('Shared successfully');
+                } else if (result.action === Share.dismissedAction) {
+                    // Share was dismissed
+                    console.log('Share dismissed');
+                }
+            }).catch(error => {
+                // Handle sharing error
+                console.error('Error sharing:', error);
+            });
+        } catch (error) {
+            console.error('Error getting pr_id from AsyncStorage:', error);
+        }
+    };
+
+    const [qrCodeImg, setQrCodeImg] = useState(null);
+
+    useEffect(() => {
+        fetchQrCode();
+    }, []);
+
+    const fetchQrCode = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getqrcode-ax.php?pr_id=${pr_id}`);
+            const data = await response.json();
+            if (data.code === 1) {
+                setQrCodeImg(data.data.qrcode_path);
+            } else {
+                console.error('Failed to fetch QR code:', data.message);
+            }
+        } catch (error) {
+            console.error('Error fetching QR code:', error);
+        }
+    };
+
+    const onSuccess = (e) => {
+        // Extract professional ID from the scanned URL
+        const url = e.data;
+        const professionalId = url.match(/prid=(\d+)/)[1]; // Extract the ID from the URL
+
+        // Navigate to ProfileScreen with professionalId as parameter
+        navigation.navigate('ProfileScreen', { professionalId });
+    };
+
+    const onReadQRCode = (event) => {
+        // Extract the URL from the QR code data
+        const scannedUrl = event.data;
+
+        // Log the URL to the console
+        console.log('Scanned URL:', scannedUrl);
+
+        // Optionally, you can do other actions with the scanned URL
+        // For example, navigate to the scanned URL
+        // navigation.navigate(scannedUrl);
+    };
 
 
     return (
@@ -284,11 +383,37 @@ console.log('Active Item:', activeItem);
                                         style={commonStyles.icon}
                                     />
                                 </View>
+                                {/* <RNCamera
+                                    style={styles.camera}
+                                    type={RNCamera.Constants.Type.back}
+                                    flashMode={RNCamera.Constants.FlashMode.off}
+                                    onBarCodeRead={onReadQRCode}
+                                /> */}
                                 <View style={styles.scannerIcon}>
-                                    <Image
+                                    {/* <Image
                                         source={require('../../assets/img/QRCode.png')}
                                         style={commonStyles.icon}
-                                    />
+                                    /> */}
+                                    {/* <QRCode
+                                        value={qrCodeUrl}
+                                        size={height * 0.25}
+                                        color="black"
+                                        backgroundColor="white"
+                                        style={commonStyles.icon}
+                                    /> */}
+                                    {qrCodeImg && (
+                                        <TouchableOpacity onPress={handleImagePress}>
+                                            <Image
+                                                source={{ uri: qrCodeImg }}
+                                                style={[styles.qrCodeImage, { width: height * 0.3, height: height * 0.3 }]}
+                                            />
+                                        </TouchableOpacity>
+                                    )}
+                                    
+                                    <View style={[styles.cornerBorder, styles.topLeft]} />
+                                    <View style={[styles.cornerBorder, styles.topRight]} />
+                                    <View style={[styles.cornerBorder, styles.bottomLeft]} />
+                                    <View style={[styles.cornerBorder, styles.bottomRight]} />
                                 </View>
                                 <View style={styles.blueContainer}>
                                     <Animated.View style={{ opacity }}>
@@ -622,7 +747,40 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'center',
-        marginTop: height * 0.05,
+        borderWidth: 2,
+        borderColor: 'transparent', // Set to transparent to hide the main border
+        borderRadius: 10,
+        marginVertical: 30
+    },
+    cornerBorder: {
+        position: 'absolute',
+        width: 15, // Adjust this value as needed for the thickness of the corner border
+        height: 15, // Adjust this value as needed for the thickness of the corner border
+        borderColor: '#289EF5',
+    },
+    topLeft: {
+        top: -6, // Half the height of the corner border
+        left: -6, // Half the width of the corner border
+        borderTopWidth: 3,
+        borderLeftWidth: 3,
+    },
+    topRight: {
+        top: -6, // Half the height of the corner border
+        right: -6, // Half the width of the corner border
+        borderTopWidth: 3,
+        borderRightWidth: 3,
+    },
+    bottomLeft: {
+        bottom: -6, // Half the height of the corner border
+        left: -6, // Half the width of the corner border
+        borderBottomWidth: 3,
+        borderLeftWidth: 3,
+    },
+    bottomRight: {
+        bottom: -6, // Half the height of the corner border
+        right: -6, // Half the width of the corner border
+        borderBottomWidth: 3,
+        borderRightWidth: 3,
     },
     profileIcon1: {
         height: height * 0.25, 

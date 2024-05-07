@@ -195,7 +195,7 @@ const Connections = ({ navigation }) => {
                                 >
                                     {/* Left side content */}
                                     <View style={styles.leftContent}>
-                                        <Image source={require('../../../assets/img/EndorseB.png')} style={styles.imageE} />
+                                        <Image source={require('../../../assets/img/Endment.png')} style={styles.imageE} />
                                         <Text style={styles.leftText}>Endorsement</Text>
                                     </View>
 
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
         marginRight: 15,
     },
     imageE: {
-        width: 22,
+        width: 24,
         height: 20,
         marginRight: 15,
     },

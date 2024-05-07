@@ -437,8 +437,13 @@ const ReceivedReq = ({ navigation }) => {
 
     const sendConnectionRequest = async () => {
         try {
+            console.log('clicked')
             const pr_id = await AsyncStorage.getItem('pr_id');
-            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersacceptconn-ax.php?accid1=${selectedProfessionalId}&accid2=${pr_id}&action=connection`);
+            console.log('pr_id', pr_id);
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            console.log('accidty', accidty);
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersacceptconn-ax.php?accid1=${selectedProfessionalId}&accidty1=1&accid2=${accidtyid}&accidty2=${accidty}&action=connection`);
             const data = await response.json();
             // Handle response data as needed
             console.log(response);
@@ -455,7 +460,11 @@ const ReceivedReq = ({ navigation }) => {
     const sendKeyAssociateRequest = async () => {
         try {
             const pr_id = await AsyncStorage.getItem('pr_id');
-            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersacceptconn-ax.php?accid1=${selectedProfessionalId}&accid2=${pr_id}&action=keyassociate`);
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersacceptconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${selectedProfessionalId}&accidty2=1&action=keyassociate`);
+
+            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersacceptconn-ax.php?accid1=${selectedProfessionalId}&accid2=${pr_id}&action=keyassociate`);
             const data = await response.json();
             // Handle response data as needed
             console.log(response);

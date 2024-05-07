@@ -26,7 +26,7 @@ const CustomDropCard = ({ visible, onClose, onContinue, onSkip }) => {
                 <TouchableOpacity style={styles.popupContainer} activeOpacity={1}
                     onPress={() => { }}>
                     <Image
-                        source={require('../../assets/img/LoginOTP.png')}
+                        source={require('../../assets/img/DropACard.png')}
                         style={styles.image}
                     />
                     <Text style={[commonStyles.headerText11BL, { marginVertical: height * 0.01, }]}>Drop a Card</Text>

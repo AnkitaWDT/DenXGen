@@ -16,6 +16,7 @@ import Animation from '../components/Loader';
 import AlertPopup from '../components/AlertPopup';
 import CustomDropCard from '../components/CustomDropCard';
 import LottieView from 'lottie-react-native';
+import { Linking } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -150,6 +151,16 @@ const ProfileScreen = ({ navigation, route }) => {
     setSelectedImageIndex(index);
     setIsModalVisible(!isModalVisible);
   };
+
+  const [isModalVisibleV, setIsModalVisibleV] = useState(false);
+
+  const toggleModalV = () => {
+    setIsModalVisibleV(!isModalVisibleV);
+  };
+  const closeModalV = () => {
+    setIsModalVisibleV(false);
+  };
+
 
   const closeModal = () => {
     setIsModalVisible(false);
@@ -319,15 +330,20 @@ const ProfileScreen = ({ navigation, route }) => {
   const fetchConnectionStatus = async () => {
     try {
       const pr_id = await AsyncStorage.getItem('pr_id');
-      setPrid(pr_id);
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallconnectionlist-ax.php?pr_id=${pr_id}`);
+      
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      setPrid(accidtyid);
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallconnectionlist-ax.php?selectedid=${accidtyid}&typeid=${accidty}&typeid2=1`);
+      console.log(response);
+      //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallconnectionlist-ax.php?pr_id=${pr_id}`);
       const data = await response.json();
       //console.log(data);
       if (data.code === 1) {
         // Check connection status
         const connection = data.data.find(connection => {
-          if ((connection.reciever === pr_id && connection.sender === professionalId) ||
-            (connection.sender === pr_id && connection.reciever === professionalId)) {
+          if ((connection.reciever === accidtyid && connection.sender === professionalId) ||
+            (connection.sender === accidtyid && connection.reciever === professionalId)) {
             return true;
           }
           return false;
@@ -387,8 +403,10 @@ const ProfileScreen = ({ navigation, route }) => {
   const [showPopup1, setShowPopup1] = useState(false);
   const [showPopup2, setShowPopup2] = useState(false);
   const [showPopup4, setShowPopup4] = useState(false);
+  const [showPopup5, setShowPopup5] = useState(false);
   const [showPopupBlock, setShowPopupBlock] = useState(false);
   const [showPopupEndorse, setShowPopupEndorse] = useState(false);
+  const [showPopupEmpanel, setShowPopupEmpanel] = useState(false);
   const [selectedProfessionalId, setSelectedProfessionalId] = useState(null);
 
   const handleConnectPress = () => {
@@ -411,8 +429,9 @@ const ProfileScreen = ({ navigation, route }) => {
     try {
       const pr_id = await AsyncStorage.getItem('pr_id');
       const id = parseInt(pr_id);
-      
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=connection`);
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=connection`);
       const data = await response.json();
       // Check if the request was successful, and update UI accordingly
       if (data.code === 1) {
@@ -432,8 +451,9 @@ const ProfileScreen = ({ navigation, route }) => {
     try {
       const pr_id = await AsyncStorage.getItem('pr_id');
       const id = parseInt(pr_id);
-
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=keyassociate`);
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=keyassociate`);
       const data = await response.json();
       // Check if the request was successful, and update UI accordingly
       if (data.code === 1) {
@@ -450,6 +470,28 @@ const ProfileScreen = ({ navigation, route }) => {
     }
   };
 
+  const acceptConnReq = async () => {
+    try {
+      console.log('clicked')
+      const pr_id = await AsyncStorage.getItem('pr_id');
+      console.log('pr_id', pr_id);
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      console.log('accidty', accidty);
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersacceptconn-ax.php?accid1=${professionalId}&accidty1=1&accid2=${accidtyid}&accidty2=${accidty}&action=connection`);
+      const data = await response.json();
+      // Handle response data as needed
+      console.log(response);
+      setButtonState('KeyAssociate');
+      console.log(data);
+      console.log('connected')
+      setShowPopup5(false); // Close the popup after making the API call
+    } catch (error) {
+      console.error('Error sending connection request:', error);
+      // Handle error
+    }
+  };
+
   const handleAcceptPress = () => {
     // Show the popup
     console.log('huhdei');
@@ -462,8 +504,11 @@ const ProfileScreen = ({ navigation, route }) => {
     try {
       const pr_id = await AsyncStorage.getItem('pr_id');
       const id = parseInt(pr_id);
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=dropacard`);
 
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=dropacard`);
+      //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=dropacard`);
       const data = await response.json();
       // Check if the request was successful, and update UI accordingly
       console.log('drop a card account');
@@ -479,8 +524,11 @@ const ProfileScreen = ({ navigation, route }) => {
     try {
       const pr_id = await AsyncStorage.getItem('pr_id');
       const id = parseInt(pr_id);
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=blocked`);
 
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=blocked`);
+      //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=blocked`);
       const data = await response.json();
       // Check if the request was successful, and update UI accordingly
       console.log('block account');
@@ -496,11 +544,34 @@ const ProfileScreen = ({ navigation, route }) => {
     try {
       const pr_id = await AsyncStorage.getItem('pr_id');
       const id = parseInt(pr_id);
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=endorsement`);
 
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=endorsement`);
+      //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=endorsement`);
       const data = await response.json();
       // Check if the request was successful, and update UI accordingly
       console.log('block account');
+      console.log(response);
+      console.log(data);
+    } catch (error) {
+      // Handle error
+      console.error(error);
+    }
+  };
+
+    const sendEmpanelRequest = async () => {
+    try {
+      const pr_id = await AsyncStorage.getItem('pr_id');
+      const id = parseInt(pr_id);
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=empaneled`);
+
+      //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=endorsement`);
+      const data = await response.json();
+      // Check if the request was successful, and update UI accordingly
+      console.log('empanel account');
       console.log(response);
       console.log(data);
     } catch (error) {
@@ -513,8 +584,11 @@ const ProfileScreen = ({ navigation, route }) => {
     try {
       const pr_id = await AsyncStorage.getItem('pr_id');
       const id = parseInt(pr_id);
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      console.log('accidty',accidty);
 
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=connection`);
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=connection`);
       const data = await response.json();
       // Check if the request was successful, and update UI accordingly
       if (data.code === 1) {
@@ -534,8 +608,11 @@ const ProfileScreen = ({ navigation, route }) => {
     try {
       const pr_id = await AsyncStorage.getItem('pr_id');
       const id = parseInt(pr_id);
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=keyassociate`);
 
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=keyassociate`);
+      //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=keyassociate`);
       const data = await response.json();
       console.log(data);
       // Check if the request was successful, and update UI accordingly
@@ -573,8 +650,28 @@ const ProfileScreen = ({ navigation, route }) => {
 
   const [modalConnectVisible, setModalConnectVisible] = useState(false);
   const [modalEndorseVisible, setModalEndorseVisible] = useState(false);
+  const [setEmpanel, sSetEmpanel] = useState('');
+  const [accidty, setAccidty] = useState('');
+
+  useEffect(() => {
+    fetchEmpanelData();
+  }, []);
+
+  const fetchEmpanelData = async () => {
+    try {
+      const accidtyValue = await AsyncStorage.getItem('selected_profile_accidty');
+      setAccidty(accidtyValue);
+      console.log('accidty', accidtyValue);
+      if (accidtyValue === '2' || accidtyValue === '3') {
+        sSetEmpanel(true);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const [profileData, setProfileData] = useState(null);
+  const [prtyid, setPrtyid] = useState(null);
   const [galleryList, setGalleryList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -588,6 +685,7 @@ const ProfileScreen = ({ navigation, route }) => {
       const data = await response.json();
       setProfileData(data.data);
       setGalleryList(data.data.galleryList);
+      setPrtyid(data.data.pr_ty_id);
       setLoading(false);
     } catch (error) {
       setError(error);
@@ -647,20 +745,51 @@ const ProfileScreen = ({ navigation, route }) => {
 
 
   const renderTabContent = () => {
+    const minHeight = 200; // Define your minimum height here
+
+    // Common styles for all tabs
+    const tabContentStyle = {
+      minHeight,
+      //borderWidth: 1,
+      borderColor: 'gray',
+      //padding: 10, 
+      marginBottom: 30
+    };
     switch (selectedTab) {
       case 0:
         if (galleryList.length === 0 && !profileData.profile_video) {
           return null; // Don't render anything if both galleryList and profile_video are empty
         }
         return (
-          <View>
-            <Video
-              source={profileData && profileData.profile_video ? { uri: profileData.profile_video } : { uri: 'https://www.denxgen.com/images/clinic-page/video-11.mp4' }}
-              //source={{ uri: 'https://www.denxgen.com/images/clinic-page/video-11.mp4' }} // Replace with the actual video URL
-              style={{ aspectRatio: 3 / 2 }}
-              controls={false}
-              resizeMode="contain"
-            />
+          <ScrollView style={tabContentStyle}>
+            <TouchableOpacity onPress={toggleModalV}>
+              <Video
+                source={profileData && profileData.profile_video ? { uri: profileData.profile_video } : null}
+                style={{ aspectRatio: 3 / 2 }}
+                controls={false}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+            <Modal
+              visible={isModalVisibleV}
+              transparent={true}
+              onRequestClose={closeModalV}
+            >
+              <TouchableWithoutFeedback onPress={closeModalV}>
+              <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)', justifyContent: 'center', alignItems: 'center' }}>
+                <TouchableOpacity style={{ position: 'absolute', top: 20, right: 20 }} onPress={closeModalV}>
+                  <Text style={{ color: 'white', fontSize: 20 }}>X</Text>
+                </TouchableOpacity>
+
+                <Video
+                  source={{ uri: profileData && profileData.profile_video ? profileData.profile_video : null }}
+                  style={{ width: width, height: height - 40 }}
+                  controls={true}
+                  resizeMode="contain"
+                />
+              </View>
+              </TouchableWithoutFeedback>
+            </Modal>
             <View style={styles.imageGrid}>
               {galleryList.map((image, index) => (
                 <TouchableOpacity
@@ -679,7 +808,6 @@ const ProfileScreen = ({ navigation, route }) => {
               ))}
             </View>
 
-            {/* Modal for Full Screen Image */}
             <Modal
               visible={isModalVisible}
               transparent={true}
@@ -721,16 +849,64 @@ const ProfileScreen = ({ navigation, route }) => {
                 </View>
               </TouchableWithoutFeedback>
             </Modal>
+            {/* <Modal
+              visible={isModalVisible}
+              transparent
+              activeOpacity={1}
+              onRequestClose={closeModal}>
+              <TouchableOpacity
+                activeOpacity={1}
+                style={styles.modalContainer1}
+                onPress={closeModal}
+              >
+                <TouchableOpacity style={styles.modalContent1}
+                  activeOpacity={1}
+                  onPress={() => { }}>
+                  <View
+                    style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
+                    <ScrollView
+                      horizontal
+                      pagingEnabled
+                      showsHorizontalScrollIndicator={false}
+                      onMomentumScrollEnd={event => {
+                        const newIndex = Math.round(
+                          event.nativeEvent.contentOffset.x / width,
+                        );
+                        setSelectedImageIndex(newIndex);
+                      }}
+                      contentContainerStyle={{ flexGrow: 1 }}>
+                      {galleryList.map((image, index) => (
+                        <View key={index} style={{ flex: 1, width: width }}>
+                          <Image
+                            source={{ uri: image.gal_image }}
+                            style={{
+                              width: width,
+                              height: height,
+                              resizeMode: 'contain',
+                            }}
+                          />
+                        </View>
+                      ))}
+                    </ScrollView>
+                    <TouchableOpacity
+                      style={{ position: 'absolute', top: 20, right: 20 }}
+                      onPress={closeModal}>
+                      <Text style={{ color: 'FEFCFC', fontSize: 20 }}>X</Text>
+                    </TouchableOpacity>
+                  </View>
+                 </TouchableOpacity>
+              </TouchableOpacity>
+            </Modal> */}
 
 
-          </View>
+          </ScrollView>
         );
       case 1:
         if (!servicesData) {
           return null; // Don't render anything if both galleryList and profile_video are empty
         }
         return (
-          <View>
+          <ScrollView style={tabContentStyle}>
             <FlatList
               data={servicesData}
               keyExtractor={(item, index) => index.toString()}
@@ -745,14 +921,14 @@ const ProfileScreen = ({ navigation, route }) => {
               )}
             // renderItem={({ item }) => <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>}
             />
-          </View>
+          </ScrollView>
         );
       case 2:
         if (!specialityData) {
           return null; // Don't render anything if both galleryList and profile_video are empty
         }
         return (
-          <View>
+          <ScrollView style={tabContentStyle}>
             <FlatList
               data={specialityData}
               keyExtractor={(item, index) => index.toString()}
@@ -767,14 +943,14 @@ const ProfileScreen = ({ navigation, route }) => {
               )}
             // renderItem={({ item }) => <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>}
             />
-          </View>
+          </ScrollView>
         );
       case 3:
         if (!keyForteData) {
           return null; // Don't render anything if both galleryList and profile_video are empty
         }
         return (
-          <View>
+          <ScrollView style={tabContentStyle}>
             <FlatList
               data={keyForteData}
               keyExtractor={(item, index) => index.toString()}
@@ -789,11 +965,11 @@ const ProfileScreen = ({ navigation, route }) => {
               )}
             // renderItem={({ item }) => <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>}
             />
-          </View>
+          </ScrollView>
         );
       case 4:
         return (
-          <View style={{ marginBottom: 20 }}>
+          <ScrollView style={tabContentStyle}>
             <View>
               <Text style={[commonStyles.headerText11BL, {
                 //marginVertical: height * 0.01,
@@ -871,7 +1047,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 </TouchableOpacity>
               )}
             </View>
-          </View>
+          </ScrollView>
         );
       case 5:
         return (
@@ -881,6 +1057,19 @@ const ProfileScreen = ({ navigation, route }) => {
         );
       default:
         return null;
+    }
+  };
+
+  const handleShare = async () => {
+    const deepLink = 'denxgen://ProfileScreen?professionalId=' + professionalId;
+    const url = 'market://details?id=com.denxgen';
+
+    const canOpen = await Linking.canOpenURL(deepLink);
+
+    if (canOpen) {
+      Linking.openURL(deepLink);
+    } else {
+      Linking.openURL(url);
     }
   };
 
@@ -1223,7 +1412,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         onPress={() => setShowPopup(true)}
                         activeOpacity={0.8}
                       >
-                        <Text style={commonStyles.buttonTextS}>Key Associated</Text>
+                        <Text style={commonStyles.buttonTextS}>Key Associate</Text>
                       </TouchableOpacity>
                         </>
                         </View>
@@ -1250,10 +1439,10 @@ const ProfileScreen = ({ navigation, route }) => {
                           </TouchableOpacity>
                     <TouchableOpacity
                         style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
-                      onPress={() => setShowPopup2(true)}
+                        onPress={() => setShowPopup4(true)}
                       activeOpacity={0.8}
                     >
-                      <Text style={commonStyles.buttonTextS1}>Cancel Req.</Text>
+                      <Text style={commonStyles.buttonTextS1}>Cancel Key Req.</Text>
                     </TouchableOpacity>
                         </>
                         </View>
@@ -1296,7 +1485,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         {prid === connection.reciever && (
                           <TouchableOpacity
                             style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01 }]}
-                            onPress={() => setShowPopup2(true)}
+                            onPress={() => setShowPopup5(true)}
                             activeOpacity={0.8}
                           >
                             <Text style={commonStyles.buttonTextS}>Accept Req</Text>
@@ -1311,6 +1500,13 @@ const ProfileScreen = ({ navigation, route }) => {
                             activeOpacity={0.8}
                           >
                             <Text style={commonStyles.buttonTextS}>Connected</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
+                            onPress={() => setShowPopup(true)}
+                            activeOpacity={0.8}
+                          >
+                            <Text style={commonStyles.buttonTextS}>Key Associate</Text>
                           </TouchableOpacity>
                           {/* <TouchableOpacity
                             style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
@@ -1334,7 +1530,7 @@ const ProfileScreen = ({ navigation, route }) => {
                               onPress={() => setShowPopup4(true)}
                               activeOpacity={0.8}
                             >
-                              <Text style={commonStyles.buttonTextS1}>Cancel Req.</Text>
+                              <Text style={commonStyles.buttonTextS1}>Cancel Key Req.</Text>
                             </TouchableOpacity>
                           )}
                           {keyAssociateStatus === '1' && (
@@ -1386,7 +1582,29 @@ const ProfileScreen = ({ navigation, route }) => {
                   </TouchableOpacity>
                 )}>
                 <View style={styles.popover}>
-                  <TouchableOpacity
+                  {setEmpanel && connectionStatus === '1' && (
+                    <TouchableOpacity onPress={() => setShowPopupEmpanel(true)}>
+                      <View style={styles.popoverItemContainer}>
+                        <Image
+                          source={require('../../assets/img/Endorsement.png')}
+                          style={styles.popoverItemIcon1}
+                        />
+                        <Text style={styles.popoverItemText}>Empanel</Text>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                  {prtyid === '1' && connectionStatus === '1' && (
+                    <TouchableOpacity onPress={() => setShowPopupEndorse(true)}>
+                      <View style={styles.popoverItemContainer}>
+                        <Image
+                          source={require('../../assets/img/Endorsement.png')}
+                          style={styles.popoverItemIcon1}
+                        />
+                        <Text style={styles.popoverItemText}>Endorse</Text>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                  {/* <TouchableOpacity
                     onPress={() => setShowPopupEndorse(true)}>
                     <View style={styles.popoverItemContainer}>
                       <Image
@@ -1395,7 +1613,7 @@ const ProfileScreen = ({ navigation, route }) => {
                       />
                       <Text style={styles.popoverItemText}>Endorse</Text>
                     </View>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
 
                   <TouchableOpacity>
                     <View style={styles.popoverItemContainer}>
@@ -1418,7 +1636,7 @@ const ProfileScreen = ({ navigation, route }) => {
                       <Text style={styles.popoverItemText}>Block Account</Text>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={handleShare}>
                     <View style={styles.popoverItemContainer}>
                       <Image
                         source={require('../../assets/img/Link.png')}
@@ -1460,6 +1678,21 @@ const ProfileScreen = ({ navigation, route }) => {
               // handleConnectPress();
               setShowPopupEndorse(false);
               sendEndorseRequest();
+            }}
+          />
+
+          <AlertPopup
+            visible={showPopupEmpanel}
+            onRequestClose={() => setShowPopupEmpanel(false)}
+            title="Empanel Account"
+            message="Are you sure you want to send empanel request to this account? "
+            yesLabel="Empanel"
+            noLabel="Cancel"
+            onYesPress={() => {
+              // setShowPopup1(false);
+              // handleConnectPress();
+              setShowPopupEmpanel(false);
+              sendEmpanelRequest();
             }}
           />
 
@@ -1521,6 +1754,21 @@ const ProfileScreen = ({ navigation, route }) => {
               // handleOptionPress('Empanel');
               setShowPopup4(false);
               cancelKeyAssociateRequest();
+            }}
+          />
+
+          <AlertPopup
+            visible={showPopup5}
+            onRequestClose={() => setShowPopup5(false)}
+            title="Connection Request"
+            message="Do you want to accept connection request? "
+            yesLabel="Send"
+            noLabel="Cancel"
+            onYesPress={() => {
+              // setShowPopup(false);
+              // handleOptionPress('Empanel');
+              setShowPopup5(false);
+              acceptConnReq();
             }}
           />
           {/* <Modal visible={modalConnectVisible} transparent 
@@ -1797,7 +2045,10 @@ const ProfileScreen = ({ navigation, route }) => {
               </TouchableOpacity>
             </Modal>
           </View>
-          {profileData.about && (<View style={styles.horizontalLine}></View>)}
+          {profileData?.about && (
+            <View style={styles.horizontalLine}></View>
+          )}
+
           {profileData.about && (
             <View style={styles.aboutContainer}>
               <Text style={[commonStyles.headerText11BL, {
@@ -2745,6 +2996,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // Background blur effect
+  },
+  modalContent1: {
+    //backgroundColor: '#FEFCFC',
+    paddingVertical: 20,
+    paddingHorizontal: moderateScale(16),
+  },
+  modalContainer1: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Background blur effect
   },
   modalContent: {
     backgroundColor: '#FEFCFC',

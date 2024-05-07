@@ -112,9 +112,124 @@ const ClinicProfile = ({ navigation, route }) => {
 
     const [clinicData, setClinicData] = useState([]);
 
-    const [buttonState, setButtonState] = useState('Connect');
+    // const [buttonState, setButtonState] = useState('Connect');
+    // const [showPopup, setShowPopup] = useState(false);
+    // const [showPopup1, setShowPopup1] = useState(false);
+
+    // const handleConnectPress = () => {
+    //     if (buttonState === 'Connect') {
+    //         setButtonState('Options');
+    //     } else {
+    //         setButtonState('Connect');
+    //     }
+    // };
+
+    // const handleOptionPress = (option) => {
+    //     if (option === 'Empanel') {
+    //         setButtonState('Remove');
+    //     } else {
+    //         // Handle Message button press
+    //     }
+    // };
+
+
+    const [buttonState, setButtonState] = useState('StatusReq');
     const [showPopup, setShowPopup] = useState(false);
     const [showPopup1, setShowPopup1] = useState(false);
+    const [showPopup2, setShowPopup2] = useState(false);
+    const [showPopup4, setShowPopup4] = useState(false);
+    const [showPopup5, setShowPopup5] = useState(false);
+    const [showPopupBlock, setShowPopupBlock] = useState(false);
+    const [showPopupEndorse, setShowPopupEndorse] = useState(false);
+    const [selectedProfessionalId, setSelectedProfessionalId] = useState(null);
+
+    const [connectionStatus, setConnectionStatus] = useState(null);
+    const [connection, setConnection] = useState(null);
+    const [prid, setPrid] = useState(null);
+    console.log('prid', connection);
+
+    const [keyAssociateStatus, setKeyAssociateStatus] = useState(null);
+    const [keyAssociate, setKeyAssociate] = useState(null);
+
+    useEffect(() => {
+        fetchConnectionStatus();
+        fetchKeyAssociateStatus();
+    }, []);
+
+
+
+
+    const fetchConnectionStatus = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            //setPrid(pr_id);
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            setPrid(accidtyid);
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallconnectionlist-ax.php?selectedid=${accidtyid}&typeid=${accidty}&typeid2=2`);
+            console.log(response);
+            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallclconnectionlist-ax.php?cl_id=${cl_id}`);
+            const data = await response.json();
+            //console.log(data);
+            if (data.code === 1) {
+                // Check connection status
+                const connection = data.data.find(connection => {
+                    if ((connection.reciever === accidtyid && connection.sender === cl_id) ||
+                        (connection.sender === accidtyid && connection.reciever === cl_id)) {
+                        return true;
+                    }
+                    return false;
+                });
+
+                console.log("Connection:", connection);
+                setConnectionStatus(connection.connection);
+                setConnection(connection);
+                console.log("Connection Status:", connection.connection);
+
+
+            } else {
+                // Handle error
+            }
+        } catch (error) {
+            // Handle error
+            console.error(error);
+        }
+    };
+
+
+    const fetchKeyAssociateStatus = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallkeyassoclist-ax.php?pr_id=${pr_id}`);
+            const data = await response.json();
+            if (data.code === 1) {
+                // Check connection status
+                const keyAssociate = data.data.find(keyAssociate => {
+                    if ((keyAssociate.reciever === pr_id && keyAssociate.sender === cl_id) ||
+                        (keyAssociate.sender === pr_id && keyAssociate.reciever === cl_id)) {
+                        return true;
+                    }
+                    return false;
+                });
+
+                //console.log("KeyAssociate:", keyAssociate);
+                if (keyAssociate) {
+                    setKeyAssociateStatus(keyAssociate.keyassociate);
+                    setKeyAssociate(keyAssociate);
+                    //console.log("Connection Status:", connection.connection);
+                } else {
+                    console.log("No connection found for professional ID:", cl_id);
+                }
+
+
+            }
+
+        } catch (error) {
+            // Handle error
+            console.error(error);
+        }
+    };
+
 
     const handleConnectPress = () => {
         if (buttonState === 'Connect') {
@@ -129,6 +244,187 @@ const ClinicProfile = ({ navigation, route }) => {
             setButtonState('Remove');
         } else {
             // Handle Message button press
+        }
+    };
+
+    const cancelConnectionRequest = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=connection`);
+            const data = await response.json();
+            // Check if the request was successful, and update UI accordingly
+            if (data.code === 1) {
+                setButtonState('Connect');
+                console.log('sent req');
+                console.log(response);
+            } else {
+                // Handle error
+            }
+        } catch (error) {
+            // Handle error
+            console.error(error);
+        }
+    };
+
+    const cancelKeyAssociateRequest = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=keyassociate`);
+            const data = await response.json();
+            // Check if the request was successful, and update UI accordingly
+            if (data.code === 1) {
+                setButtonState('KeyAssociate');
+                console.log('sent req');
+                console.log(response);
+                console.log(data);
+            } else {
+                // Handle error
+            }
+        } catch (error) {
+            // Handle error
+            console.error(error);
+        }
+    };
+
+    const acceptConnReq = async () => {
+        try {
+            console.log('clicked')
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            console.log('pr_id', pr_id);
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            console.log('accidty', accidty);
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersacceptconn-ax.php?accid1=${accidtyid}&accidty1=2&accid2=${pr_id}&accidty2=${accidty}&action=connection`);
+            const data = await response.json();
+            // Handle response data as needed
+            console.log(response);
+            setButtonState('KeyAssociate');
+            console.log(data);
+            console.log('connected')
+            setShowPopup5(false); // Close the popup after making the API call
+        } catch (error) {
+            console.error('Error sending connection request:', error);
+            // Handle error
+        }
+    };
+
+    const handleAcceptPress = () => {
+        // Show the popup
+        console.log('huhdei');
+        setShowPopup2(true);
+        // Set the selected professional's id to state
+        setSelectedProfessionalId(cl_id);
+    };
+
+    const sendDropCardRequest = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=dropacard`);
+
+            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=dropacard`);
+            const data = await response.json();
+            // Check if the request was successful, and update UI accordingly
+            console.log('drop a card account');
+            console.log(response);
+            console.log(data);
+        } catch (error) {
+            // Handle error
+            console.error(error);
+        }
+    };
+
+    const sendBlockRequest = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=blocked`);
+
+            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=blocked`);
+            const data = await response.json();
+            // Check if the request was successful, and update UI accordingly
+            console.log('block account');
+            console.log(response);
+            console.log(data);
+        } catch (error) {
+            // Handle error
+            console.error(error);
+        }
+    };
+
+    const sendEndorseRequest = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=endorsement`);
+
+            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=endorsement`);
+            const data = await response.json();
+            // Check if the request was successful, and update UI accordingly
+            console.log('block account');
+            console.log(response);
+            console.log(data);
+        } catch (error) {
+            // Handle error
+            console.error(error);
+        }
+    };
+
+    const sendConnectionRequest = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            console.log('accidty', accidty);
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=connection`);
+            const data = await response.json();
+            // Check if the request was successful, and update UI accordingly
+            if (data.code === 1) {
+                setButtonState('Remove');
+                console.log('sent req');
+                console.log(response);
+            } else {
+                // Handle error
+            }
+        } catch (error) {
+            // Handle error
+            console.error(error);
+        }
+    };
+
+    const sendKeyAssociateRequest = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=keyassociate`);
+
+            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=keyassociate`);
+            const data = await response.json();
+            console.log(data);
+            // Check if the request was successful, and update UI accordingly
+            if (data.code === 1) {
+                setButtonState('RemoveKey');
+            } else {
+                // Handle error
+            }
+        } catch (error) {
+            // Handle error
+            console.error(error);
         }
     };
 
@@ -507,6 +803,7 @@ const ClinicProfile = ({ navigation, route }) => {
     };
 
 
+
     return (
         <SafeAreaView style={styles.container}>
 
@@ -694,7 +991,7 @@ const ClinicProfile = ({ navigation, route }) => {
           >
             <Text style={styles.buttonText}>Connect</Text>
           </TouchableOpacity> */}
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    {/* <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <View style={{ flexDirection: 'row', marginVertical: height * 0.005 }}>
                             <View>
                                 {buttonState === 'Connect' && (
@@ -710,13 +1007,6 @@ const ClinicProfile = ({ navigation, route }) => {
 
                                 {buttonState === 'Options' && (
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: height * 0.01 }}>
-                                        {/* <TouchableOpacity
-                    style={[commonStyles.buttonS1, { marginRight: height * 0.01 }]}
-                    onPress={() => handleOptionPress('Message')}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={commonStyles.buttonTextS1}>Message</Text>
-                  </TouchableOpacity> */}
 
                                         <TouchableOpacity
                                             style={commonStyles.buttonS}
@@ -731,13 +1021,7 @@ const ClinicProfile = ({ navigation, route }) => {
 
                                 {buttonState === 'Remove' && (
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: height * 0.01 }}>
-                                        {/* <TouchableOpacity
-                    style={[commonStyles.buttonS1, { marginRight: height * 0.01 }]}
-                    onPress={() => handleOptionPress('Message')}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={commonStyles.buttonTextS1}>Message</Text>
-                  </TouchableOpacity> */}
+
 
                                         <TouchableOpacity
                                             style={commonStyles.buttonS1}
@@ -814,8 +1098,7 @@ const ClinicProfile = ({ navigation, route }) => {
                                     </TouchableOpacity>
                                 </View>
                             </Popover>
-                            {/* <Image source={require('../../assets/img/Option.png')} style={{ width: 20, height: 20, marginLeft: width * 0.02 }} /> */}
-                        </View>
+                         </View>
                     </View>
                     <AlertPopup
                         visible={showPopup1}
@@ -828,9 +1111,9 @@ const ClinicProfile = ({ navigation, route }) => {
                             setShowPopup1(false);
                             handleConnectPress();
                         }}
-                    />
+                    /> */}
 
-                    <AlertPopup
+                    {/* <AlertPopup
                         visible={showPopup}
                         onRequestClose={() => setShowPopup(false)}
                         title="Empanelment Request"
@@ -840,6 +1123,349 @@ const ClinicProfile = ({ navigation, route }) => {
                         onYesPress={() => {
                             setShowPopup(false);
                             handleOptionPress('Empanel');
+                        }}
+                    /> */}
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <View style={{ flexDirection: 'row', marginVertical: height * 0.005 }}>
+                            <View>
+                                {buttonState === 'Connect' && (
+                                    <TouchableOpacity
+                                        style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, }]}
+                                        // onPress={handleConnectPress}
+                                        onPress={() => setShowPopup1(true)}
+                                        activeOpacity={0.8}
+                                    >
+                                        <Text style={commonStyles.buttonTextS}>Connect</Text>
+                                    </TouchableOpacity>
+                                )}
+                                {buttonState === 'KeyAssociate' && (
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                        <>
+                                            <TouchableOpacity
+                                                style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01 }]}
+                                                onPress={() => setShowPopup4(true)}
+                                                activeOpacity={0.8}
+                                            >
+                                                <Text style={commonStyles.buttonTextS}>Connected</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
+                                                onPress={() => setShowPopup(true)}
+                                                activeOpacity={0.8}
+                                            >
+                                                <Text style={commonStyles.buttonTextS}>Key Associate</Text>
+                                            </TouchableOpacity>
+                                        </>
+                                    </View>
+
+                                )}
+                                {buttonState === 'Remove' && (
+                                    <TouchableOpacity
+                                        style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, }]}
+                                        onPress={() => setShowPopup2(true)}
+                                        activeOpacity={0.8}
+                                    >
+                                        <Text style={commonStyles.buttonTextS1}>Cancel Req.</Text>
+                                    </TouchableOpacity>
+                                )}
+                                {buttonState === 'RemoveKey' && (
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                        <>
+                                            <TouchableOpacity
+                                                style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01 }]}
+                                                onPress={() => setShowPopup4(true)}
+                                                activeOpacity={0.8}
+                                            >
+                                                <Text style={commonStyles.buttonTextS}>Connected</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
+                                                onPress={() => setShowPopup4(true)}
+                                                activeOpacity={0.8}
+                                            >
+                                                <Text style={commonStyles.buttonTextS1}>Cancel Key Req.</Text>
+                                            </TouchableOpacity>
+                                        </>
+                                    </View>
+
+                                )}
+                                {buttonState === 'Options' && (
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: height * 0.01 }}>
+                                        {/* <TouchableOpacity
+                    style={[commonStyles.buttonS1, { marginRight: height * 0.01 }]}
+                    onPress={() => handleOptionPress('Message')}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={commonStyles.buttonTextS1}>Message</Text>
+                  </TouchableOpacity> */}
+
+                                        <TouchableOpacity
+                                            style={commonStyles.buttonS}
+                                            //onPress={() => handleOptionPress('Emphasize')}
+                                            onPress={() => setShowPopup(true)}
+                                            activeOpacity={0.8}
+                                        >
+                                            <Text style={commonStyles.buttonTextS}>Empanel</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+
+                                {buttonState === 'StatusReq' && (
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                        {connectionStatus === '2' && connection ? (
+                                            <>
+                                                {prid === connection.sender && (
+                                                    <TouchableOpacity
+                                                        style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01 }]}
+                                                        onPress={() => setShowPopup2(true)}
+                                                        activeOpacity={0.8}
+                                                    >
+                                                        <Text style={commonStyles.buttonTextS1}>Cancel Req.</Text>
+                                                    </TouchableOpacity>
+                                                )}
+                                                {prid === connection.reciever && (
+                                                    <TouchableOpacity
+                                                        style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01 }]}
+                                                        onPress={() => setShowPopup5(true)}
+                                                        activeOpacity={0.8}
+                                                    >
+                                                        <Text style={commonStyles.buttonTextS}>Accept Req</Text>
+                                                    </TouchableOpacity>
+                                                )}
+                                            </>
+                                        ) : connectionStatus === '1' ? (
+                                            <>
+                                                <TouchableOpacity
+                                                    style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01 }]}
+                                                    onPress={() => setShowPopup2(true)}
+                                                    activeOpacity={0.8}
+                                                >
+                                                    <Text style={commonStyles.buttonTextS}>Connected</Text>
+                                                </TouchableOpacity>
+                                                {/* <TouchableOpacity
+                            style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
+                            onPress={() => setShowPopup(true)}
+                            activeOpacity={0.8}
+                          >
+                            <Text style={commonStyles.buttonTextS1}>Key Assoc.</Text>
+                          </TouchableOpacity> */}
+                                                {keyAssociateStatus === '0' && (
+                                                    <TouchableOpacity
+                                                        style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
+                                                        onPress={() => setShowPopup(true)}
+                                                        activeOpacity={0.8}
+                                                    >
+                                                        <Text style={commonStyles.buttonTextS}>Key Assoc.</Text>
+                                                    </TouchableOpacity>
+                                                )}
+                                                {keyAssociateStatus === '2' && (
+                                                    <TouchableOpacity
+                                                        style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
+                                                        onPress={() => setShowPopup4(true)}
+                                                        activeOpacity={0.8}
+                                                    >
+                                                        <Text style={commonStyles.buttonTextS1}>Cancel Key Req.</Text>
+                                                    </TouchableOpacity>
+                                                )}
+                                                {keyAssociateStatus === '1' && (
+                                                    <TouchableOpacity
+                                                        style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
+                                                        onPress={() => setShowPopup4(true)}
+                                                        activeOpacity={0.8}
+                                                    >
+                                                        <Text style={commonStyles.buttonTextS}>Key Associated</Text>
+                                                    </TouchableOpacity>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <TouchableOpacity
+                                                style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, }]}
+                                                onPress={() => setShowPopup1(true)}
+                                                activeOpacity={0.8}
+                                            >
+                                                <Text style={commonStyles.buttonTextS}>Connect</Text>
+                                            </TouchableOpacity>
+                                        )}
+                                    </View>
+                                )}
+
+
+                            </View>
+                            {/* <TouchableOpacity
+                style={[commonStyles.buttonS, { marginLeft: height * 0.01 }]}
+                activeOpacity={0.8}
+              >
+                <Text style={commonStyles.buttonTextS}>Key Associate</Text>
+              </TouchableOpacity> */}
+
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => setModalConnectVisible(true)}>
+                                <Image source={require('../../../assets/img/connections.png')} style={{ width: 20, height: 20 }} />
+                            </TouchableOpacity>
+                            <Popover
+                                placement={PopoverPlacement.LEFT}
+                                from={(
+                                    <TouchableOpacity
+                                        style={commonStyles.backContainer1}
+                                    >
+                                        <Image
+                                            source={require('../../../assets/img/Option.png')}
+                                            style={{ width: 20, height: 20, marginLeft: width * 0.02 }}
+                                        />
+                                    </TouchableOpacity>
+                                )}>
+                                <View style={styles.popover}>
+                                    {/* <TouchableOpacity
+                                        onPress={() => setShowPopupEndorse(true)}>
+                                        <View style={styles.popoverItemContainer}>
+                                            <Image
+                                                source={require('../../../assets/img/Endorsement.png')}
+                                                style={styles.popoverItemIcon1}
+                                            />
+                                            <Text style={styles.popoverItemText}>Endorse</Text>
+                                        </View>
+                                    </TouchableOpacity> */}
+
+                                    <TouchableOpacity>
+                                        <View style={styles.popoverItemContainer}>
+                                            <Image
+                                                source={require('../../../assets/img/SaveCon.png')}
+                                                style={styles.popoverItemIcon}
+                                            />
+                                            <Text style={styles.popoverItemText}>Save Contact</Text>
+                                        </View>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity
+                                        onPress={() => setShowPopupBlock(true)}
+                                    >
+                                        <View style={styles.popoverItemContainer}>
+                                            <Image
+                                                source={require('../../../assets/img/Spam.png')}
+                                                style={styles.popoverItemIcon}
+                                            />
+                                            <Text style={styles.popoverItemText}>Block Account</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                    {/* <TouchableOpacity onPress={handleShare}>
+                                        <View style={styles.popoverItemContainer}>
+                                            <Image
+                                                source={require('../../assets/img/Link.png')}
+                                                style={styles.popoverItemIcon}
+                                            />
+                                            <Text style={styles.popoverItemText}>Copy Link</Text>
+                                        </View>
+                                    </TouchableOpacity> */}
+                                </View>
+                            </Popover>
+                            {/* <Image source={require('../../assets/img/Option.png')} style={{ width: 20, height: 20, marginLeft: width * 0.02 }} /> */}
+                        </View>
+                    </View>
+
+                    <AlertPopup
+                        visible={showPopupBlock}
+                        onRequestClose={() => setShowPopupBlock(false)}
+                        title="Block Account"
+                        message="Are you sure you want to block this account? "
+                        yesLabel="Block"
+                        noLabel="Cancel"
+                        onYesPress={() => {
+                            // setShowPopup1(false);
+                            // handleConnectPress();
+                            setShowPopupBlock(false);
+                            sendBlockRequest();
+                        }}
+                    />
+
+                    <AlertPopup
+                        visible={showPopupEndorse}
+                        onRequestClose={() => setShowPopupEndorse(false)}
+                        title="Endorse Account"
+                        message="Are you sure you want to send endorsement to this account? "
+                        yesLabel="Endorse"
+                        noLabel="Cancel"
+                        onYesPress={() => {
+                            // setShowPopup1(false);
+                            // handleConnectPress();
+                            setShowPopupEndorse(false);
+                            sendEndorseRequest();
+                        }}
+                    />
+
+
+                    <AlertPopup
+                        visible={showPopup1}
+                        onRequestClose={() => setShowPopup1(false)}
+                        title="Connection Request"
+                        message="Do you want to send connection request? "
+                        yesLabel="Send"
+                        noLabel="Cancel"
+                        onYesPress={() => {
+                            // setShowPopup1(false);
+                            // handleConnectPress();
+                            setShowPopup1(false);
+                            sendConnectionRequest();
+                        }}
+                    />
+
+                    <AlertPopup
+                        visible={showPopup}
+                        onRequestClose={() => setShowPopup(false)}
+                        title="Key Associate Request"
+                        message="Do you want to send key associate request? "
+                        yesLabel="Send"
+                        noLabel="Cancel"
+                        onYesPress={() => {
+                            // setShowPopup(false);
+                            // handleOptionPress('Empanel');
+                            setShowPopup(false);
+                            sendKeyAssociateRequest();
+                        }}
+                    />
+
+                    <AlertPopup
+                        visible={showPopup2}
+                        onRequestClose={() => setShowPopup2(false)}
+                        title="Key Associate Request"
+                        message="Do you want to cancel connection request? "
+                        yesLabel="Send"
+                        noLabel="Cancel"
+                        onYesPress={() => {
+                            // setShowPopup(false);
+                            // handleOptionPress('Empanel');
+                            setShowPopup2(false);
+                            cancelConnectionRequest();
+                        }}
+                    />
+
+                    <AlertPopup
+                        visible={showPopup4}
+                        onRequestClose={() => setShowPopup4(false)}
+                        title="Key Associate Request"
+                        message="Do you want to cancel key associate request? "
+                        yesLabel="Send"
+                        noLabel="Cancel"
+                        onYesPress={() => {
+                            // setShowPopup(false);
+                            // handleOptionPress('Empanel');
+                            setShowPopup4(false);
+                            cancelKeyAssociateRequest();
+                        }}
+                    />
+
+                    <AlertPopup
+                        visible={showPopup5}
+                        onRequestClose={() => setShowPopup5(false)}
+                        title="Connection Request"
+                        message="Do you want to accept connection request? "
+                        yesLabel="Send"
+                        noLabel="Cancel"
+                        onYesPress={() => {
+                            // setShowPopup(false);
+                            // handleOptionPress('Empanel');
+                            setShowPopup5(false);
+                            acceptConnReq();
                         }}
                     />
                     {/* <Modal visible={modalConnectVisible} transparent 
@@ -1273,7 +1899,7 @@ const ClinicProfile = ({ navigation, route }) => {
                             <View>
                                 <Text style={[commonStyles.headerText4BL]}>Chief Dentist</Text>
                                 <TouchableOpacity
-                                    onPress={() => navigation.navigate('ProfileScreen')}
+                                    onPress={() => navigation.navigate('ProfileScreen', { professionalId: 1 })}
                                     activeOpacity={0.8}
                                     style={styles.contentContainer}>
                                     <Image
@@ -1290,7 +1916,7 @@ const ClinicProfile = ({ navigation, route }) => {
                                 <Text style={[commonStyles.headerText4BL, { marginTop: 10 }]}>Empanelled Dental Members</Text>
                                 <View style={{ flexDirection: 'row' }}>
                                     <TouchableOpacity
-                                        onPress={() => navigation.navigate('ProfileScreen')}
+                                        onPress={() => navigation.navigate('ProfileScreen', { professionalId: 1 })}
                                         activeOpacity={0.8}
                                         style={styles.contentContainer}>
                                         <Image
@@ -1303,7 +1929,7 @@ const ClinicProfile = ({ navigation, route }) => {
                                         </View>
                                     </TouchableOpacity>
                                     <TouchableOpacity
-                                        onPress={() => navigation.navigate('ProfileScreen')}
+                                        onPress={() => navigation.navigate('ProfileScreen', { professionalId: 1 })}
                                         activeOpacity={0.8}
                                         style={styles.contentContainer}>
                                         <Image
@@ -1316,7 +1942,7 @@ const ClinicProfile = ({ navigation, route }) => {
                                         </View>
                                     </TouchableOpacity>
                                     <TouchableOpacity
-                                        onPress={() => navigation.navigate('ProfileScreen')}
+                                        onPress={() => navigation.navigate('ProfileScreen', { professionalId: 1 })}
                                         activeOpacity={0.8}
                                         style={styles.contentContainer}>
                                         <Image
@@ -2147,11 +2773,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         alignSelf: 'center',
     },
+    popoverItemIcon1: {
+        height: 15,
+        width: 18,
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignSelf: 'center',
+    },
     popoverItemText: {
         fontSize: 15,
         color: '#121212',
         fontFamily: 'DMSans-Medium',
-        lineHeight: height * 0.022, //28
+        lineHeight: 22, //28
         marginHorizontal: 10,
         alignSelf: 'center',
     },
