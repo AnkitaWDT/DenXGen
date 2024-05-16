@@ -1,13 +1,16 @@
 /* eslint-disable prettier/prettier */
 import React, {Component} from 'react';
 import PushNotification from 'react-native-push-notification';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // var PushNotification = require("react-native-push-notification");
 export default class PushController extends Component {
   componentDidMount() {
     PushNotification.configure({
       // (optional) Called when Token is generated (iOS and Android)
-      onRegister: function (token) {
+      onRegister: async function (token) {
         console.log('TOKEN:', token);
+        // Save the token locally
+        await AsyncStorage.setItem('playerId', token.token);
       },
       // (required) Called when a remote or local notification is opened or received
       onNotification: function (notification) {

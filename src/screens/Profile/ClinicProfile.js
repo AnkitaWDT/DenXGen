@@ -166,7 +166,7 @@ const ClinicProfile = ({ navigation, route }) => {
             const accidty = await AsyncStorage.getItem('selected_profile_accidty');
             const accidtyid = await AsyncStorage.getItem('selected_id');
             setPrid(accidtyid);
-            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallconnectionlist-ax.php?selectedid=${accidtyid}&typeid=${accidty}&typeid2=2`);
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallconnectionlist-ax.php?selectedid=${accidtyid}&accidty1=${accidty}&accidty2=2`);
             console.log(response);
             //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallclconnectionlist-ax.php?cl_id=${cl_id}`);
             const data = await response.json();
@@ -199,14 +199,18 @@ const ClinicProfile = ({ navigation, route }) => {
 
     const fetchKeyAssociateStatus = async () => {
         try {
-            const pr_id = await AsyncStorage.getItem('pr_id');
-            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallkeyassoclist-ax.php?pr_id=${pr_id}`);
+
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            setPrid(accidtyid);
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallkeyassoclist-ax.php?selectedid=${accidtyid}&accidty1=${accidty}&accidty2=1`);
+            console.log(response);
             const data = await response.json();
             if (data.code === 1) {
                 // Check connection status
                 const keyAssociate = data.data.find(keyAssociate => {
-                    if ((keyAssociate.reciever === pr_id && keyAssociate.sender === cl_id) ||
-                        (keyAssociate.sender === pr_id && keyAssociate.reciever === cl_id)) {
+                    if ((keyAssociate.reciever === accidtyid && keyAssociate.sender === cl_id) ||
+                        (keyAssociate.sender === accidtyid && keyAssociate.reciever === cl_id)) {
                         return true;
                     }
                     return false;

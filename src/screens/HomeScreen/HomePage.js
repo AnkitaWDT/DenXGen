@@ -193,7 +193,10 @@ const HomePage = ({ navigation, route }) => {
   useFocusEffect(
     React.useCallback(() => {
       fetchData();
-      fetchCompletionData();
+      // fetchCompletionData();
+      fetchPersonalProfileCount();
+      fetchClinicProfileCount();
+      fetchOfficeProfileCount();
     }, [])
   );
 
@@ -393,6 +396,7 @@ const HomePage = ({ navigation, route }) => {
         await AsyncStorage.setItem('selected_profile_accidty', '1');
         await AsyncStorage.setItem('selected_profile_pic', profilePic || ''); // Save profile pic URL, or empty string if it's null
         console.log('Selected My Account:', name, profilePic, type); // Log the selected value
+        await fetchPersonalProfileCount(id);
         break;
       case 'Clinic Account':
         await AsyncStorage.setItem('selected_id', id.toString());
@@ -401,6 +405,7 @@ const HomePage = ({ navigation, route }) => {
         await AsyncStorage.setItem('selected_profile_accidty', '2');
         await AsyncStorage.setItem('selected_profile_pic', profilePic || ''); // Save profile pic URL, or empty string if it's null
         console.log('Selected Clinic Account:', name, profilePic, type); // Log the selected value
+        await fetchClinicProfileCount(id);
         break;
       case 'Office Account':
         await AsyncStorage.setItem('selected_id', id.toString());
@@ -409,6 +414,7 @@ const HomePage = ({ navigation, route }) => {
         await AsyncStorage.setItem('selected_profile_accidty', '3');
         await AsyncStorage.setItem('selected_profile_pic', profilePic || ''); // Save profile pic URL, or empty string if it's null
         console.log('Selected Office Account:', name, profilePic, type); // Log the selected value
+        await fetchOfficeProfileCount(id);
         break;
       default:
         break;
@@ -534,29 +540,80 @@ const HomePage = ({ navigation, route }) => {
   const [completionData, setCompletionData] = useState(null);
 
   useEffect(() => {
-    fetchCompletionData();
+    //fetchCompletionData();
+    fetchPersonalProfileCount();
+    fetchClinicProfileCount();
+    fetchOfficeProfileCount();
   }, []);
 
-  const fetchCompletionData = async () => {
+  const fetchPersonalProfileCount= async (id) => {
     try {
-
-      const pr_id = await AsyncStorage.getItem('pr_id');
-      // Parse pr_id to an integer
-      const id = parseInt(pr_id);
-      
       const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersprofilecount-ax.php?pr_id=${id}`);
       const json = await response.json();
       if (json.code === 1) {
         setCompletionData(json.data);
-        console.log('completionData', completionData);
+        console.log('Personal Profile Completion Data:', completionData);
       } else {
         // Handle error
       }
     } catch (error) {
+      console.error('Error fetching personal profile completion data:', error);
       // Handle error
-      console.error(error);
     }
   };
+
+  const fetchClinicProfileCount = async (id) => {
+    try {
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getclprofilecount-ax.php?cl_id=${id}`);
+      const json = await response.json();
+      if (json.code === 1) {
+        setCompletionData(json.data);
+        console.log('Clinic Profile Completion Data:', completionData);
+      } else {
+        // Handle error
+      }
+    } catch (error) {
+      console.error('Error fetching clinic profile completion data:', error);
+      // Handle error
+    }
+  };
+
+  const fetchOfficeProfileCount = async (id) => {
+    try {
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getoffprofilecount-ax.php?off_id=${id}`);
+      const json = await response.json();
+      if (json.code === 1) {
+        setCompletionData(json.data);
+        console.log('Office Profile Completion Data:', completionData);
+      } else {
+        // Handle error
+      }
+    } catch (error) {
+      console.error('Error fetching office profile completion data:', error);
+      // Handle error
+    }
+  };
+
+  // const fetchCompletionData = async () => {
+  //   try {
+
+  //     const pr_id = await AsyncStorage.getItem('pr_id');
+  //     // Parse pr_id to an integer
+  //     const id = parseInt(pr_id);
+      
+  //     const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersprofilecount-ax.php?pr_id=${id}`);
+  //     const json = await response.json();
+  //     if (json.code === 1) {
+  //       setCompletionData(json.data);
+  //       console.log('completionData', completionData);
+  //     } else {
+  //       // Handle error
+  //     }
+  //   } catch (error) {
+  //     // Handle error
+  //     console.error(error);
+  //   }
+  // };
 
     const truncateText1 = (text, maxWidth, fontSize) => {
         const ellipsisWidth = 30; // Width of the ellipsis
@@ -615,32 +672,112 @@ const HomePage = ({ navigation, route }) => {
     }
   };
 
-  const navigateToScreen = () => {
-    // if (!completionData || !completionData.gotosteps) return;
+  const navigateToScreen = (id) => {
+    if (!completionData || !completionData.gotosteps) return;
 
     const gotosteps = parseFloat(completionData.gotosteps);
     let screenName = '';
 
-    if (gotosteps >= 2 && gotosteps < 3) {
-      screenName = 'ProfileCompletion2';
-    } else if (gotosteps >= 3 && gotosteps < 4) {
-      screenName = 'NDProfileCompletion3';
-    } else if (gotosteps >= 4 && gotosteps < 5) {
-      screenName = 'ProfileCompletion4';
-    } else if (gotosteps >= 5 && gotosteps < 6) {
-      screenName = 'ProfileCompletion5';
-    } else if (gotosteps >= 6 && gotosteps < 7) {
-      screenName = 'ProfileCompletion6';
-    } else if (gotosteps >= 7 && gotosteps < 8) {
-      screenName = 'ProfileCompletion7';
-    } else if (gotosteps >= 8 && gotosteps < 9) {
-      screenName = 'ProfileCompletion8';
+    switch (selectedItem.type) {
+      case 'My Account':
+        if (gotosteps >= 2 && gotosteps < 3) {
+          screenName = 'ProfileCompletion2';
+        } else if (gotosteps >= 3 && gotosteps < 4) {
+          screenName = 'NDProfileCompletion3';
+        } else if (gotosteps >= 4 && gotosteps < 5) {
+          screenName = 'ProfileCompletion4';
+        } else if (gotosteps >= 5 && gotosteps < 6) {
+          screenName = 'ProfileCompletion5';
+        } else if (gotosteps >= 6 && gotosteps < 7) {
+          screenName = 'ProfileCompletion6';
+        } else if (gotosteps >= 7 && gotosteps < 8) {
+          screenName = 'ProfileCompletion7';
+        } else if (gotosteps >= 8 && gotosteps < 9) {
+          screenName = 'ProfileCompletion8';
+        }
+        break;
+      case 'Clinic Account':
+        if (gotosteps >= 2 && gotosteps < 3) {
+          screenName = 'ClinicProfileCompletion2';
+        } else if (gotosteps >= 3 && gotosteps < 4) {
+          screenName = 'ClinicProfileCompletion3';
+        } else if (gotosteps >= 4 && gotosteps < 5) {
+          screenName = 'ClinicProfileCompletion4';
+        } else if (gotosteps >= 5 && gotosteps < 6) {
+          screenName = 'ClinicProfileCompletion5';
+        } else if (gotosteps >= 6 && gotosteps < 7) {
+          screenName = 'ClinicProfileCompletion6';
+        } else if (gotosteps >= 7 && gotosteps < 8) {
+          screenName = 'ClinicProfileCompletion7';
+        } else if (gotosteps >= 8 && gotosteps < 9) {
+          screenName = 'ClinicProfileCompletion8';
+        }
+        break;
+      case 'Office Account':
+        if (gotosteps >= 2 && gotosteps < 3) {
+          screenName = 'OfficeProfileCompletion2';
+        } else if (gotosteps >= 3 && gotosteps < 4) {
+          screenName = 'OfficeProfileCompletion3';
+        } else if (gotosteps >= 4 && gotosteps < 5) {
+          screenName = 'OfficeProfileCompletion4';
+        } else if (gotosteps >= 5 && gotosteps < 6) {
+          screenName = 'OfficeProfileCompletion5';
+        } else if (gotosteps >= 6 && gotosteps < 7) {
+          screenName = 'OfficeProfileCompletion6';
+        } else if (gotosteps >= 7 && gotosteps < 8) {
+          screenName = 'OfficeProfileCompletion7';
+        } else if (gotosteps >= 8 && gotosteps < 9) {
+          screenName = 'OfficeProfileCompletion8';
+        }
+        break;
+      default:
+        break;
     }
 
     if (screenName) {
-      navigation.navigate(screenName);
+      if (selectedItem.type === 'Clinic Account') {
+        // Assuming 'navigation' is defined elsewhere
+        navigation.navigate(screenName, { cl_id: id });
+      } 
+      else if (selectedItem.type === 'Office Account') {
+        // Assuming 'navigation' is defined elsewhere
+        navigation.navigate(screenName, { off_id: id });
+      } else {
+        navigation.navigate(screenName);
+      }
     }
+    // if (screenName) {
+    //   navigation.navigate(screenName);
+    // }
   };
+
+
+  // const navigateToScreen = () => {
+  //   // if (!completionData || !completionData.gotosteps) return;
+
+  //   const gotosteps = parseFloat(completionData.gotosteps);
+  //   let screenName = '';
+
+  //   if (gotosteps >= 2 && gotosteps < 3) {
+  //     screenName = 'ProfileCompletion2';
+  //   } else if (gotosteps >= 3 && gotosteps < 4) {
+  //     screenName = 'NDProfileCompletion3';
+  //   } else if (gotosteps >= 4 && gotosteps < 5) {
+  //     screenName = 'ProfileCompletion4';
+  //   } else if (gotosteps >= 5 && gotosteps < 6) {
+  //     screenName = 'ProfileCompletion5';
+  //   } else if (gotosteps >= 6 && gotosteps < 7) {
+  //     screenName = 'ProfileCompletion6';
+  //   } else if (gotosteps >= 7 && gotosteps < 8) {
+  //     screenName = 'ProfileCompletion7';
+  //   } else if (gotosteps >= 8 && gotosteps < 9) {
+  //     screenName = 'ProfileCompletion8';
+  //   }
+
+  //   if (screenName) {
+  //     navigation.navigate(screenName);
+  //   }
+  // };
 
 
   return (
@@ -1194,8 +1331,8 @@ const HomePage = ({ navigation, route }) => {
                       position: 'absolute',
                       right: width * 0.02,
                     }}
-                    // onPress={() => navigation.navigate('ProfileCompletion2')}
-                    onPress={() => navigateToScreen()}
+                      onPress={() => navigateToScreen(selectedItem.id)} 
+                    //onPress={() => navigateToScreen()}
                   >
                     <Text style={{
                       fontSize: responsiveFontSize(14),

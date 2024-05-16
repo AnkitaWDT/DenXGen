@@ -6,7 +6,7 @@ import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 import Contacts from 'react-native-contacts';
 import LottieView from 'lottie-react-native';
-import { moderateScale } from 'react-native-size-matters';
+import { moderateScale } from 'react-native-size-matters';///
 import AlertPopup from '../../components/AlertPopup';
 import Popover, { PopoverPlacement } from 'react-native-popover-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -199,25 +199,44 @@ const SentReq = ({ navigation }) => {
     const [professionals, setProfessionals] = useState([]);
     const [keyAssociates, setKeyAssociates] = useState([]);
 
-
     useEffect(() => {
-        const fetchProfessionalsData = async () => {
-            try {
-                const pr_id = await AsyncStorage.getItem('pr_id');
-                const id = parseInt(pr_id);
-
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getperssentreqlist-ax.php?pr_id=${id}`);
-                const data = await response.json();
-                setProfessionals(data.data);
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setIsLoading(false);
-            }
-        };
-
         fetchProfessionalsData();
     }, []);
+
+    const fetchProfessionalsData = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getperssentreqlist-ax.php?pr_id=${id}`);
+            const data = await response.json();
+            setProfessionals(data.data);
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setIsLoading(false);
+        }
+    };
+
+
+    // useEffect(() => {
+    //     const fetchProfessionalsData = async () => {
+    //         try {
+    //             const pr_id = await AsyncStorage.getItem('pr_id');
+    //             const id = parseInt(pr_id);
+
+    //             const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getperssentreqlist-ax.php?pr_id=${id}`);
+    //             const data = await response.json();
+    //             setProfessionals(data.data);
+    //             setIsLoading(false);
+    //         } catch (error) {
+    //             console.error('Error fetching data:', error);
+    //             setIsLoading(false);
+    //         }
+    //     };
+
+    //     fetchProfessionalsData();
+    // }, []);
 
 
     useEffect(() => {
@@ -326,6 +345,7 @@ const SentReq = ({ navigation }) => {
             console.log(data);
             // Check if the request was successful, and update UI accordingly
             if (data.code === 1) {
+                fetchProfessionalsData();
                 console.log('sent req');
                 console.log(response);
             } else {

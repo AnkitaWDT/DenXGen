@@ -22,8 +22,28 @@ const responsiveFontSize = (size) => {
 const ReceivedReq = ({ navigation }) => {
     const [activeTab, setActiveTab] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
-    const tabs = ['Professionals', 'Key Associates','Clinics', 'Office'];
+    const [tabs, setTabs] = useState(['Professionals', 'Key Associates', 'Clinics', 'Office']);
+    const [accidty, setAccidty] = useState(null);
 
+    useEffect(() => {
+        fetchAccidty();
+    }, []);
+
+    const fetchAccidty = async () => {
+        try {
+            const accidtyValue = await AsyncStorage.getItem('selected_profile_accidty');
+            setAccidty(accidtyValue);
+        } catch (error) {
+            console.error('Error fetching accidty:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (accidty === '1') {
+            // If accidty is 1, add the additional tab
+            setTabs(prevTabs => [...prevTabs, 'Empanelled']);
+        }
+    }, [accidty]);
 
     const data = [
         // Data for Tab 1
@@ -193,6 +213,7 @@ const ReceivedReq = ({ navigation }) => {
         ],
 
     ];
+
 
     const [professionals, setProfessionals] = useState([]);
     const [keyAssociates, setKeyAssociates] = useState([]);

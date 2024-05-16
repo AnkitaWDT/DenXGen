@@ -29,10 +29,10 @@ const SelectCategory = ({ navigation }) => {
         let pr_ty_id;
         if (option === 'Dental Professional') {
             pr_ty_id = '1';
-            navigation.navigate('ProfileCompletion1');
+            //navigation.navigate('ProfileCompletion1');
         } else if (option === 'Non-Dental Professional') {
             pr_ty_id = '2';
-            navigation.navigate('ProfileCompletion1');
+            //navigation.navigate('ProfileCompletion1');
         }
         try {
             await AsyncStorage.setItem('pr_ty_id', pr_ty_id); // Removed the space before 'pr_ty_id'

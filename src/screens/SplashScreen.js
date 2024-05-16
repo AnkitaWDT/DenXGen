@@ -4,9 +4,40 @@ import { Animated, View, Image, StyleSheet, Dimensions, PermissionsAndroid, Plat
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG } from '../API/APIConfig';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import axios from 'axios';
 
 const SplashScreen = ({ navigation }) => {
     const fadeAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        const fetchPlayerIdAndHitApi = async () => {
+            try {
+                // Fetch player ID from local storage
+                const playerId = await AsyncStorage.getItem('playerId');
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                // Check if player ID exists
+                if (playerId) {
+                    // Make API call to send player ID
+                    const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/reqplayerid-ax.php?pr_id=${pr_id}&playerid=${playerId}`);
+                    console.log('Player ID sent to server:', response.data);
+
+                    // Continue with your navigation logic here
+                    // For example, navigate to the next screen after the API call
+                    // navigation.navigate('NextScreen');
+                } else {
+                    // Player ID not found in local storage
+                    console.log('Player ID not found');
+                    // Handle the case where player ID is not found, if needed
+                }
+            } catch (error) {
+                console.error('Error fetching player ID or hitting API:', error);
+                // Handle errors, e.g., show an error message to the user
+            }
+        };
+
+        // Call the function to fetch player ID and hit API
+        fetchPlayerIdAndHitApi();
+    }, [navigation]);
 
     useEffect(() => {
         const requestNotificationPermission = async () => {
@@ -90,52 +121,48 @@ const SplashScreen = ({ navigation }) => {
         const checkUserLoggedInStatus = async () => {
             try {
                 const userLoggedIn = await AsyncStorage.getItem('userLoggedIn');
-                const adminLoggedIn = await AsyncStorage.getItem('adminLoggedIn');
-                const userid = await AsyncStorage.getItem('userid');
-                
-                //console.log(adminLoggedIn);
-                console.log(userLoggedIn);
 
                 if (userLoggedIn === null || userLoggedIn === 'false') {
                     // User not logged in
                     showLoginScreen();
-                } else {
-                    //showHomeScreen();
+                    return; // Exit early
+                }
 
-                    const userData = {
-                        status: await AsyncStorage.getItem('status'),
-                        isregistered: await AsyncStorage.getItem('isregistered'),
-                    };
+                const userData = {
+                    status: await AsyncStorage.getItem('status'),
+                    isregistered: await AsyncStorage.getItem('isregistered'),
+                };
 
-                    // Fetch the updated API response
-                    const phoneNumber = await AsyncStorage.getItem('phoneno');
-                    const response = await fetch(`${API_CONFIG.API_DOMAIN}${API_CONFIG.loginUrl}?phno=${phoneNumber}`);
-                    const apiData = await response.json();
+                const phoneNumber = await AsyncStorage.getItem('phoneno');
+                const response = await fetch(`${API_CONFIG.API_DOMAIN}${API_CONFIG.loginUrl}?phno=${phoneNumber}`);
+                const apiData = await response.json();
 
+                // Check if API response contains the expected data
+                if (apiData && apiData.data && apiData.data.isregistered !== undefined) {
                     // Update the userData object with new values
-                    userData.isregistered = apiData.data.isregistered;
-                    //userData.isregistered = apiData.data.isregistered.toString(); // Convert to string
+                    userData.isregistered = apiData.data.isregistered.toString();
 
                     // Save the updated userData object back to AsyncStorage
                     await AsyncStorage.setItem('isregistered', userData.isregistered);
+                } else {
+                    console.log('Error: API response is missing expected data');
+                    // Handle the case where API response is missing expected data
+                    // For example, show an error message to the user
+                    return; // Exit early
+                }
 
-                    console.log("Status:", userData.isregistered);
+                console.log("Status:", userData.isregistered);
 
-                    // Compare the current and new userData.status values
-                    if (parseInt(userData.isregistered) === 1) {
-
-                        console.log('HomeScreen');
-                        showHomeScreen();
-                    }
-                    else if (parseInt(userData.isregistered) === 0) {
-                        console.log('SelectCategory');
-                       showSelectCategoryScreen();
-                        //showSelectCategoryScreen();
-                    }
-                    else {
-                        console.log('WaitingScreen2');
-                        null;
-                    }
+                // Compare the current and new userData.status values
+                if (parseInt(userData.isregistered) === 1) {
+                    console.log('HomeScreen');
+                    showHomeScreen();
+                } else if (parseInt(userData.isregistered) === 0) {
+                    console.log('SelectCategory');
+                    showSelectCategoryScreen();
+                } else {
+                    console.log('WaitingScreen2');
+                    // Consider handling this case
                 }
             } catch (error) {
                 // Handle AsyncStorage errors
@@ -144,6 +171,7 @@ const SplashScreen = ({ navigation }) => {
                 //showNoInternetScreen();
             }
         };
+
 
         const showProfileScreen = () => {
             const fadeIn = Animated.timing(fadeAnim, {

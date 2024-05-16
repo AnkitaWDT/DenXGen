@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   PixelRatio, RefreshControl, View, Image, ImageBackground, StyleSheet, SafeAreaView, TouchableOpacity, Text, TouchableWithoutFeedback, Modal, Dimensions, FlatList
 } from 'react-native';
@@ -290,6 +290,36 @@ const ProfileScreen = ({ navigation, route }) => {
   const [showImage, setShowImage] = useState(true);
   const [showAnimation, setShowAnimation] = useState(false);
 
+  const [dropCardData, setDropCardData] = useState([]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchDropCardData();
+    }, [])
+  );
+
+
+  const fetchDropCardData = async () => {
+    try {
+      const pr_id = await AsyncStorage.getItem('pr_id');
+
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersdroplist-ax.php?pr_id=${pr_id}`);
+      const data = await response.json();
+      if (data) {
+        setDropCardData(data.data);
+        console.log('dropCardData',dropCardData);
+        // Check if any data items have pr_id matching the professionalId
+        const match = data.data.some(item => item.pr_id === professionalId);
+        if (match) {
+          setShowImage(false); // If there's a match, don't show the image
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching drop card data: ', error);
+    }
+  };
+
+
   const handleImageClick = () => {
     setShowAlert(true);
   };
@@ -322,10 +352,24 @@ const ProfileScreen = ({ navigation, route }) => {
   const [keyAssociateStatus, setKeyAssociateStatus] = useState(null);
   const [keyAssociate, setKeyAssociate] = useState(null);
 
+  const [empaneledStatus, setEmpaneledStatus] = useState(null);
+  const [empaneled, setEmpaneled] = useState(null);
+
+
   useEffect(() => {
     fetchConnectionStatus();
     fetchKeyAssociateStatus();
+    fetchEmpaneledStatus();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchConnectionStatus();
+      fetchKeyAssociateStatus();
+      fetchEmpaneledStatus();
+    }, [])
+  );
+
 
   const fetchConnectionStatus = async () => {
     try {
@@ -334,10 +378,11 @@ const ProfileScreen = ({ navigation, route }) => {
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
       const accidtyid = await AsyncStorage.getItem('selected_id');
       setPrid(accidtyid);
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallconnectionlist-ax.php?selectedid=${accidtyid}&typeid=${accidty}&typeid2=1`);
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallconnectionlist-ax.php?selectedid=${accidtyid}&accidty1=${accidty}&accidty2=1`);
       console.log(response);
       //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallconnectionlist-ax.php?pr_id=${pr_id}`);
       const data = await response.json();
+      console.log('data', data);
       //console.log(data);
       if (data.code === 1) {
         // Check connection status
@@ -367,14 +412,18 @@ const ProfileScreen = ({ navigation, route }) => {
 
   const fetchKeyAssociateStatus = async () => {
     try {
-      const pr_id = await AsyncStorage.getItem('pr_id');
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallkeyassoclist-ax.php?pr_id=${pr_id}`);
+
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      setPrid(accidtyid);
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallkeyassoclist-ax.php?selectedid=${accidtyid}&accidty1=${accidty}&accidty2=1`);
+      console.log(response);
       const data = await response.json();
       if (data.code === 1) {
         // Check connection status
         const keyAssociate = data.data.find(keyAssociate => {
-          if ((keyAssociate.reciever === pr_id && keyAssociate.sender === professionalId) ||
-            (keyAssociate.sender === pr_id && keyAssociate.reciever === professionalId)) {
+          if ((keyAssociate.reciever === accidtyid && keyAssociate.sender === professionalId) ||
+            (keyAssociate.sender === accidtyid && keyAssociate.reciever === professionalId)) {
             return true;
           }
           return false;
@@ -398,10 +447,48 @@ const ProfileScreen = ({ navigation, route }) => {
     }
   };
 
+  const fetchEmpaneledStatus = async () => {
+    try {
+
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      setPrid(accidtyid);
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallempalist-ax.php?selectedid=${accidtyid}&accidty1=${accidty}&accidty2=1`);
+      console.log(response);
+      const data = await response.json();
+      if (data.code === 1) {
+        // Check connection status
+        const empaneled = data.data.find(empaneled => {
+          if ((empaneled.reciever === accidtyid && empaneled.sender === professionalId) ||
+            (empaneled.sender === accidtyid && empaneled.reciever === professionalId)) {
+            return true;
+          }
+          return false;
+        });
+
+        //console.log("KeyAssociate:", keyAssociate);
+        if (empaneled) {
+          setEmpaneledStatus(empaneled.empaneled);
+          setEmpaneled(empaneled);
+          //console.log("Connection Status:", connection.connection);
+        } else {
+          console.log("No connection found for professional ID:", professionalId);
+        }
+
+
+      }
+
+    } catch (error) {
+      // Handle error
+      console.error(error);
+    }
+  };
+
   const [buttonState, setButtonState] = useState('StatusReq');
   const [showPopup, setShowPopup] = useState(false);
   const [showPopup1, setShowPopup1] = useState(false);
   const [showPopup2, setShowPopup2] = useState(false);
+  const [showPopup3, setShowPopup3] = useState(false);
   const [showPopup4, setShowPopup4] = useState(false);
   const [showPopup5, setShowPopup5] = useState(false);
   const [showPopupBlock, setShowPopupBlock] = useState(false);
@@ -438,6 +525,7 @@ const ProfileScreen = ({ navigation, route }) => {
         setButtonState('Connect');
         console.log('sent req');
         console.log(response);
+        fetchConnectionStatus();
       } else {
         // Handle error
       }
@@ -457,6 +545,7 @@ const ProfileScreen = ({ navigation, route }) => {
       const data = await response.json();
       // Check if the request was successful, and update UI accordingly
       if (data.code === 1) {
+        fetchKeyAssociateStatus();
         setButtonState('KeyAssociate');
         console.log('sent req');
         console.log(response);
@@ -469,6 +558,31 @@ const ProfileScreen = ({ navigation, route }) => {
       console.error(error);
     }
   };
+
+  const cancelEmpanelledRequest = async () => {
+    try {
+      const pr_id = await AsyncStorage.getItem('pr_id');
+      const id = parseInt(pr_id);
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=empaneled`);
+      const data = await response.json();
+      // Check if the request was successful, and update UI accordingly
+      if (data.code === 1) {
+        fetchEmpaneledStatus();
+        setButtonState('KeyAssociate');
+        console.log('sent req');
+        console.log(response);
+        console.log(data);
+      } else {
+        // Handle error
+      }
+    } catch (error) {
+      // Handle error
+      console.error(error);
+    }
+  };
+  
 
   const acceptConnReq = async () => {
     try {
@@ -483,6 +597,7 @@ const ProfileScreen = ({ navigation, route }) => {
       // Handle response data as needed
       console.log(response);
       setButtonState('KeyAssociate');
+      fetchConnectionStatus();
       console.log(data);
       console.log('connected')
       setShowPopup5(false); // Close the popup after making the API call
@@ -570,7 +685,7 @@ const ProfileScreen = ({ navigation, route }) => {
 
       //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=endorsement`);
       const data = await response.json();
-      // Check if the request was successful, and update UI accordingly
+      fetchEmpaneledStatus();
       console.log('empanel account');
       console.log(response);
       console.log(data);
@@ -590,9 +705,13 @@ const ProfileScreen = ({ navigation, route }) => {
 
       const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=connection`);
       const data = await response.json();
-      // Check if the request was successful, and update UI accordingly
+      console.log('sent req');
+      console.log(response);// Check if the request was successful, and update UI accordingly
       if (data.code === 1) {
+        console.log('sent req');
+        console.log(response);
         setButtonState('Remove');
+        fetchConnectionStatus();
         console.log('sent req');
         console.log(response);
       } else {
@@ -617,6 +736,7 @@ const ProfileScreen = ({ navigation, route }) => {
       console.log(data);
       // Check if the request was successful, and update UI accordingly
       if (data.code === 1) {
+        fetchKeyAssociateStatus();
         setButtonState('RemoveKey');
       } else {
         // Handle error
@@ -1396,7 +1516,7 @@ const ProfileScreen = ({ navigation, route }) => {
                   >
                     <Text style={commonStyles.buttonTextS}>Connect</Text>
                   </TouchableOpacity>
-                )}
+                )}7
                 {buttonState === 'KeyAssociate' && (
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                    <>
@@ -1407,13 +1527,13 @@ const ProfileScreen = ({ navigation, route }) => {
                           >
                             <Text style={commonStyles.buttonTextS}>Connected</Text>
                           </TouchableOpacity>
-                      <TouchableOpacity
+                      {/* <TouchableOpacity
                         style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
                         onPress={() => setShowPopup(true)}
                         activeOpacity={0.8}
                       >
                         <Text style={commonStyles.buttonTextS}>Key Associate</Text>
-                      </TouchableOpacity>
+                      </TouchableOpacity> */}
                         </>
                         </View>
               
@@ -1437,13 +1557,13 @@ const ProfileScreen = ({ navigation, route }) => {
                           >
                             <Text style={commonStyles.buttonTextS}>Connected</Text>
                           </TouchableOpacity>
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
                         onPress={() => setShowPopup4(true)}
                       activeOpacity={0.8}
                     >
                       <Text style={commonStyles.buttonTextS1}>Cancel Key Req.</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                         </>
                         </View>
                  
@@ -1501,13 +1621,13 @@ const ProfileScreen = ({ navigation, route }) => {
                           >
                             <Text style={commonStyles.buttonTextS}>Connected</Text>
                           </TouchableOpacity>
-                          <TouchableOpacity
+                          {/* <TouchableOpacity
                             style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
                             onPress={() => setShowPopup(true)}
                             activeOpacity={0.8}
                           >
                             <Text style={commonStyles.buttonTextS}>Key Associate</Text>
-                          </TouchableOpacity>
+                          </TouchableOpacity> */}
                           {/* <TouchableOpacity
                             style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
                             onPress={() => setShowPopup(true)}
@@ -1515,7 +1635,7 @@ const ProfileScreen = ({ navigation, route }) => {
                           >
                             <Text style={commonStyles.buttonTextS1}>Key Assoc.</Text>
                           </TouchableOpacity> */}
-                          {keyAssociateStatus === '0' && (
+                          {/* {keyAssociateStatus === '0' && (
                             <TouchableOpacity
                               style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
                               onPress={() => setShowPopup(true)}
@@ -1541,7 +1661,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             >
                               <Text style={commonStyles.buttonTextS}>Key Associated</Text>
                             </TouchableOpacity>
-                          )}
+                          )} */}
                         </>
                     ) : (
                       <TouchableOpacity
@@ -1565,6 +1685,7 @@ const ProfileScreen = ({ navigation, route }) => {
               </TouchableOpacity> */}
 
             </View>
+
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <TouchableOpacity onPress={() => setModalConnectVisible(true)}>
                 <Image source={require('../../assets/img/connections.png')} style={{ width: 20, height: 20 }} />
@@ -1582,7 +1703,7 @@ const ProfileScreen = ({ navigation, route }) => {
                   </TouchableOpacity>
                 )}>
                 <View style={styles.popover}>
-                  {setEmpanel && connectionStatus === '1' && (
+                  {/* {setEmpanel && connectionStatus === '1' && (
                     <TouchableOpacity onPress={() => setShowPopupEmpanel(true)}>
                       <View style={styles.popoverItemContainer}>
                         <Image
@@ -1592,7 +1713,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         <Text style={styles.popoverItemText}>Empanel</Text>
                       </View>
                     </TouchableOpacity>
-                  )}
+                  )} */}
                   {prtyid === '1' && connectionStatus === '1' && (
                     <TouchableOpacity onPress={() => setShowPopupEndorse(true)}>
                       <View style={styles.popoverItemContainer}>
@@ -1649,6 +1770,92 @@ const ProfileScreen = ({ navigation, route }) => {
               </Popover>
               {/* <Image source={require('../../assets/img/Option.png')} style={{ width: 20, height: 20, marginLeft: width * 0.02 }} /> */}
             </View>
+          </View>
+
+          {connectionStatus === '1' && (<View style={styles.horizontalLine}></View> )}
+
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+           
+            <View style={{ flexDirection: 'row', marginVertical: height * 0.005 }}>    
+              {connectionStatus === '1' && (
+                <>
+                  {keyAssociateStatus === '0' && (
+                    <TouchableOpacity
+                      style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, width: width * 0.45 }]}
+                      onPress={() => setShowPopup(true)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={commonStyles.buttonTextS}>Key Assoc.</Text>
+                    </TouchableOpacity>
+                  )}
+                  {keyAssociateStatus === '2' && (
+                    <TouchableOpacity
+                      style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, width: width * 0.45 }]}
+                      onPress={() => setShowPopup4(true)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={commonStyles.buttonTextS1}>Cancel Key Req.</Text>
+                    </TouchableOpacity>
+                  )}
+                  {keyAssociateStatus === '1' && (
+                    <TouchableOpacity
+                      style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, width: width * 0.45, }]}
+                      onPress={() => setShowPopup4(true)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={commonStyles.buttonTextS}>Key Associated</Text>
+                    </TouchableOpacity>
+                  )}
+                </>
+              )}         
+              {setEmpanel && connectionStatus === '1' && (
+                <>
+                {empaneledStatus === '0' && (
+                  <TouchableOpacity onPress={() => setShowPopupEmpanel(true)}
+                      style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10, width: width * 0.45 }]}
+                    activeOpacity={0.8}>
+                    <Text style={commonStyles.buttonTextS}>Empanel</Text>
+                  </TouchableOpacity>
+                )}
+                  {empaneledStatus === '2' && (
+                    <TouchableOpacity
+                      style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10, width: width * 0.45 }]}
+                      onPress={() => setShowPopup3(true)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={commonStyles.buttonTextS1}>Cancel Emp Req.</Text>
+                    </TouchableOpacity>
+                  )}
+                  {empaneledStatus === '1' && (
+                    <TouchableOpacity
+                      style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10, width: width * 0.45 }]}
+                      onPress={() => setShowPopup3(true)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={commonStyles.buttonTextS}>Empanelled</Text>
+                    </TouchableOpacity>
+                  )}
+                </>
+              )}
+             
+    
+              {/* {buttonState === 'RemoveKey' && (
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <>
+                      
+                      <TouchableOpacity
+                        style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
+                        onPress={() => setShowPopup4(true)}
+                        activeOpacity={0.8}
+                      >
+                        <Text style={commonStyles.buttonTextS1}>Cancel Key Req.</Text>
+                      </TouchableOpacity>
+                    </>
+                  </View>
+
+                )} */}
+            </View>
+
           </View>
 
           <AlertPopup
@@ -1747,8 +1954,8 @@ const ProfileScreen = ({ navigation, route }) => {
             onRequestClose={() => setShowPopup4(false)}
             title="Key Associate Request"
             message="Do you want to cancel key associate request? "
-            yesLabel="Send"
-            noLabel="Cancel"
+            yesLabel="Yes"
+            noLabel="No"
             onYesPress={() => {
               // setShowPopup(false);
               // handleOptionPress('Empanel');
@@ -1756,6 +1963,22 @@ const ProfileScreen = ({ navigation, route }) => {
               cancelKeyAssociateRequest();
             }}
           />
+
+          <AlertPopup
+            visible={showPopup3}
+            onRequestClose={() => setShowPopup3(false)}
+            title="Empanelled Request"
+            message="Do you want to cancel empanelled request? "
+            yesLabel="Yes"
+            noLabel="No"
+            onYesPress={() => {
+              // setShowPopup(false);
+              // handleOptionPress('Empanel');
+              setShowPopup3(false);
+              cancelEmpanelledRequest();
+            }}
+          />
+
 
           <AlertPopup
             visible={showPopup5}

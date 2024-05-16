@@ -1,23 +1,60 @@
 /* eslint-disable prettier/prettier */
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import commonStyles from '../../components/CommonStyles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-gesture-handler';
 import NotificationItem from '../../components/NotificationItem';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Notifications = ({ navigation }) => {
 
-    const [notifications, setNotifications] = useState([
-        { id: 1, title: 'Dennis Nedry commented on Isla Nublar SOC2 compliance report', time: 'Last Wednesday at 9:42 AM' },
-        { id: 2, title: 'Dennis Nedry commented on Isla Nublar SOC2 compliance report', time: 'Last Wednesday at 9:42 AM' },
-        { id: 3, title: 'Dennis Nedry commented on Isla Nublar SOC2 compliance report', time: 'Last Wednesday at 9:42 AM' },
-        { id: 4, title: 'Another notification', time: 'Yesterday at 3:30 PM' },
-        { id: 5, title: 'Another notification', time: 'Yesterday at 3:30 PM' },
-        { id: 6, title: 'Dennis Nedry commented on Isla Nublar SOC2 compliance report', time: 'Last Wednesday at 9:42 AM' },
-        { id: 7, title: 'Dennis Nedry commented on Isla Nublar SOC2 compliance report', time: 'Last Wednesday at 9:42 AM' },
-        { id: 8, title: 'Another notification', time: 'Yesterday at 3:30 PM' },
-    ]);
+    // const [notifications, setNotifications] = useState([
+    //     { id: 1, title: 'Dennis Nedry commented on Isla Nublar SOC2 compliance report', time: 'Last Wednesday at 9:42 AM' },
+    //     { id: 2, title: 'Dennis Nedry commented on Isla Nublar SOC2 compliance report', time: 'Last Wednesday at 9:42 AM' },
+    //     { id: 3, title: 'Dennis Nedry commented on Isla Nublar SOC2 compliance report', time: 'Last Wednesday at 9:42 AM' },
+    //     { id: 4, title: 'Another notification', time: 'Yesterday at 3:30 PM' },
+    //     { id: 5, title: 'Another notification', time: 'Yesterday at 3:30 PM' },
+    //     { id: 6, title: 'Dennis Nedry commented on Isla Nublar SOC2 compliance report', time: 'Last Wednesday at 9:42 AM' },
+    //     { id: 7, title: 'Dennis Nedry commented on Isla Nublar SOC2 compliance report', time: 'Last Wednesday at 9:42 AM' },
+    //     { id: 8, title: 'Another notification', time: 'Yesterday at 3:30 PM' },
+    // ]);
+
+    const [notifications, setNotifications] = useState([]);
+
+    useEffect(() => {
+        fetchNotifications();
+    }, []);
+
+    const fetchNotifications = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersnotificationlist-ax.php?pr_id=${id}`);
+            const data = await response.json();
+            console.log(response);
+            console.log(data);
+            if (data.code === 1) {
+                const formattedData = data.data.map(notification => ({
+                    ...notification,
+                    dateupdated: formatDateTime(notification.dateupdated)
+                }));
+                setNotifications(formattedData);
+            } else {
+                console.error('Error fetching notifications:', data.message);
+            }
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+        }
+    };
+
+    const formatDateTime = (dateTimeStr) => {
+        const dateTime = new Date(dateTimeStr);
+        const date = dateTime.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        const time = dateTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        return `${date}, ${time}`;
+    };
 
     const markAsRead = (id) => {
         const updatedNotifications = notifications.map(notification =>
@@ -50,11 +87,21 @@ const Notifications = ({ navigation }) => {
             <ScrollView style={styles.subContainer}>
                 <View style={{ height: 1, backgroundColor: '#ccc' }} />
                 {/* Render the list of notifications */}
-                {notifications.map((notification, index) => (
+                {/* {notifications.map((notification, index) => (
                     <TouchableOpacity onPress={() => markAsRead(notification.id)} activeOpacity={0.8}>
                         <NotificationItem
                             title={notification.title}
                             time={notification.time}
+                            isRead={notification.isRead}
+                        />
+                        {index < notifications.length - 1 && <View style={styles.separator} />}
+                    </TouchableOpacity>
+                ))} */}
+                {notifications.map((notification, index) => (
+                    <TouchableOpacity key={notification.id} onPress={() => markAsRead(notification.id)} activeOpacity={0.8}>
+                        <NotificationItem
+                            title={notification.content}
+                            time={notification.dateupdated}
                             isRead={notification.isRead}
                         />
                         {index < notifications.length - 1 && <View style={styles.separator} />}
