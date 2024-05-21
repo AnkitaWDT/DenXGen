@@ -24,7 +24,7 @@ const MyConnections = ({ navigation }) => {
     const [activeTab, setActiveTab] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
     const [contacts, setContacts] = useState([]);
-    const tabs = ['Professionals', 'Key Associates', 'Clinics', 'Office'];
+    const tabs = ['Professionals', 'Clinics', 'Office', 'Others'];
 
     const [showPopup1, setShowPopup1] = useState(false);
     const [showPopup2, setShowPopup2] = useState(false);
@@ -183,6 +183,9 @@ const MyConnections = ({ navigation }) => {
     ];
 
     const [professionals, setProfessionals] = useState([]);
+    const [clinics, setClinics] = useState([]);
+    const [offices, setOffices] = useState([]);
+    const [others, setOthers] = useState([]);
     const [keyAssociates, setKeyAssociates] = useState([]);
 
     useEffect(() => {
@@ -190,8 +193,11 @@ const MyConnections = ({ navigation }) => {
             try {
                 const pr_id = await AsyncStorage.getItem('pr_id');
                 const id = parseInt(pr_id);
-
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersmyconnlist-ax.php?pr_id=${id}`);
+                const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+                const accidtyid = await AsyncStorage.getItem('selected_id');
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccconnlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=professionals`);
+                //https://temp.wedeveloptech.in/denxgen/appdata/getaccconnlist-ax.php?accid=5&accidty=1&action=professionals 
+                //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersmyconnlist-ax.php?pr_id=${id}`);
                 const data = await response.json();
 
                 // Filter out items where pr_id matches
@@ -206,6 +212,84 @@ const MyConnections = ({ navigation }) => {
         };
 
         fetchProfessionalsData();
+    }, []);
+
+    useEffect(() => {
+        const fetchClinicsData = async () => {
+            try {
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                const id = parseInt(pr_id);
+                const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+                const accidtyid = await AsyncStorage.getItem('selected_id');
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccconnlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=clinics`);
+                //https://temp.wedeveloptech.in/denxgen/appdata/getaccconnlist-ax.php?accid=5&accidty=1&action=professionals 
+                //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersmyconnlist-ax.php?pr_id=${id}`);
+                const data = await response.json();
+
+                // Filter out items where pr_id matches
+                const filteredData = data.data.filter(item => parseInt(item.pr_id) !== id);
+
+                setClinics(filteredData);
+                setIsLoading(false);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                setIsLoading(false);
+            }
+        };
+
+        fetchClinicsData();
+    }, []);
+
+    useEffect(() => {
+        const fetchOfficesData = async () => {
+            try {
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                const id = parseInt(pr_id);
+                const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+                const accidtyid = await AsyncStorage.getItem('selected_id');
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccconnlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=offices`);
+                //https://temp.wedeveloptech.in/denxgen/appdata/getaccconnlist-ax.php?accid=5&accidty=1&action=professionals 
+                //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersmyconnlist-ax.php?pr_id=${id}`);
+                const data = await response.json();
+
+                // Filter out items where pr_id matches
+                const filteredData = data.data.filter(item => parseInt(item.pr_id) !== id);
+
+                setOffices(filteredData);
+                setIsLoading(false);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                setIsLoading(false);
+            }
+        };
+
+        fetchOfficesData();
+    }, []);
+
+    useEffect(() => {
+        const fetchOthersData = async () => {
+            try {
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                const id = parseInt(pr_id);
+                const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+                const accidtyid = await AsyncStorage.getItem('selected_id');
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccconnlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=others`);
+                //https://temp.wedeveloptech.in/denxgen/appdata/getaccconnlist-ax.php?accid=5&accidty=1&action=professionals 
+                //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersmyconnlist-ax.php?pr_id=${id}`);
+                const data = await response.json();
+
+                // Filter out items where pr_id matches
+                const filteredData = data.data.filter(item => parseInt(item.pr_id) !== id);
+
+                setOthers(filteredData);
+                setIsLoading(false);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                setIsLoading(false);
+            }
+        };
+
+        fetchOthersData();
     }, []);
 
     useEffect(() => {
@@ -333,7 +417,7 @@ const MyConnections = ({ navigation }) => {
             }
         } 
         else if (activeTab === 1) {
-            if (keyAssociates.length === 0) {
+            if (clinics.length === 0) {
                 return (
                     <View style={styles.animationContainer}>
                         <LottieView
@@ -350,7 +434,59 @@ const MyConnections = ({ navigation }) => {
             } else {
                 return (
                     <FlatList
-                        data={keyAssociates}
+                        data={clinics}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item.cl_id.toString()}
+                        refreshing={isLoading}
+                    />
+                );
+            }
+        } 
+        else if (activeTab === 2) {
+            if (offices.length === 0) {
+                return (
+                    <View style={styles.animationContainer}>
+                        <LottieView
+                            ref={animationRef}
+                            source={require('../../../assets/img/NoData.json')}
+                            style={styles.animation}
+                            autoPlay={true}
+                            loop={true}
+                            onLoad={() => setAnimationLoaded(true)}
+                        />
+                        <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
+                    </View>
+                );
+            } else {
+                return (
+                    <FlatList
+                        data={offices}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item.off_id.toString()}
+                        refreshing={isLoading}
+                    />
+                );
+            }
+        } 
+        else if (activeTab === 3) {
+            if (others.length === 0) {
+                return (
+                    <View style={styles.animationContainer}>
+                        <LottieView
+                            ref={animationRef}
+                            source={require('../../../assets/img/NoData.json')}
+                            style={styles.animation}
+                            autoPlay={true}
+                            loop={true}
+                            onLoad={() => setAnimationLoaded(true)}
+                        />
+                        <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
+                    </View>
+                );
+            } else {
+                return (
+                    <FlatList
+                        data={others}
                         renderItem={renderItem}
                         keyExtractor={(item) => item.pr_id.toString()}
                         refreshing={isLoading}
@@ -358,18 +494,6 @@ const MyConnections = ({ navigation }) => {
                 );
             }
         } 
-        else {
-            // Return manual data for other tabs
-            return (
-                <FlatList
-                    ref={flatListRef}
-                    data={data[activeTab]}
-                    renderItem={renderItem}
-                    keyExtractor={(item) => item.id.toString()}
-                    refreshing={isLoading}
-                />
-            );
-        }
     };
 
 
@@ -439,18 +563,27 @@ const MyConnections = ({ navigation }) => {
             imageUrl = item.profile_pic;
         } else {
             if (item.gender === 1) {
-                imageUrl = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJQAlwMBIgACEQEDEQH/xAAbAAEBAAMBAQEAAAAAAAAAAAAAAQIEBQMGB//EADAQAAIBAwMEAQEFCQAAAAAAAAABAgMEEQUhMRJBUWETcSJSYoHwJCUyNDZCU5Gx/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AP3DkoAAGLeSoCgACMJFAAEyEAwUACNk5MgAAJkA1kJYKAAAAGLZkAIlgoIwDYSCQYEnOMIuU2kly2aFfU4ReKMer29ka17dzrSlDZU4vjyagHtUuq9RvNRpS5S2RIXFaCSjVnhcLJ5ADajqFzHmal6aRs2+pKc8VoqK+8vJzBwB9JGSlFNPKfdFOLp9x8NXpk/sz2+h2WA5CWAkUARsNhICgAAgCN4AoIkUAa1/UVO1m+7WF+ZsNmlqv8rv95YA5AAAAIAABnwAzud2wmp2tNrOyw8+ThHZ0t/si9SYG4CNlAiRQRvADJTHGQBWwl5GCgARsIBg09WTdqsLiSybppatKStkovGZYYHHHIAAFIAYQAA7OmbWi9ybOMdjSm3bYfEZNIDcSKAAIkUAAAAI2UncCLcyBGwDNXUl1Wk/TTX+zaPG8g521SMVltbAcEFaxzyQCZyVDAABsZ3AA7emx6bOHvLZxDvWkXC1pxfPSB7NhLyEu5QABjyBU8gJYKBEUEbAoIuSgADHkDiX8ei7qLs31L8zXOpqtHMI1UuNpHMAgGQAADA2NPh13UE1lLdndOdpNBxhKrLmey+h0QADInkA0UAADEAVvBFuXBQABMgHuVAAScVOLjJZT2aPn7in8NedJPKi9mfQTajFtvCXJ8/WqfLVnPtJ5QHmAADPW1o/PXhTb2fJ5HrbVPirwn2T3+gHfilGKjFYSWEikTUkmuHwNwJyzIAAYmQAiQKAOdb3VSWtXVrKWadOlCUV08Zznc6JyrX+or3Z7W9P+7bl9v12OowHJUa1S9oUnhzy/EdzWqar/jpZ9tgdI8a1xTorM5Jeu5yat/cVOJ9K/Ca27eW8sDbu72Vf7MV00/HdmoAAfAQKAJkMcgblleyo4hPMqfbyjq0q1Oss05JnzxU2nlNp+gPo8kOLTv7iDx19S/Esm1T1RcVKT+sWB0ga9O9oVOJ4fiSwezeeOAMsgiQA51vP9+XMOhJujBuW2ZLtnbtv379jHU7luXwwey/i9+jzhOnS1y8l0S61bwbk2999kv13Zpybk3JvLbywIAUCABgMgJAAAAGNwAAAzuAAAAM6WmXLz8NR5+63/wAOaZQk4SUlynlAfRgwpzU6cZriSyAONd01DULuom8zp00+OzNVlAAAAHwRFAFIABCgAUxZQAAABhAAAAB2tOfVawz2ygAB/9k='; // Replace DEFAULT_MALE_IMAGE_URL with the URL of your default male image
+                imageUrl = '../../../assets/img/defaultMale.png'; // Path to your default male image
             } else {
-                imageUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANcAAACUCAMAAAA3b0xFAAAAMFBMVEX29va4uLjq6uqxsbH6+vrKysrX19e1tbW8vLze3t7z8/PFxcXv7+/k5OTT09POzs6cN24OAAADy0lEQVR4nO2c23KjMAxAAQvfjf//b2tI0rRpAF8yWNrVedinbMdnZGTZFgwDwzC0gVd6D+gTwOBN1OqJnuVkB+JuYM2shBp/IZQznraYcepFaiNFTVqyZmDn8Z3VZja6iagYTDtODwxJMQh7sfp+ziRBMQgnVutkJBixSZ97jWMgJ+bOZuGGnnqPswyIWVqjmnuPtAiYRJYWudzhMrUShNZnMPlaaqHjZfOSxg1NplQsCVeCTMBsZjK8T0Tnew84E5+1JD8nIpHF+bwwfAkYlVRvCr0W23vEecxlXqOj4WXLHq8EjSIxu4Z6oELvIecAptiLxAoGBbXhHU3Cq1hrFAQSR/4W5QmF8wCQhVl+9ZoJeJU/XiQesMLi8B4w9GekYGq88O9Vcg9sXnC9x32GL9kqP9HIJ2LOKe9bsO9VlqpwpUyPe2muyoYbqDfNULil/BGwpffYj4C6rLGiMU/EitrwgUA8ESsXr3vA8HoN9VaYNyswNYQL8WalZovyA4fVq+R26A1oM2L5AdtvkB63Qd5V+T5IM32rl0aaOJrjxV6XAvXF/AbaQw4ovUj5je49/j1OG9iOw4V0Gq40zESFdPVagVC/T8F8qQItiQNxPV94YU4mYI11b+/h7/DP1oeyTWuMSL0qz0QfoO2xbDm1Wb2Q9nHYtjIKbcdeqxfWxrbm5wvpJVhhO+VfkObDzFcB9kG6fqX9V5MW2oPsxvoQ8ZVlS7gEzmy4UtWT8g3ecNVfV6ZpiDUbDnU9Xw8E4uONpvtKxF4tF0XKoX1f2zdtwNSC9UTKu/ppuL75i7Z92Zq3b2FnWYmIc/e1AYPUY7Fb+g96Qf56GwxhdqvbaqePCmGt7z/TbjYWbdL4BsAHI5dFGhPkgVgM6Wcy/Sx4Kl93uH1iI/0bDrzk7VMcFD/HcVRXYS7fzzh6z1IhPaXJ4LgMxt2Zt0sKxllPrByoJIwnYFK6P1vI3Cx7j7OQtWPvfHlWaM/WdoAlt1JUeLu9/lJygS4ClQUMvCw559DLRMAMYIqlx6N6xm6Wqt6qjmylDdZ6HsD6EFXtzlIJFzyqz5vdylc7bV9hq7TaEHqWwQ4YvkyXRmCnEIKMrlHqFjSlXZTp7022p1vKEYvT+rZBbJZ6qI3bX3QxdJqU4OP4+qW8D5Ke1Nijcc8vH4vRvlq8/OjNnBa1n0Bc2/oAEDOq2g9wdUtHa0cDTq/mhiH2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/SXuIqru1z8NNV4H33l2H+W74AIQo8Ck+dyoUAAAAASUVORK5CYII='; // Replace DEFAULT_FEMALE_IMAGE_URL with the URL of your default female image
+                imageUrl = '../../../assets/img/defaultFemale.png'; // Path to your default female image
             }
         }
 
+        const handleNavigation = () => {
+            if (activeTab === 0 || activeTab === 3) {
+                navigation.navigate('ProfileScreen', { professionalId: item.pr_id });
+            } else if (activeTab === 1) {
+                navigation.navigate('ClinicProfile', { cl_id: item.cl_id });
+            } else if (activeTab === 2) {
+                navigation.navigate('OfficeProfile', { off_id: item.off_id });
+            }
+        };
         return (
             <ScrollView>
                 {/* Content row with text and button */}
                 <TouchableOpacity
                     activeOpacity={0.8}
-                    onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.pr_id })}
+                    onPress={handleNavigation}
                     style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}
                 >
                     {/* Left side text and image */}

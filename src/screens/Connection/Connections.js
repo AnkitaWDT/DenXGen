@@ -87,6 +87,29 @@ const Connections = ({ navigation }) => {
                             </TouchableOpacity>
 
                                 {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
+                                <TouchableOpacity
+                                    style={styles.CContainer}
+                                    onPress={() => navigation.navigate('MyConnections')}
+                                    activeOpacity={0.8}
+                                >
+                                    {/* Left side content */}
+                                    <View style={styles.leftContent}>
+                                        <Image source={require('../../../assets/img/MyConnectCC.png')} style={styles.image} />
+                                        <Text style={styles.leftText}>Key Associates</Text>
+                                    </View>
+
+                                    {/* Middle content */}
+                                    <View style={styles.middleContent}>
+                                        <Text style={styles.middleText}>(100+ others)</Text>
+                                    </View>
+
+                                    {/* Right side content */}
+                                    <View style={styles.rightContent}>
+                                        <Image source={require('../../../assets/img/ViewAll.png')} style={styles.imageR} />
+                                    </View>
+                                </TouchableOpacity>
+
+                                {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
 
                                 <TouchableOpacity
                                     style={styles.CContainer}
@@ -197,6 +220,54 @@ const Connections = ({ navigation }) => {
                                     <View style={styles.leftContent}>
                                         <Image source={require('../../../assets/img/Endment.png')} style={styles.imageE} />
                                         <Text style={styles.leftText}>Endorsement</Text>
+                                    </View>
+
+                                    {/* Middle content */}
+                                    <View style={styles.middleContent}>
+                                        <Text style={styles.middleText}>(02 others)</Text>
+                                    </View>
+
+                                    {/* Right side content */}
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', flex: 1 }}>
+                                        <Image source={require('../../../assets/img/ViewAll.png')} style={{ width: 18, height: 18, marginLeft: 10 }} />
+                                    </View>
+                                </TouchableOpacity>
+
+                                {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
+
+                                <TouchableOpacity
+                                    style={styles.CContainer}
+                                    onPress={() => navigation.navigate('Endorsement')}
+                                    activeOpacity={0.8}
+                                >
+                                    {/* Left side content */}
+                                    <View style={styles.leftContent}>
+                                        <Image source={require('../../../assets/img/Endment.png')} style={styles.imageE} />
+                                        <Text style={styles.leftText}>Empanelled</Text>
+                                    </View>
+
+                                    {/* Middle content */}
+                                    <View style={styles.middleContent}>
+                                        <Text style={styles.middleText}>(02 others)</Text>
+                                    </View>
+
+                                    {/* Right side content */}
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', flex: 1 }}>
+                                        <Image source={require('../../../assets/img/ViewAll.png')} style={{ width: 18, height: 18, marginLeft: 10 }} />
+                                    </View>
+                                </TouchableOpacity>
+
+                                {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
+
+                                <TouchableOpacity
+                                    style={styles.CContainer}
+                                    onPress={() => navigation.navigate('Endorsement')}
+                                    activeOpacity={0.8}
+                                >
+                                    {/* Left side content */}
+                                    <View style={styles.leftContent}>
+                                        <Image source={require('../../../assets/img/Endment.png')} style={styles.imageE} />
+                                        <Text style={styles.leftText}>Branches</Text>
                                     </View>
 
                                     {/* Middle content */}

@@ -65,25 +65,6 @@ const ProfileScreen = ({ navigation, route }) => {
     setRefreshing(false);
   };
 
-  const [editIndex, setEditIndex] = useState(null);
-
-  const [sections, setSections] = useState([
-    { id: 1, schoolName: '', graduated: false, fromYear: '', fromMonth: '', toYear: '', toMonth: '', degree: '', },
-  ]);
-  const [isEducationModalVisible, setIsEducationModalVisible] = useState(false);
-  const [activeSection, setActiveSection] = useState(1);
-
-  const [selectedFromYears, setSelectedFromYears] = useState({});
-  const [selectedToYears, setSelectedToYears] = useState({});
-  const [isYearPickerVisible, setYearPickerVisible] = useState(false);
-  const [yearPickerType, setYearPickerType] = useState(null);
-
-  const [selectedFromMonths, setSelectedFromMonths] = useState({});
-  const [selectedToMonths, setSelectedToMonths] = useState({});
-  const [isMonthPickerVisible, setMonthPickerVisible] = useState(false);
-  const [monthPickerType, setMonthPickerType] = useState(null);
-
-  const [selectedYear, setSelectedYear] = useState(null);
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -97,7 +78,7 @@ const ProfileScreen = ({ navigation, route }) => {
         const pr_id = await AsyncStorage.getItem('pr_id');
         const id = parseInt(pr_id);
 
-        const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getcliniclist-ax.php?pr_id=${pr_id}`);
+        const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/getcliniclist-ax.php?pr_id=${professionalId}`);
 
         if (response.data && response.data.data) {
           setClinicData(response.data.data);
@@ -166,81 +147,8 @@ const ProfileScreen = ({ navigation, route }) => {
     setIsModalVisible(false);
   };
 
-  // const [servicesData, setServicesData] = useState([
-  //     'Dental implant',
-  //     'Root canal',
-  //     'Teeth Whitening',
-  //     'Root canal treatment',
-  //     'Dentures',
-  //     'Teeth cleaning',
-  //     'Dental braces',
-  // ]);
-
-
-  // const educationData = [
-  //     {
-  //         licNo: 'D.Y. Patil College Of Dental Institute',
-  //         licText: 'BDS, Oral pathology, Dentistry',
-  //         fromYear: '2022',
-  //         fromMonth: 'Jun'
-  //     },
-  //     {
-  //         licNo: 'D.Y. Patil College Of Dental Institute',
-  //         licText: 'BDS, Oral pathology, Dentistry',
-  //         fromYear: '2022',
-  //         fromMonth: 'June',
-  //         toYear: '2023',
-  //         toMonth: 'Aug'
-  //     },
-  //     {
-  //         licNo: 'D.Y. Patil College Of Dental Institute',
-  //         licText: 'BDS, Oral pathology, Dentistry',
-  //         fromYear: '2022',
-  //         fromMonth: 'July'
-  //     },
-  //     // Add more education entries as needed
-  // ];
-  // const experienceData = [
-  //     {
-  //         licNo: 'D.Y. Patil College Of Dental Institute',
-  //         licText: 'BDS, Oral pathology, Dentistry',
-  //         fromYear: '2022',
-  //         fromMonth: 'Jun'
-  //     },
-  //     {
-  //         licNo: 'D.Y. Patil College Of Dental Institute',
-  //         licText: 'BDS, Oral pathology, Dentistry',
-  //         fromYear: '2022',
-  //         fromMonth: 'June',
-  //         toYear: '2023',
-  //         toMonth: 'Aug'
-  //     },
-  //     {
-  //         licNo: 'D.Y. Patil College Of Dental Institute',
-  //         licText: 'BDS, Oral pathology, Dentistry',
-  //         fromYear: '2022',
-  //         fromMonth: 'July'
-  //     },
-  //     {
-  //         licNo: 'D.Y. Patil College Of Dental Institute',
-  //         licText: 'BDS, Oral pathology, Dentistry',
-  //         fromYear: '2022',
-  //         fromMonth: 'June',
-  //         toYear: '2023',
-  //         toMonth: 'Aug'
-  //     },
-  //     // Add more education entries as needed
-  // ];
-  
-
 
   const [showAllVid, setShowAllVid] = useState(false);
-  const videos = [
-    { id: 1, link: 'https://www.youtube.com/watch?v=video1' },
-    { id: 2, link: 'https://www.youtube.com/watch?v=video2' },
-    { id: 3, link: 'https://www.youtube.com/watch?v=video3' },
-  ];
-  // const initialVideosToShow = showAllVid ? videos.length : 2;
   const initialVideosToShow = showAllVid ? profileData.vidList.length : 2;
 
   const handleToggleShowAllVid = () => {
@@ -248,12 +156,6 @@ const ProfileScreen = ({ navigation, route }) => {
   };
 
   const [showAllAwards, setShowAllAwards] = useState(false);
-  const awards = [
-    { id: 1, link: 'https://www.youtube.com/watch?v=video1' },
-    { id: 2, link: 'https://www.youtube.com/watch?v=video2' },
-    { id: 3, link: 'https://www.youtube.com/watch?v=video3' },
-  ];
-  //const initialAwardsToShow = showAllAwards ? awards.length : 2;
   const initialAwardsToShow = showAllAwards ? profileData.awaList.length : 2;
 
   const handleToggleShowAllAwards = () => {
@@ -261,12 +163,6 @@ const ProfileScreen = ({ navigation, route }) => {
   };
 
   const [showAllBlog, setShowAllBlog] = useState(false);
-  const blog = [
-    { id: 1, link: 'https://www.youtube.com/watch?v=video1' },
-    { id: 2, link: 'https://www.youtube.com/watch?v=video2' },
-    { id: 3, link: 'https://www.youtube.com/watch?v=video3' },
-  ];
-  //const initialBlogToShow = showAllBlog ? blog.length : 2;
   const initialBlogToShow = showAllBlog ? profileData.pubList.length : 2;
 
   const handleToggleShowAllBlog = () => {
@@ -621,9 +517,9 @@ const ProfileScreen = ({ navigation, route }) => {
       const id = parseInt(pr_id);
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
       const accidtyid = await AsyncStorage.getItem('selected_id');
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=dropacard`);
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=dropacard`);
 
-      //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=dropacard`);
+      //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=dropacard`);
       const data = await response.json();
       // Check if the request was successful, and update UI accordingly
       console.log('drop a card account');
@@ -641,9 +537,9 @@ const ProfileScreen = ({ navigation, route }) => {
       const id = parseInt(pr_id);
       const accidtyid = await AsyncStorage.getItem('selected_id');
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=blocked`);
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=blocked`);
 
-      //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=blocked`);
+      //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=blocked`);
       const data = await response.json();
       // Check if the request was successful, and update UI accordingly
       console.log('block account');
@@ -661,9 +557,9 @@ const ProfileScreen = ({ navigation, route }) => {
       const id = parseInt(pr_id);
       const accidtyid = await AsyncStorage.getItem('selected_id');
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=endorsement`);
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=endorsement`);
 
-      //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=endorsement`);
+      //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=endorsement`);
       const data = await response.json();
       // Check if the request was successful, and update UI accordingly
       console.log('block account');
@@ -681,9 +577,9 @@ const ProfileScreen = ({ navigation, route }) => {
       const id = parseInt(pr_id);
       const accidtyid = await AsyncStorage.getItem('selected_id');
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=empaneled`);
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=empaneled`);
 
-      //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=endorsement`);
+      //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=endorsement`);
       const data = await response.json();
       fetchEmpaneledStatus();
       console.log('empanel account');
@@ -703,7 +599,7 @@ const ProfileScreen = ({ navigation, route }) => {
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
       console.log('accidty',accidty);
 
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=connection`);
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=connection`);
       const data = await response.json();
       console.log('sent req');
       console.log(response);// Check if the request was successful, and update UI accordingly
@@ -729,9 +625,9 @@ const ProfileScreen = ({ navigation, route }) => {
       const id = parseInt(pr_id);
       const accidtyid = await AsyncStorage.getItem('selected_id');
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=keyassociate`);
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=keyassociate`);
 
-      //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=keyassociate`);
+      //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=keyassociate`);
       const data = await response.json();
       console.log(data);
       // Check if the request was successful, and update UI accordingly
@@ -969,56 +865,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 </View>
               </TouchableWithoutFeedback>
             </Modal>
-            {/* <Modal
-              visible={isModalVisible}
-              transparent
-              activeOpacity={1}
-              onRequestClose={closeModal}>
-              <TouchableOpacity
-                activeOpacity={1}
-                style={styles.modalContainer1}
-                onPress={closeModal}
-              >
-                <TouchableOpacity style={styles.modalContent1}
-                  activeOpacity={1}
-                  onPress={() => { }}>
-                  <View
-                    style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
-                    <ScrollView
-                      horizontal
-                      pagingEnabled
-                      showsHorizontalScrollIndicator={false}
-                      onMomentumScrollEnd={event => {
-                        const newIndex = Math.round(
-                          event.nativeEvent.contentOffset.x / width,
-                        );
-                        setSelectedImageIndex(newIndex);
-                      }}
-                      contentContainerStyle={{ flexGrow: 1 }}>
-                      {galleryList.map((image, index) => (
-                        <View key={index} style={{ flex: 1, width: width }}>
-                          <Image
-                            source={{ uri: image.gal_image }}
-                            style={{
-                              width: width,
-                              height: height,
-                              resizeMode: 'contain',
-                            }}
-                          />
-                        </View>
-                      ))}
-                    </ScrollView>
-                    <TouchableOpacity
-                      style={{ position: 'absolute', top: 20, right: 20 }}
-                      onPress={closeModal}>
-                      <Text style={{ color: 'FEFCFC', fontSize: 20 }}>X</Text>
-                    </TouchableOpacity>
-                  </View>
-                 </TouchableOpacity>
-              </TouchableOpacity>
-            </Modal> */}
-
-
+         
           </ScrollView>
         );
       case 1:
@@ -1504,7 +1351,7 @@ const ProfileScreen = ({ navigation, route }) => {
           >
             <Text style={styles.buttonText}>Connect</Text>
           </TouchableOpacity> */}
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          {/* <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <View style={{ flexDirection: 'row', marginVertical: height * 0.005 }}>
               <View>
                 {buttonState === 'Connect' && (
@@ -1527,13 +1374,13 @@ const ProfileScreen = ({ navigation, route }) => {
                           >
                             <Text style={commonStyles.buttonTextS}>Connected</Text>
                           </TouchableOpacity>
-                      {/* <TouchableOpacity
+                       <TouchableOpacity
                         style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
                         onPress={() => setShowPopup(true)}
                         activeOpacity={0.8}
                       >
                         <Text style={commonStyles.buttonTextS}>Key Associate</Text>
-                      </TouchableOpacity> */}
+                      </TouchableOpacity> 
                         </>
                         </View>
               
@@ -1557,26 +1404,26 @@ const ProfileScreen = ({ navigation, route }) => {
                           >
                             <Text style={commonStyles.buttonTextS}>Connected</Text>
                           </TouchableOpacity>
-                    {/* <TouchableOpacity
+                     <TouchableOpacity
                         style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
                         onPress={() => setShowPopup4(true)}
                       activeOpacity={0.8}
                     >
                       <Text style={commonStyles.buttonTextS1}>Cancel Key Req.</Text>
-                    </TouchableOpacity> */}
+                    </TouchableOpacity> 
                         </>
                         </View>
                  
                 )}
                 {buttonState === 'Options' && (
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: height * 0.01 }}>
-                    {/* <TouchableOpacity
+                     <TouchableOpacity
                     style={[commonStyles.buttonS1, { marginRight: height * 0.01 }]}
                     onPress={() => handleOptionPress('Message')}
                     activeOpacity={0.8}
                   >
                     <Text style={commonStyles.buttonTextS1}>Message</Text>
-                  </TouchableOpacity> */}
+                  </TouchableOpacity> 
 
                     <TouchableOpacity
                       style={commonStyles.buttonS}
@@ -1621,21 +1468,21 @@ const ProfileScreen = ({ navigation, route }) => {
                           >
                             <Text style={commonStyles.buttonTextS}>Connected</Text>
                           </TouchableOpacity>
-                          {/* <TouchableOpacity
+                           <TouchableOpacity
                             style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
                             onPress={() => setShowPopup(true)}
                             activeOpacity={0.8}
                           >
                             <Text style={commonStyles.buttonTextS}>Key Associate</Text>
-                          </TouchableOpacity> */}
-                          {/* <TouchableOpacity
+                          </TouchableOpacity> 
+                          <TouchableOpacity
                             style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
                             onPress={() => setShowPopup(true)}
                             activeOpacity={0.8}
                           >
                             <Text style={commonStyles.buttonTextS1}>Key Assoc.</Text>
-                          </TouchableOpacity> */}
-                          {/* {keyAssociateStatus === '0' && (
+                          </TouchableOpacity> 
+                           {keyAssociateStatus === '0' && (
                             <TouchableOpacity
                               style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10 }]}
                               onPress={() => setShowPopup(true)}
@@ -1661,7 +1508,7 @@ const ProfileScreen = ({ navigation, route }) => {
                             >
                               <Text style={commonStyles.buttonTextS}>Key Associated</Text>
                             </TouchableOpacity>
-                          )} */}
+                          )} 
                         </>
                     ) : (
                       <TouchableOpacity
@@ -1677,12 +1524,12 @@ const ProfileScreen = ({ navigation, route }) => {
 
 
               </View>
-              {/* <TouchableOpacity
+              <TouchableOpacity
                 style={[commonStyles.buttonS, { marginLeft: height * 0.01 }]}
                 activeOpacity={0.8}
               >
                 <Text style={commonStyles.buttonTextS}>Key Associate</Text>
-              </TouchableOpacity> */}
+              </TouchableOpacity> 
 
             </View>
 
@@ -1703,7 +1550,7 @@ const ProfileScreen = ({ navigation, route }) => {
                   </TouchableOpacity>
                 )}>
                 <View style={styles.popover}>
-                  {/* {setEmpanel && connectionStatus === '1' && (
+                 {setEmpanel && connectionStatus === '1' && (
                     <TouchableOpacity onPress={() => setShowPopupEmpanel(true)}>
                       <View style={styles.popoverItemContainer}>
                         <Image
@@ -1713,7 +1560,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         <Text style={styles.popoverItemText}>Empanel</Text>
                       </View>
                     </TouchableOpacity>
-                  )} */}
+                  )} 
                   {prtyid === '1' && connectionStatus === '1' && (
                     <TouchableOpacity onPress={() => setShowPopupEndorse(true)}>
                       <View style={styles.popoverItemContainer}>
@@ -1725,7 +1572,7 @@ const ProfileScreen = ({ navigation, route }) => {
                       </View>
                     </TouchableOpacity>
                   )}
-                  {/* <TouchableOpacity
+                   <TouchableOpacity
                     onPress={() => setShowPopupEndorse(true)}>
                     <View style={styles.popoverItemContainer}>
                       <Image
@@ -1734,7 +1581,7 @@ const ProfileScreen = ({ navigation, route }) => {
                       />
                       <Text style={styles.popoverItemText}>Endorse</Text>
                     </View>
-                  </TouchableOpacity> */}
+                  </TouchableOpacity> 
 
                   <TouchableOpacity>
                     <View style={styles.popoverItemContainer}>
@@ -1768,9 +1615,9 @@ const ProfileScreen = ({ navigation, route }) => {
                   </TouchableOpacity>
                 </View>
               </Popover>
-              {/* <Image source={require('../../assets/img/Option.png')} style={{ width: 20, height: 20, marginLeft: width * 0.02 }} /> */}
+               <Image source={require('../../assets/img/Option.png')} style={{ width: 20, height: 20, marginLeft: width * 0.02 }} />
             </View>
-          </View>
+          </View> */}
 
           {connectionStatus === '1' && (<View style={styles.horizontalLine}></View> )}
 

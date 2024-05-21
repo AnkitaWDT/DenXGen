@@ -36,11 +36,15 @@ const Notifications = ({ navigation }) => {
             console.log(response);
             console.log(data);
             if (data.code === 1) {
-                const formattedData = data.data.map(notification => ({
+                const sortedData = data.data.sort((a, b) => new Date(b.dateupdated) - new Date(a.dateupdated));
+
+                const formattedData = sortedData.map(notification => ({
                     ...notification,
                     dateupdated: formatDateTime(notification.dateupdated)
                 }));
+
                 setNotifications(formattedData);
+                console.log(notifications);
             } else {
                 console.error('Error fetching notifications:', data.message);
             }

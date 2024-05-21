@@ -417,7 +417,7 @@ const EditClinicProfile = ({ navigation, route }) => {
                     noLabel="No"
                     onYesPress={() => {
                         setShowPopup3(false);
-                        navigation.navigate('NDProfileCompletion5');
+                        navigation.navigate('ClinicProfileCompletion6');
                     }}
                 />
 

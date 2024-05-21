@@ -195,6 +195,7 @@ const Explore = ({navigation, route}) => {
 
       const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getprofessionallist-ax.php');
       const json = await response.json();
+      //console.log(json);
       
       if (json.code === 1) {
         const filteredData = json.data.filter(professional => parseInt(professional.id) !== id);

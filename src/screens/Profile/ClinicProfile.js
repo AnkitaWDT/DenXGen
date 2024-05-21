@@ -332,9 +332,9 @@ const ClinicProfile = ({ navigation, route }) => {
             const id = parseInt(pr_id);
             const accidty = await AsyncStorage.getItem('selected_profile_accidty');
             const accidtyid = await AsyncStorage.getItem('selected_id');
-            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=dropacard`);
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=dropacard`);
 
-            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=dropacard`);
+            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=dropacard`);
             const data = await response.json();
             // Check if the request was successful, and update UI accordingly
             console.log('drop a card account');
@@ -352,9 +352,9 @@ const ClinicProfile = ({ navigation, route }) => {
             const id = parseInt(pr_id);
             const accidty = await AsyncStorage.getItem('selected_profile_accidty');
             const accidtyid = await AsyncStorage.getItem('selected_id');
-            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=blocked`);
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=blocked`);
 
-            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=blocked`);
+            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=blocked`);
             const data = await response.json();
             // Check if the request was successful, and update UI accordingly
             console.log('block account');
@@ -372,9 +372,9 @@ const ClinicProfile = ({ navigation, route }) => {
             const id = parseInt(pr_id);
             const accidty = await AsyncStorage.getItem('selected_profile_accidty');
             const accidtyid = await AsyncStorage.getItem('selected_id');
-            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=endorsement`);
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=endorsement`);
 
-            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=endorsement`);
+            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=endorsement`);
             const data = await response.json();
             // Check if the request was successful, and update UI accordingly
             console.log('block account');
@@ -393,7 +393,7 @@ const ClinicProfile = ({ navigation, route }) => {
             const accidty = await AsyncStorage.getItem('selected_profile_accidty');
             console.log('accidty', accidty);
             const accidtyid = await AsyncStorage.getItem('selected_id');
-            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=connection`);
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=connection`);
             const data = await response.json();
             // Check if the request was successful, and update UI accordingly
             if (data.code === 1) {
@@ -415,9 +415,9 @@ const ClinicProfile = ({ navigation, route }) => {
             const id = parseInt(pr_id);
             const accidty = await AsyncStorage.getItem('selected_profile_accidty');
             const accidtyid = await AsyncStorage.getItem('selected_id');
-            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=keyassociate`);
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${cl_id}&accidty2=2&action=keyassociate`);
 
-            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=keyassociate`);
+            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${pr_id}&accid2=${professionalId}&action=keyassociate`);
             const data = await response.json();
             console.log(data);
             // Check if the request was successful, and update UI accordingly
