@@ -1034,6 +1034,7 @@ const Explore = ({navigation, route}) => {
                   // }}
                   onPress={() => {
                     const phoneNumber = contact.phoneNumbers[0].number;
+                    console.log(phoneNumber);
                     const message = 'Hey, I would like to invite you to join my app! Install it from the Link: ]';
                     const playStoreLink = 'https://play.google.com/store/apps/details?id=com.cheersbyunited'; // Replace with your app's Play Store link
                     const smsUrl = `sms:${phoneNumber}?body=${encodeURIComponent(`${message}\n${playStoreLink}`)}`;

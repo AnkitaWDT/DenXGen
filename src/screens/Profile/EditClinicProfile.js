@@ -335,7 +335,7 @@ const EditClinicProfile = ({ navigation, route }) => {
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                 <Text style={[commonStyles.headerText11BL, {
                                     marginVertical: height * 0.015,
-                                }]}>Personal Details</Text>
+                                }]}>Founders Details</Text>
                                 <TouchableOpacity style={styles.editC}
                                     onPress={() => setShowPopup3(true)}
                                     activeOpacity={0.8}
@@ -417,7 +417,8 @@ const EditClinicProfile = ({ navigation, route }) => {
                     noLabel="No"
                     onYesPress={() => {
                         setShowPopup3(false);
-                        navigation.navigate('ClinicProfileCompletion6');
+                        // navigation.navigate('ClinicProfileCompletion6');
+                        navigation.navigate('ClinicProfileCompletion6', { cl_id: cl_id });
                     }}
                 />
 

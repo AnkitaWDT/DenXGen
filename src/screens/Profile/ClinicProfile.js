@@ -304,7 +304,7 @@ const ClinicProfile = ({ navigation, route }) => {
             const accidty = await AsyncStorage.getItem('selected_profile_accidty');
             const accidtyid = await AsyncStorage.getItem('selected_id');
             console.log('accidty', accidty);
-            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersacceptconn-ax.php?accid1=${accidtyid}&accidty1=2&accid2=${pr_id}&accidty2=${accidty}&action=connection`);
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccacceptconn-ax.php?accid1=${accidtyid}&accidty1=2&accid2=${pr_id}&accidty2=${accidty}&action=connection`);
             const data = await response.json();
             // Handle response data as needed
             console.log(response);
@@ -521,6 +521,15 @@ const ClinicProfile = ({ navigation, route }) => {
         setShowAllExp(!showAllExp);
     };
 
+    const [isModalVisibleV, setIsModalVisibleV] = useState(false);
+
+    const toggleModalV = () => {
+        setIsModalVisibleV(!isModalVisibleV);
+    };
+    const closeModalV = () => {
+        setIsModalVisibleV(false);
+    };
+
     const [selectedTab, setSelectedTab] = useState(0);
     const [showPlayButton, setShowPlayButton] = useState(false);
 
@@ -575,21 +584,57 @@ const ClinicProfile = ({ navigation, route }) => {
     const treatmentsData = profileData ? profileData.treatmentList.map(item => item.treatment) : [];
     // const keyForteData = profileData ? profileData.keyfList.map(item => item.keyforte) : [];
     // const languages = profileData ? profileData.langList.map(lang => lang.language).join(', ') : null;
+   
+
 
   
 
     const renderTabContent = () => {
+        const minHeight = 200; // Define your minimum height here
+
+        // Common styles for all tabs
+        const tabContentStyle = {
+            minHeight,
+            //borderWidth: 1,
+            borderColor: 'gray',
+            //padding: 10, 
+            marginBottom: 30
+        };
         switch (selectedTab) {
             case 0:
+                if (galleryList.length === 0 && !profileData.profile_video) {
+                    return null; // Don't render anything if both galleryList and profile_video are empty
+                }
                 return (
-                    <View>
-                        <Video
-                            source={profileData && profileData.profile_video ? { uri: profileData.profile_video } : { uri: 'https://www.denxgen.com/images/clinic-page/video-11.mp4' }}
-                            //source={{ uri: 'https://www.denxgen.com/images/clinic-page/video-11.mp4' }} // Replace with the actual video URL
-                            style={{ aspectRatio: 3 / 2 }}
-                            controls={false}
-                            resizeMode="contain"
-                        />
+                    <ScrollView style={tabContentStyle}>
+                        <TouchableOpacity onPress={toggleModalV}>
+                            <Video
+                                source={profileData && profileData.profile_video ? { uri: profileData.profile_video } : null}
+                                style={{ aspectRatio: 3 / 2 }}
+                                controls={false}
+                                resizeMode="contain"
+                            />
+                        </TouchableOpacity>
+                        <Modal
+                            visible={isModalVisibleV}
+                            transparent={true}
+                            onRequestClose={closeModalV}
+                        >
+                            <TouchableWithoutFeedback onPress={closeModalV}>
+                                <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)', justifyContent: 'center', alignItems: 'center' }}>
+                                    <TouchableOpacity style={{ position: 'absolute', top: 20, right: 20 }} onPress={closeModalV}>
+                                        <Text style={{ color: 'white', fontSize: 20 }}>X</Text>
+                                    </TouchableOpacity>
+
+                                    <Video
+                                        source={{ uri: profileData && profileData.profile_video ? profileData.profile_video : null }}
+                                        style={{ width: width, height: height - 40 }}
+                                        controls={true}
+                                        resizeMode="contain"
+                                    />
+                                </View>
+                            </TouchableWithoutFeedback>
+                        </Modal>
                         <View style={styles.imageGrid}>
                             {galleryList.map((image, index) => (
                                 <TouchableOpacity
@@ -608,7 +653,6 @@ const ClinicProfile = ({ navigation, route }) => {
                             ))}
                         </View>
 
-                        {/* Modal for Full Screen Image */}
                         <Modal
                             visible={isModalVisible}
                             transparent={true}
@@ -651,12 +695,14 @@ const ClinicProfile = ({ navigation, route }) => {
                             </TouchableWithoutFeedback>
                         </Modal>
 
-
-                    </View>
+                    </ScrollView>
                 );
             case 1:
+                if (!treatmentsData) {
+                    return null; // Don't render anything if both galleryList and profile_video are empty
+                }
                 return (
-                    <View>
+                    <ScrollView style={tabContentStyle}>
                         <FlatList
                             data={treatmentsData}
                             keyExtractor={(item, index) => index.toString()}
@@ -671,11 +717,14 @@ const ClinicProfile = ({ navigation, route }) => {
                             )}
                         // renderItem={({ item }) => <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>}
                         />
-                    </View>
+                    </ScrollView>
                 );
             case 2:
+                if (!servicesData) {
+                    return null; // Don't render anything if both galleryList and profile_video are empty
+                }
                 return (
-                    <View>
+                    <ScrollView style={tabContentStyle}>
                         <FlatList
                             data={servicesData}
                             keyExtractor={(item, index) => index.toString()}
@@ -690,32 +739,12 @@ const ClinicProfile = ({ navigation, route }) => {
                             )}
                         // renderItem={({ item }) => <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>}
                         />
-                    </View>
+                    </ScrollView>
                 );
             case 3:
 
-                return null;
-            // return (
-            //     <View>
-            //         <FlatList
-            //             data={keyForteData}
-            //             keyExtractor={(item, index) => index.toString()}
-            //             renderItem={({ item }) => (
-            //                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-            //                     <Image
-            //                         source={require('../../../assets/img/services.png')}
-            //                         style={{ width: 20, height: 25, marginRight: 10, }}
-            //                     />
-            //                     <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>
-            //                 </View>
-            //             )}
-            //         // renderItem={({ item }) => <Text style={[commonStyles.headerText3BL, {}]}>{item}</Text>}
-            //         />
-            //     </View>
-            // );
-            case 4:
                 return (
-                    <View style={{ marginBottom: 20 }}>
+                    <ScrollView style={tabContentStyle}>
                         <View>
                             <Text style={[commonStyles.headerText11BL, {
                                 //marginVertical: height * 0.01,
@@ -793,6 +822,12 @@ const ClinicProfile = ({ navigation, route }) => {
                                 </TouchableOpacity>
                             )}
                         </View>
+                    </ScrollView>
+                );
+            case 4:
+                return (
+                    <View>
+                        <Text>Content for Tab 5</Text>
                     </View>
                 );
             case 5:

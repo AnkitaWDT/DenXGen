@@ -5,11 +5,14 @@ import commonStyles from '../../components/CommonStyles';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 import Contacts from 'react-native-contacts';
-import Animation from '../../components/Loader';
+import LottieView from 'lottie-react-native';
+import { moderateScale } from 'react-native-size-matters';///
+import AlertPopup from '../../components/AlertPopup';
 import Popover, { PopoverPlacement } from 'react-native-popover-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import LottieView from 'lottie-react-native';
-import AlertPopup from '../../components/AlertPopup';
+import Animation from '../../components/Loader';
+
+
 
 const { width, height } = Dimensions.get('window');
 const responsiveFontSize = (size) => {
@@ -18,12 +21,11 @@ const responsiveFontSize = (size) => {
     return Math.round(PixelRatio.roundToNearestPixel(newSize));
 };
 
-
-const DropCards = ({ navigation }) => {
+const Branches = ({ navigation }) => {
     const [activeTab, setActiveTab] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
     const [contacts, setContacts] = useState([]);
-    const tabs = ['Professionals', 'Clinics', 'Office', 'Others', 'Sent'];
+    const tabs = ['Clinics', 'Offices'];
 
     const [showPopup1, setShowPopup1] = useState(false);
     const [showPopup2, setShowPopup2] = useState(false);
@@ -140,16 +142,15 @@ const DropCards = ({ navigation }) => {
                 gender: 1
             },
         ],
-        // Data for Tab 4
         [
             {
                 id: 1, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                //image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU',
+                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU',
                 gender: 1
             },
             {
                 id: 2, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww',
+                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU',
                 gender: 1
             },
             {
@@ -164,92 +165,21 @@ const DropCards = ({ navigation }) => {
             },
             {
                 id: 5, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                //image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww',
-                gender: 2
-            },
-            {
-                id: 6, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
                 image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU',
-                gender: 2
-            },
-            {
-                id: 7, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww',
                 gender: 1
             },
         ],
- [
-            {
-                id: 1, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                //image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU',
-                gender: 1
-            },
-            {
-                id: 2, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww',
-                gender: 1
-            },
-            {
-                id: 3, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww',
-                gender: 1
-            },
-            {
-                id: 4, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU',
-                gender: 1
-            },
-            {
-                id: 5, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                //image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww',
-                gender: 2
-            },
-            {
-                id: 6, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU',
-                gender: 2
-            },
-            {
-                id: 7, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww',
-                gender: 1
-            },
-        ],
+
+
     ];
 
-    const [professionals, setProfessionals] = useState([]);
+    const [connections, setConnections] = useState([]);
+    const [empanelled, setEmpanelled] = useState([]);
+    const [blocked, setBlocked] = useState([]);
+    const [keyAssociates, setKeyAssociates] = useState([]);
+
     const [clinics, setClinics] = useState([]);
     const [offices, setOffices] = useState([]);
-    const [others, setOthers] = useState([]);
-    const [sentDropCard, setSentDropCard] = useState([]);
-
-    useEffect(() => {
-        const fetchProfessionalsData = async () => {
-            try {
-                const accidty = await AsyncStorage.getItem('selected_profile_accidty');
-                const accidtyid = await AsyncStorage.getItem('selected_id');
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccdroplist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=professionals`);
-                const data = await response.json();
-                console.log(response);
-                console.log(data);
-
-                // Debug: Log the id value
-                console.log('ID to filter:', data.pr_id);
-
-                // Filter out items where pr_id matches id (ensure id is a string)
-                const filteredData = data.data.filter(item => item.pr_id !== String(data.pr_id));
-
-                setProfessionals(filteredData);
-                console.log(filteredData);
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setIsLoading(false);
-            }
-        };
-
-        fetchProfessionalsData();
-    }, []);
 
 
     useEffect(() => {
@@ -258,7 +188,7 @@ const DropCards = ({ navigation }) => {
 
                 const accidty = await AsyncStorage.getItem('selected_profile_accidty');
                 const accidtyid = await AsyncStorage.getItem('selected_id');
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccdroplist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=clinics`);
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccbranchlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=clinics`);
                 //https://temp.wedeveloptech.in/denxgen/appdata/getaccconnlist-ax.php?accid=5&accidty=1&action=professionals 
                 //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersmyconnlist-ax.php?pr_id=${id}`);
                 const data = await response.json();
@@ -280,15 +210,17 @@ const DropCards = ({ navigation }) => {
     useEffect(() => {
         const fetchOfficesData = async () => {
             try {
+                const pr_id = await AsyncStorage.getItem('pr_id');
+                const id = parseInt(pr_id);
                 const accidty = await AsyncStorage.getItem('selected_profile_accidty');
                 const accidtyid = await AsyncStorage.getItem('selected_id');
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccdroplist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=offices`);
+                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccbranchlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=offices`);
                 //https://temp.wedeveloptech.in/denxgen/appdata/getaccconnlist-ax.php?accid=5&accidty=1&action=professionals 
                 //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersmyconnlist-ax.php?pr_id=${id}`);
                 const data = await response.json();
 
                 // Filter out items where pr_id matches
-                const filteredData = data.data.filter(item => item.off_id !== String(data.off_id));
+                const filteredData = data.data.filter(item => parseInt(item.pr_id) !== id);
 
                 setOffices(filteredData);
                 setIsLoading(false);
@@ -300,74 +232,6 @@ const DropCards = ({ navigation }) => {
 
         fetchOfficesData();
     }, []);
-
-    useEffect(() => {
-        const fetchOthersData = async () => {
-            try {
-                const accidty = await AsyncStorage.getItem('selected_profile_accidty');
-                const accidtyid = await AsyncStorage.getItem('selected_id');
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccdroplist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=others`);
-                //https://temp.wedeveloptech.in/denxgen/appdata/getaccconnlist-ax.php?accid=5&accidty=1&action=professionals 
-                //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersmyconnlist-ax.php?pr_id=${id}`);
-                const data = await response.json();
-
-                // Filter out items where pr_id matches
-                const filteredData = data.data.filter(item => item.off_id !== String(data.off_id));
-
-                setOthers(filteredData);
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setIsLoading(false);
-            }
-        };
-
-        fetchOthersData();
-    }, []);
-
-    useEffect(() => {
-        const fetchSentDropCardsData = async () => {
-            try {
-                const pr_id = await AsyncStorage.getItem('pr_id');
-                const id = parseInt(pr_id);
-                const accidty = await AsyncStorage.getItem('selected_profile_accidty');
-                const accidtyid = await AsyncStorage.getItem('selected_id');
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccdroplist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=sent`);
-                const data = await response.json();
-                console.log('response', response);
-                console.log('data', data);
-
-                const dataArray = Object.values(data.data); // Extract values into an array
-                console.log('dataArray', dataArray);
-
-                // Filter out items based on different keys
-                const filteredData = dataArray.filter(item => {
-                    if ('pr_id' in item && parseInt(item.pr_id) !== parseInt(accidtyid)) {
-                        return true;
-                    }
-                    if ('cl_id' in item && parseInt(item.cl_id) !== parseInt(accidtyid)) {
-                        return true;
-                    }
-                    if ('off_id' in item && parseInt(item.off_id) !== parseInt(accidtyid)) {
-                        return true;
-                    }
-                    return false;
-                });
-
-                setSentDropCard(filteredData);
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setIsLoading(false);
-            }
-        };
-
-        fetchSentDropCardsData();
-    }, []);
-
-
-
-
 
 
     const [animationLoaded, setAnimationLoaded] = useState(false);
@@ -399,7 +263,7 @@ const DropCards = ({ navigation }) => {
 
     const handleTabPress = async (index) => {
         setActiveTab(index);
-        //console.log('Data for tab', index, ':', data[index]);
+        console.log('Data for tab', index, ':', data[index]);
         renderTabContent(index);
         renderTabContent(data[index]);
         // setIsLoading(true); // Show loading indicator while fetching data
@@ -446,32 +310,6 @@ const DropCards = ({ navigation }) => {
 
     const renderTabContent = () => {
         if (activeTab === 0) {
-            if (professionals.length === 0) {
-                return (
-                    <View style={styles.animationContainer}>
-                        <LottieView
-                            ref={animationRef}
-                            source={require('../../../assets/img/NoData.json')}
-                            style={styles.animation}
-                            autoPlay={true}
-                            loop={true}
-                            onLoad={() => setAnimationLoaded(true)}
-                        />
-                        <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
-                    </View>
-                );
-            } else {
-                return (
-                    <FlatList
-                        data={professionals}
-                        renderItem={renderItem}
-                        keyExtractor={(item) => item.pr_id.toString()}
-                        refreshing={isLoading}
-                    />
-                );
-            }
-        }
-        else if (activeTab === 1) {
             if (clinics.length === 0) {
                 return (
                     <View style={styles.animationContainer}>
@@ -497,7 +335,7 @@ const DropCards = ({ navigation }) => {
                 );
             }
         }
-        else if (activeTab === 2) {
+        else if (activeTab === 1) {
             if (offices.length === 0) {
                 return (
                     <View style={styles.animationContainer}>
@@ -518,58 +356,6 @@ const DropCards = ({ navigation }) => {
                         data={offices}
                         renderItem={renderItem}
                         keyExtractor={(item) => item.off_id.toString()}
-                        refreshing={isLoading}
-                    />
-                );
-            }
-        }
-        else if (activeTab === 3) {
-            if (others.length === 0) {
-                return (
-                    <View style={styles.animationContainer}>
-                        <LottieView
-                            ref={animationRef}
-                            source={require('../../../assets/img/NoData.json')}
-                            style={styles.animation}
-                            autoPlay={true}
-                            loop={true}
-                            onLoad={() => setAnimationLoaded(true)}
-                        />
-                        <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
-                    </View>
-                );
-            } else {
-                return (
-                    <FlatList
-                        data={others}
-                        renderItem={renderItem}
-                        keyExtractor={(item) => item.pr_id.toString()}
-                        refreshing={isLoading}
-                    />
-                );
-            }
-        }
-        else if (activeTab === 4) {
-            if (sentDropCard.length === 0) {
-                return (
-                    <View style={styles.animationContainer}>
-                        <LottieView
-                            ref={animationRef}
-                            source={require('../../../assets/img/NoData.json')}
-                            style={styles.animation}
-                            autoPlay={true}
-                            loop={true}
-                            onLoad={() => setAnimationLoaded(true)}
-                        />
-                        <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
-                    </View>
-                );
-            } else {
-                return (
-                    <FlatList
-                        data={sentDropCard}
-                        renderItem={renderItem}
-                        keyExtractor={(item) => item.name.toString()}
                         refreshing={isLoading}
                     />
                 );
@@ -633,6 +419,12 @@ const DropCards = ({ navigation }) => {
         // const truncatedDescription = truncateText(item.specList[0].speciality, width * 0.85, 15);
 
 
+        console.log('Original title:', item.title);
+        console.log('Truncated title:', truncatedTitle);
+
+        console.log('Original description:', item.description);
+        console.log('Truncated description:', truncatedDescription);
+
         let imageUrl;
         if (item.profile_pic) {
             imageUrl = item.profile_pic;
@@ -655,7 +447,6 @@ const DropCards = ({ navigation }) => {
         };
         return (
             <ScrollView>
-                {/* Content row with text and button */}
                 <TouchableOpacity
                     activeOpacity={0.8}
                     onPress={() => {
@@ -671,130 +462,62 @@ const DropCards = ({ navigation }) => {
                         }
                     }}
                     //onPress={handleNavigation}
-                    style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}
+                    style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10 }}
                 >
-                    {/* Left side text and image */}
-                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                        {/* Image */}
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+
                         <Image
                             source={{ uri: item.profile_pic }}
                             style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10 }}
                         />
 
-                        {/* Text */}
-                        <View style={{ flexDirection: 'column', flex: 1 }}>
-                            {/* <Text style={[commonStyles.headerText4BL, {}]}>{truncatedTitle}</Text> */}
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Text style={[commonStyles.headerText4BL, {}]}>{truncatedTitle}</Text>
-                                {/* <Popover
-                                    placement={PopoverPlacement.LEFT}
-                                    visible={showPopover}
-                                    onRequestClose={() => setShowPopover(false)}
-                                    from={(
-                                        <TouchableOpacity style={{ paddingHorizontal: 10 }}
-                                        >
-                                            <Image
-                                                source={require('../../../assets/img/ViewM.png')}
-                                                style={{ width: 4, height: 18 }}
-                                            />
-                                        </TouchableOpacity>
-                                    )}>
-                                    <View style={commonStyles.popover}>
-                                        <TouchableOpacity
-                                            onPress={() => {
-                                                setShowPopup1(true);
-                                                setShowPopover(false); // Close popover when opening popup
-                                            }}
-                                            activeOpacity={0.8}>
-                                            <View style={commonStyles.popoverItemContainer}>
-                                                <Image
-                                                    source={require('../../../assets/img/Bookmark.png')}
-                                                    style={commonStyles.popoverItemIcon}
-                                                />
-                                                <Text style={commonStyles.popoverItemText}>Remove</Text>
-                                            </View>
-                                        </TouchableOpacity>
-
-                                        <AlertPopup
-                                            visible={showPopup1}
-                                            onRequestClose={() => {
-                                                setShowPopup1(false);
-                                                setShowPopover(false); // Close popover when closing popup
-                                            }}
-                                            title="Remove Account?"
-                                            message="Do you want to remove Dr. Mridula Radhakrishnan account ? "
-                                            yesLabel="Yes"
-                                            noLabel="No"
-                                            onYesPress={() => {
-                                                setShowPopup1(false);
-                                                setShowPopover(false);
-                                                //navigation.navigate('ProfileCompletion1');
-                                            }}
-                                        />
-
-                                        <TouchableOpacity
-                                            onPress={() => setShowPopup2(true)}
-                                            activeOpacity={0.8}>
-                                            <View style={commonStyles.popoverItemContainer}>
-                                                <Image
-                                                    source={require('../../../assets/img/SaveCon.png')}
-                                                    style={commonStyles.popoverItemIcon}
-                                                />
-                                                <Text style={commonStyles.popoverItemText}>Block</Text>
-                                            </View>
-                                        </TouchableOpacity>
-
-                                        <AlertPopup
-                                            visible={showPopup2}
-                                            onRequestClose={() => setShowPopup2(false)}
-                                            title="Block Account?"
-                                            message="Do you want to block Dr. Mridula Radhakrishnan account ? "
-                                            yesLabel="Yes"
-                                            noLabel="No"
-                                            onYesPress={() => {
-                                                setShowPopup2(false);
-                                                setShowPopover(false);
-                                                //navigation.navigate('ProfileCompletion1');
-                                            }}
-                                        />
-                                    </View>
-                                </Popover> */}
-                            </View>
+                        <View style={{ flexDirection: 'column', }}>
+                            <Text style={[commonStyles.headerText4BL, {}]}>{truncatedTitle}</Text>
                             <Text style={[commonStyles.headerText5G, {}]}>{truncatedDescription}</Text>
                         </View>
                     </View>
 
-                    {/* Right side button */}
-                    {/* <TouchableOpacity
-        style={{
-            paddingVertical: 4,
-            paddingHorizontal: width * 0.01,
-            borderRadius: 24,
-            borderColor: '#289EF5',
-            borderWidth: 1,
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            width: width * 0.2,
-        }}
-        onPress={() => {
-            // Handle button press logic here
-        }}
-    >
-        <Text style={{
-            fontSize: responsiveFontSize(14),
-            alignSelf: 'center',
-            color: '#289EF5',
-            paddingHorizontal: 5,
-            textAlign: 'center',
-            fontFamily: 'DMSans-Medium',
-            lineHeight: height * 0.028 //28
-        }}>Remove</Text>
-    </TouchableOpacity> */}
+                    <TouchableOpacity
+                        style={{
+                            paddingVertical: 4,
+                            paddingHorizontal: width * 0.01,
+                            borderRadius: 24,
+                            borderColor: '#289EF5',
+                            borderWidth: 1,
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            width: width * 0.2,
+                        }}
+                    //onPress={handleAcceptPress}
+                    >
+                        <Text style={{
+                            fontSize: responsiveFontSize(14),
+                            alignSelf: 'center',
+                            color: '#289EF5',
+                            paddingHorizontal: 5,
+                            textAlign: 'center',
+                            fontFamily: 'DMSans-Medium',
+                            lineHeight: height * 0.028 //28
+                        }}>Cancel</Text>
+                    </TouchableOpacity>
+
                 </TouchableOpacity>
 
-
-                {/* Horizontal line */}
                 <View style={{ height: 1, backgroundColor: '#ccc', marginVertical: 4 }} />
+
+                <AlertPopup
+                    visible={showPopup1}
+                    onRequestClose={() => setShowPopup1(false)}
+                    title="Cancel Request"
+                    message="Are you sure you want to cancel connection request? "
+                    yesLabel="Yes"
+                    noLabel="No"
+                    onYesPress={() => {
+                        setShowPopup1(false);
+                        //cancelConnectionRequest();
+                    }}
+                />
+
             </ScrollView>
         );
     };
@@ -810,7 +533,7 @@ const DropCards = ({ navigation }) => {
                         <TouchableOpacity style={commonStyles.backContainer} activeOpacity={0.8} onPress={() => navigation.goBack()}>
                             <Image source={require('../../../assets/img/Back.png')} style={commonStyles.icon} />
                         </TouchableOpacity>
-                        <Text style={commonStyles.backText}>Drop a Card</Text>
+                        <Text style={commonStyles.backText}>Branches</Text>
                         <TouchableOpacity style={commonStyles.backContainer1} activeOpacity={0.8}>
                             <Image source={require('../../../assets/img/Option.png')} style={commonStyles.icon} />
                         </TouchableOpacity>
@@ -857,6 +580,7 @@ const DropCards = ({ navigation }) => {
                                     <TouchableOpacity
                                         style={{
                                             height: height * 0.04,
+                                            width: width * 0.44,
                                             backgroundColor: activeTab === index ? "#289EF5" : '#E8F8FF',
                                             opacity: activeTab === index ? 1 : 1,
                                             borderRadius: 6,
@@ -949,6 +673,13 @@ const DropCards = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+    noDataContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignSelf: 'center',
+        height: height,
+        width: width
+    },
     animationContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -1042,4 +773,5 @@ const styles = StyleSheet.create({
 
     },
 });
-export default DropCards;
+
+export default Branches

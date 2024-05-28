@@ -22,34 +22,22 @@ const responsiveFontSize = (size) => {
 const ReceivedReq = ({ navigation }) => {
     const [activeTab, setActiveTab] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
-    const [tabs, setTabs] = useState(['Professionals', 'Key Associates', 'Clinics', 'Office']);
-    const [accidty, setAccidty] = useState(null);
+    const [contacts, setContacts] = useState([]);
+    const tabs = ['Connections', 'Key Associates', 'Empanelled'];
 
-    useEffect(() => {
-        fetchAccidty();
-    }, []);
+    const [showPopup1, setShowPopup1] = useState(false);
+    const [showPopup2, setShowPopup2] = useState(false);
+    const [showPopover, setShowPopover] = useState(false);
 
-    const fetchAccidty = async () => {
-        try {
-            const accidtyValue = await AsyncStorage.getItem('selected_profile_accidty');
-            setAccidty(accidtyValue);
-        } catch (error) {
-            console.error('Error fetching accidty:', error);
-        }
-    };
-
-    useEffect(() => {
-        if (accidty === '1') {
-            // If accidty is 1, add the additional tab
-            setTabs(prevTabs => [...prevTabs, 'Empanelled']);
-        }
-    }, [accidty]);
+    const [connections, setConnections] = useState([]);
+    const [empanelled, setEmpanelled] = useState([]);
+    const [keyAssociates, setKeyAssociates] = useState([]);
 
     const data = [
         // Data for Tab 1
         [
             {
-                id: 1, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
+                id: 1, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
                 image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU',
                 gender: 1
             },
@@ -85,21 +73,6 @@ const ReceivedReq = ({ navigation }) => {
             },
             {
                 id: 8, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU',
-                gender: 1
-            },
-            {
-                id: 9, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU',
-                gender: 1
-            },
-            {
-                id: 10, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU',
-                gender: 1
-            },
-            {
-                id: 11, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
                 image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU',
                 gender: 1
             },
@@ -173,87 +146,100 @@ const ReceivedReq = ({ navigation }) => {
         ],
 
 
-        // Data for Tab 4
-        [
-            {
-                id: 1, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                //image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU',
-                gender: 1
-            },
-            {
-                id: 2, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww',
-                gender: 1
-            },
-            {
-                id: 3, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww',
-                gender: 1
-            },
-            {
-                id: 4, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU',
-                gender: 1
-            },
-            {
-                id: 5, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                //image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww',
-                gender: 2
-            },
-            {
-                id: 6, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU',
-                gender: 2
-            },
-            {
-                id: 7, name: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', star: '4.8', location: 'Ghatkopar, India',
-                image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww',
-                gender: 1
-            },
-        ],
-
     ];
 
-
-    const [professionals, setProfessionals] = useState([]);
-    const [keyAssociates, setKeyAssociates] = useState([]);
-
     useEffect(() => {
-        const fetchProfessionalsData = async () => {
-            try {
-                const pr_id = await AsyncStorage.getItem('pr_id');
-                const id = parseInt(pr_id);
-
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getperspendreqlist-ax.php?pr_id=${id}`);
-                const data = await response.json();
-                setProfessionals(data.data);
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setIsLoading(false);
-            }
-        };
-
-        fetchProfessionalsData();
-    }, []);
-    useEffect(() => {
-        const fetchKeyAssociatesData = async () => {
-            try {
-                const pr_id = await AsyncStorage.getItem('pr_id');
-                const id = parseInt(pr_id);
-
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getperskeypendreqlist-ax.php?pr_id=${id}`);
-                const data = await response.json();
-                setKeyAssociates(data.data);
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setIsLoading(false);
-            }
-        };
-
+        fetchConnectionsData();
         fetchKeyAssociatesData();
+        fetchEmpanelledData();
     }, []);
+
+    const fetchConnectionsData = async () => {
+        try {
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccpendreqlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=connections`);
+            const data = await response.json();
+            const dataArray = Object.values(data.data);
+            const filteredData = dataArray.filter(item => {
+                if ('pr_id' in item && parseInt(item.pr_id) !== parseInt(accidtyid)) {
+                    return true;
+                }
+                if ('cl_id' in item && parseInt(item.cl_id) !== parseInt(accidtyid)) {
+                    return true;
+                }
+                if ('off_id' in item && parseInt(item.off_id) !== parseInt(accidtyid)) {
+                    return true;
+                }
+                return false;
+            });
+
+            setConnections(filteredData);
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setIsLoading(false);
+        }
+    };
+
+    const fetchKeyAssociatesData = async () => {
+        try {
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccpendreqlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=keyassociate`);
+            const data = await response.json();
+            const dataArray = Object.values(data.data);
+            const filteredData = dataArray.filter(item => {
+                if ('pr_id' in item && parseInt(item.pr_id) !== parseInt(accidtyid)) {
+                    return true;
+                }
+                if ('cl_id' in item && parseInt(item.cl_id) !== parseInt(accidtyid)) {
+                    return true;
+                }
+                if ('off_id' in item && parseInt(item.off_id) !== parseInt(accidtyid)) {
+                    return true;
+                }
+                return false;
+            });
+
+            setKeyAssociates(filteredData);
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setIsLoading(false);
+        }
+    };
+
+    const fetchEmpanelledData = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccpendreqlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=empaneled`);
+            const data = await response.json();
+            const dataArray = Object.values(data.data);
+            const filteredData = dataArray.filter(item => {
+                if ('pr_id' in item && parseInt(item.pr_id) !== parseInt(accidtyid)) {
+                    return true;
+                }
+                if ('cl_id' in item && parseInt(item.cl_id) !== parseInt(accidtyid)) {
+                    return true;
+                }
+                if ('off_id' in item && parseInt(item.off_id) !== parseInt(accidtyid)) {
+                    return true;
+                }
+                return false;
+            });
+
+            setEmpanelled(filteredData);
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setIsLoading(false);
+        }
+    };
+
 
     const [animationLoaded, setAnimationLoaded] = useState(false);
     const animationRef = useRef(null);
@@ -267,32 +253,115 @@ const ReceivedReq = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Simulate an asynchronous operation (e.g., fetching data) before rendering the profile screen
         const fakeAsyncOperation = async () => {
-            // Add any asynchronous logic here if needed
-            // For now, just simulate a delay
             await new Promise(resolve => setTimeout(resolve, 1000));
-
-            // Set loading state to false after the delay
             setIsLoading(false);
         };
 
-        // Execute the fakeAsyncOperation
         fakeAsyncOperation();
     }, []);
 
-
-    // const handleTabPress = (index) => {
-    //     setActiveTab(index);
-    // };
+    const handleTabPress = async (index) => {
+        setActiveTab(index);
+        console.log('Data for tab', index, ':', data[index]);
+        renderTabContent(index);
+        renderTabContent(data[index]);
+    };
 
     const handleSearch = (query) => {
-        // Handle the search logic based on the query
         setSearchQuery(query);
+    };
+    const scrollViewRef = useRef();
+    const flatListRef = useRef();
+
+    const renderTabContent = () => {
+        if (activeTab === 0) {
+            if (connections.length === 0) {
+                return (
+                    <View style={styles.animationContainer}>
+                        <LottieView
+                            ref={animationRef}
+                            source={require('../../../assets/img/NoData.json')}
+                            style={styles.animation}
+                            autoPlay={true}
+                            loop={true}
+                            onLoad={() => setAnimationLoaded(true)}
+                        />
+                        <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
+                    </View>
+                );
+            } else {
+                return (
+                    <FlatList
+                        data={connections}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item.name.toString()}
+                        refreshing={isLoading}
+                    />
+                );
+            }
+        }
+        else if (activeTab === 1) {
+            if (keyAssociates.length === 0) {
+                return (
+                    <View style={styles.animationContainer}>
+                        <LottieView
+                            ref={animationRef}
+                            source={require('../../../assets/img/NoData.json')}
+                            style={styles.animation}
+                            autoPlay={true}
+                            loop={true}
+                            onLoad={() => setAnimationLoaded(true)}
+                        />
+                        <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
+                    </View>
+                );
+            } else {
+                return (
+                    <FlatList
+                        data={keyAssociates}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item.name.toString()}
+                        refreshing={isLoading}
+                    />
+                );
+            }
+        }
+        else if (activeTab === 2) {
+            if (empanelled.length === 0) {
+                return (
+                    <View style={styles.animationContainer}>
+                        <LottieView
+                            ref={animationRef}
+                            source={require('../../../assets/img/NoData.json')}
+                            style={styles.animation}
+                            autoPlay={true}
+                            loop={true}
+                            onLoad={() => setAnimationLoaded(true)}
+                        />
+                        <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
+                    </View>
+                );
+            } else {
+                return (
+                    <FlatList
+                        data={empanelled}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item.name.toString()}
+                        refreshing={isLoading}
+                    />
+                );
+            }
+        }
+    };
+
+    const openContactDetails = (contact) => {
+        console.log(JSON.stringify(contact));
+        Contacts.openExistingContact(contact);
     };
 
     const truncateText = (text, maxWidth, fontSize) => {
-        const ellipsisWidth = 30; // Width of the ellipsis
+        const ellipsisWidth = 30;
         const maxTextWidth = maxWidth - ellipsisWidth;
 
         if (!text) {
@@ -328,46 +397,130 @@ const ReceivedReq = ({ navigation }) => {
         return charWidth;
     };
 
-    const [showPopup1, setShowPopup1] = useState(false);
-    const [showPopup2, setShowPopup2] = useState(false);
-    const [selectedProfessionalId, setSelectedProfessionalId] = useState(null);
+    const [showAcceptPopup, setShowAcceptPopup] = useState(false);
+    const [currentItem, setCurrentItem] = useState(null);
+    const [currentContactStatus, setCurrentContactStatus] = useState(null);
+    const [currentId, setCurrentId] = useState(null);
+    const [currentAccidty, setCurrentAccidty] = useState(null);
+    const [currentContactType, setCurrentContactType] = useState(null);
 
 
-    const renderItem = ({ item, index }) => {
+    const handleAcceptPress = (item, contactStatus, id, accidty, contactType) => {
+        setCurrentItem(item);
+        setCurrentContactStatus(contactStatus);
+        setCurrentId(id);
+        setCurrentAccidty(accidty);
+        setCurrentContactType(contactType);
+        setShowAcceptPopup(true);
+    };
+
+    const proceedWithAccept = async () => {
+        const accidtyid = await AsyncStorage.getItem('selected_id');
+        const accidtymy = await AsyncStorage.getItem('selected_profile_accidty');
+        const actionMap = {
+            0: 'connection',
+            1: 'keyassociate',
+            2: 'empaneled',
+        };
+        const action = actionMap[activeTab];
+
+        const url = `https://temp.wedeveloptech.in/denxgen/appdata/reqaccacceptconn-ax.php?accid1=${currentId}&accidty1=${currentAccidty}&accid2=${accidtyid}&accidty2=${accidtymy}&action=${action}`;
+        console.log(url);
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+            });
+
+            const result = await response.json();
+            console.log(`Request accepted successfully for ${action}`);
+        } catch (error) {
+            console.error('Error accepting request:', error);
+        }
+
+        setShowAcceptPopup(false); 
+        fetchConnectionsData();
+        fetchKeyAssociatesData();
+        fetchEmpanelledData();
+    };
+
+    const handleCancelPress = (item, contactStatus, id, accidty, contactType) => {
+        setCurrentItem(item);
+        setCurrentContactStatus(contactStatus);
+        setCurrentId(id);
+        setCurrentAccidty(accidty);
+        setCurrentContactType(contactType);
+        setShowPopup1(true);
+    };
+
+    const cancelConnectionRequest = async () => {
+        const accidtyid = await AsyncStorage.getItem('selected_id');
+        const accidtymy = await AsyncStorage.getItem('selected_profile_accidty');
+        const actionMap = {
+            0: 'connection',
+            1: 'keyassociate',
+            2: 'empaneled',
+        };
+        const action = actionMap[activeTab];
+
+        const url = `https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${currentId}&accidty1=${currentAccidty}&accid2=${accidtyid}&accidty2=${accidtymy}&action=${action}`;
+        console.log(url);
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+            });
+
+            const result = await response.json();
+            console.log(`Request cancel successfully for ${action}`);
+        } catch (error) {
+            console.error('Error accepting request:', error);
+        }
+
+        setShowPopup1(false);
+        fetchConnectionsData();
+        fetchKeyAssociatesData();
+        fetchEmpanelledData();
+    };
+
+    const renderItem = ({ item }) => {
+        const name =
+            item.name;
+
+        const contactStatus =
+            item.pr_contact_status ||
+            item.cl_contact_status ||
+            item.off_contact_status ||
+            item.contact_status ||
+            item.status;
+
+        const contactType =
+            item.pr_type ||
+            item.cl_type ||
+            item.off_type ||
+            item.contact_type ||
+            item.type;
+
+        const id =
+            item.pr_id ||
+            item.cl_id ||
+            item.off_id ||
+            item.contact_id ||
+            item.id;
+
+        const accidty = item.con_ty;
 
 
-        const truncatedTitle = truncateText(item.name, width * 0.65, 17);
-        const truncatedDescription = truncateText(item.description, width * 0.65, 15);
+        const truncatedTitle = truncateText(item.name, width * 0.75, 17);
+        const truncatedDescription = truncateText(item.description, width * 0.85, 15);
         // const truncatedDescription = truncateText(item.specList[0].speciality, width * 0.85, 15);
 
-        // console.log('Original name:', item.title);
-        // console.log('Truncated name:', truncatedTitle);
+
+        // console.log('Original title:', item.title);
+        // console.log('Truncated title:', truncatedTitle);
 
         // console.log('Original description:', item.description);
         // console.log('Truncated description:', truncatedDescription);
-
-        const handleAcceptPress = (sender) => {
-            // Show the popup
-            console.log('huhdei');
-            //console.log(sender);
-           
-            // Set the selected professional's id to state
-           
-            console.log(selectedProfessionalId);
-
-            if (activeTab === 0) {
-                // Logic for the first tab
-                setShowPopup1(true);
-            } else if (activeTab === 1) {
-                // Logic for the second tab
-                setShowPopup2(true);
-            } else {
-                // Logic for other tabs if needed
-            }
-
-            setSelectedProfessionalId(sender);
-            console.log(selectedProfessionalId);
-        };
 
 
         let imageUrl;
@@ -375,40 +528,49 @@ const ReceivedReq = ({ navigation }) => {
             imageUrl = item.profile_pic;
         } else {
             if (item.gender === 1) {
-                imageUrl = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJQAlwMBIgACEQEDEQH/xAAbAAEBAAMBAQEAAAAAAAAAAAAAAQIEBQMGB//EADAQAAIBAwMEAQEFCQAAAAAAAAABAgMEEQUhMRJBUWETcSJSYoHwJCUyNDZCU5Gx/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AP3DkoAAGLeSoCgACMJFAAEyEAwUACNk5MgAAJkA1kJYKAAAAGLZkAIlgoIwDYSCQYEnOMIuU2kly2aFfU4ReKMer29ka17dzrSlDZU4vjyagHtUuq9RvNRpS5S2RIXFaCSjVnhcLJ5ADajqFzHmal6aRs2+pKc8VoqK+8vJzBwB9JGSlFNPKfdFOLp9x8NXpk/sz2+h2WA5CWAkUARsNhICgAAgCN4AoIkUAa1/UVO1m+7WF+ZsNmlqv8rv95YA5AAAAIAABnwAzud2wmp2tNrOyw8+ThHZ0t/si9SYG4CNlAiRQRvADJTHGQBWwl5GCgARsIBg09WTdqsLiSybppatKStkovGZYYHHHIAAFIAYQAA7OmbWi9ybOMdjSm3bYfEZNIDcSKAAIkUAAAAI2UncCLcyBGwDNXUl1Wk/TTX+zaPG8g521SMVltbAcEFaxzyQCZyVDAABsZ3AA7emx6bOHvLZxDvWkXC1pxfPSB7NhLyEu5QABjyBU8gJYKBEUEbAoIuSgADHkDiX8ei7qLs31L8zXOpqtHMI1UuNpHMAgGQAADA2NPh13UE1lLdndOdpNBxhKrLmey+h0QADInkA0UAADEAVvBFuXBQABMgHuVAAScVOLjJZT2aPn7in8NedJPKi9mfQTajFtvCXJ8/WqfLVnPtJ5QHmAADPW1o/PXhTb2fJ5HrbVPirwn2T3+gHfilGKjFYSWEikTUkmuHwNwJyzIAAYmQAiQKAOdb3VSWtXVrKWadOlCUV08Zznc6JyrX+or3Z7W9P+7bl9v12OowHJUa1S9oUnhzy/EdzWqar/jpZ9tgdI8a1xTorM5Jeu5yat/cVOJ9K/Ca27eW8sDbu72Vf7MV00/HdmoAAfAQKAJkMcgblleyo4hPMqfbyjq0q1Oss05JnzxU2nlNp+gPo8kOLTv7iDx19S/Esm1T1RcVKT+sWB0ga9O9oVOJ4fiSwezeeOAMsgiQA51vP9+XMOhJujBuW2ZLtnbtv379jHU7luXwwey/i9+jzhOnS1y8l0S61bwbk2999kv13Zpybk3JvLbywIAUCABgMgJAAAAGNwAAAzuAAAAM6WmXLz8NR5+63/wAOaZQk4SUlynlAfRgwpzU6cZriSyAONd01DULuom8zp00+OzNVlAAAAHwRFAFIABCgAUxZQAAABhAAAAB2tOfVawz2ygAB/9k='; // Replace DEFAULT_MALE_IMAGE_URL with the URL of your default male image
+                imageUrl = '../../../assets/img/defaultMale.png'; // Path to your default male image
             } else {
-                imageUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANcAAACUCAMAAAA3b0xFAAAAMFBMVEX29va4uLjq6uqxsbH6+vrKysrX19e1tbW8vLze3t7z8/PFxcXv7+/k5OTT09POzs6cN24OAAADy0lEQVR4nO2c23KjMAxAAQvfjf//b2tI0rRpAF8yWNrVedinbMdnZGTZFgwDwzC0gVd6D+gTwOBN1OqJnuVkB+JuYM2shBp/IZQznraYcepFaiNFTVqyZmDn8Z3VZja6iagYTDtODwxJMQh7sfp+ziRBMQgnVutkJBixSZ97jWMgJ+bOZuGGnnqPswyIWVqjmnuPtAiYRJYWudzhMrUShNZnMPlaaqHjZfOSxg1NplQsCVeCTMBsZjK8T0Tnew84E5+1JD8nIpHF+bwwfAkYlVRvCr0W23vEecxlXqOj4WXLHq8EjSIxu4Z6oELvIecAptiLxAoGBbXhHU3Cq1hrFAQSR/4W5QmF8wCQhVl+9ZoJeJU/XiQesMLi8B4w9GekYGq88O9Vcg9sXnC9x32GL9kqP9HIJ2LOKe9bsO9VlqpwpUyPe2muyoYbqDfNULil/BGwpffYj4C6rLGiMU/EitrwgUA8ESsXr3vA8HoN9VaYNyswNYQL8WalZovyA4fVq+R26A1oM2L5AdtvkB63Qd5V+T5IM32rl0aaOJrjxV6XAvXF/AbaQw4ovUj5je49/j1OG9iOw4V0Gq40zESFdPVagVC/T8F8qQItiQNxPV94YU4mYI11b+/h7/DP1oeyTWuMSL0qz0QfoO2xbDm1Wb2Q9nHYtjIKbcdeqxfWxrbm5wvpJVhhO+VfkObDzFcB9kG6fqX9V5MW2oPsxvoQ8ZVlS7gEzmy4UtWT8g3ecNVfV6ZpiDUbDnU9Xw8E4uONpvtKxF4tF0XKoX1f2zdtwNSC9UTKu/ppuL75i7Z92Zq3b2FnWYmIc/e1AYPUY7Fb+g96Qf56GwxhdqvbaqePCmGt7z/TbjYWbdL4BsAHI5dFGhPkgVgM6Wcy/Sx4Kl93uH1iI/0bDrzk7VMcFD/HcVRXYS7fzzh6z1IhPaXJ4LgMxt2Zt0sKxllPrByoJIwnYFK6P1vI3Cx7j7OQtWPvfHlWaM/WdoAlt1JUeLu9/lJygS4ClQUMvCw559DLRMAMYIqlx6N6xm6Wqt6qjmylDdZ6HsD6EFXtzlIJFzyqz5vdylc7bV9hq7TaEHqWwQ4YvkyXRmCnEIKMrlHqFjSlXZTp7022p1vKEYvT+rZBbJZ6qI3bX3QxdJqU4OP4+qW8D5Ke1Nijcc8vH4vRvlq8/OjNnBa1n0Bc2/oAEDOq2g9wdUtHa0cDTq/mhiH2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/2Yi/SXuIqru1z8NNV4H33l2H+W74AIQo8Ck+dyoUAAAAASUVORK5CYII='; // Replace DEFAULT_FEMALE_IMAGE_URL with the URL of your default female image
+                imageUrl = '../../../assets/img/defaultFemale.png'; // Path to your default female image
             }
         }
 
+
         return (
             <ScrollView>
-                {/* Content row with text and button */}
                 <TouchableOpacity
                     activeOpacity={0.8}
-                    onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.pr_id })}
+                    onPress={() => {
+                        if ('off_id' in item) {
+                            console.log('OfficeProfile');
+                            navigation.navigate('OfficeProfile', { off_id: item.off_id });
+                        } else if ('cl_id' in item) {
+                            console.log('ClinicProfile');
+                            navigation.navigate('ClinicProfile', { cl_id: item.cl_id });
+                        } else if ('pr_id' in item) {
+                            console.log('ProfileScreen');
+                            navigation.navigate('ProfileScreen', { professionalId: item.pr_id });
+                        }
+                    }}
+                    //onPress={handleNavigation}
                     style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10 }}
                 >
-                    {/* Left side text and image */}
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        {/* Image */}
+
                         <Image
-                            source={{ uri: imageUrl }}
+                            source={{ uri: item.profile_pic }}
                             style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10 }}
                         />
 
-                        {/* Text */}
                         <View style={{ flexDirection: 'column', }}>
                             <Text style={[commonStyles.headerText4BL, {}]}>{truncatedTitle}</Text>
                             <Text style={[commonStyles.headerText5G, {}]}>{truncatedDescription}</Text>
                         </View>
                     </View>
 
-                    {/* Right side button */}
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <TouchableOpacity
                             style={{ marginRight: 10 }}
-                            onPress={() => handleAcceptPress(item.pr_id)} 
+                            onPress={() => handleAcceptPress(item, contactStatus, id, accidty, contactType)}
                         >
                             <Image
                                 source={require('../../../assets/img/Accept.png')}
@@ -417,9 +579,7 @@ const ReceivedReq = ({ navigation }) => {
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                            onPress={() => {
-                                // Handle second image press logic here
-                            }}
+                            onPress={() => handleCancelPress(item, contactStatus, id, accidty, contactType)}
                         >
                             <Image
                                 source={require('../../../assets/img/Cancel.png')}
@@ -427,336 +587,90 @@ const ReceivedReq = ({ navigation }) => {
                             />
                         </TouchableOpacity>
                     </View>
+
                 </TouchableOpacity>
 
-                {/* Horizontal line */}
                 <View style={{ height: 1, backgroundColor: '#ccc', marginVertical: 4 }} />
+
+                <AlertPopup
+                    visible={showAcceptPopup}
+                    onRequestClose={() => setShowAcceptPopup(false)}
+                    title="Accept Request"
+                    message="Are you sure you want to accept this request?"
+                    yesLabel="Yes"
+                    noLabel="No"
+                    onYesPress={proceedWithAccept}
+                />
+
 
                 <AlertPopup
                     visible={showPopup1}
                     onRequestClose={() => setShowPopup1(false)}
-                    title="Connection Request"
-                    message="Do you want to accept connection request?"
+                    title="Cancel Request"
+                    message="Are you sure you want to cancel connection request? "
                     yesLabel="Yes"
                     noLabel="No"
-                    onYesPress={sendConnectionRequest}
+                    onYesPress={() => {
+                        setShowPopup1(false);
+                        cancelConnectionRequest();
+                    }}
                 />
-                <AlertPopup
-                    visible={showPopup2}
-                    onRequestClose={() => setShowPopup2(false)}
-                    title="Connection Request"
-                    message="Do you want to accept a key associate request?"
-                    yesLabel="Yes"
-                    noLabel="No"
-                    onYesPress={sendKeyAssociateRequest}
-                />
+
             </ScrollView>
         );
     };
 
 
-
-    const sendConnectionRequest = async () => {
-        try {
-            console.log('clicked')
-            const pr_id = await AsyncStorage.getItem('pr_id');
-            console.log('pr_id', pr_id);
-            const accidtyid = await AsyncStorage.getItem('selected_id');
-            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
-            console.log('accidty', accidty);
-            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersacceptconn-ax.php?accid1=${selectedProfessionalId}&accidty1=1&accid2=${accidtyid}&accidty2=${accidty}&action=connection`);
-            const data = await response.json();
-            // Handle response data as needed
-            console.log(response);
-            console.log(data);
-            console.log('connected')
-            setShowPopup1(false); // Close the popup after making the API call
-        } catch (error) {
-            console.error('Error sending connection request:', error);
-            // Handle error
-        }
-    };
-
-
-    const sendKeyAssociateRequest = async () => {
-        try {
-            const pr_id = await AsyncStorage.getItem('pr_id');
-            const accidtyid = await AsyncStorage.getItem('selected_id');
-            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
-            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersacceptconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${selectedProfessionalId}&accidty2=1&action=keyassociate`);
-
-            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersacceptconn-ax.php?accid1=${selectedProfessionalId}&accid2=${pr_id}&action=keyassociate`);
-            const data = await response.json();
-            // Handle response data as needed
-            console.log(response);
-            console.log(data);
-            console.log('connected')
-            setShowPopup1(false); // Close the popup after making the API call
-        } catch (error) {
-            console.error('Error sending connection request:', error);
-            // Handle error
-        }
-    };
-
-    
-
-
-    const flatListRef = useRef();
-
-    useEffect(() => {
-        const fakeAsyncOperation = async () => {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            setIsLoading(false);
-        };
-
-        fakeAsyncOperation();
-    }, []);
-
-    const handleTabPress = async (index) => {
-        setActiveTab(index);
-        console.log('Data for tab', index, ':', data[index]);
-        renderTabContent(index);
-        renderTabContent(data[index]);
-        // setIsLoading(true); // Show loading indicator while fetching data
-        // // Fetch or update data based on the selected tab
-        // try {
-        //     // Simulate fetching data (replace this with actual fetching logic)
-        //     await new Promise(resolve => setTimeout(resolve, 10000));
-        //     setIsLoading(false); // Hide loading indicator after data is fetched
-        // } catch (error) {
-        //     console.error("Error fetching data:", error);
-        //     setIsLoading(false); // Hide loading indicator if an error occurs
-        // }
-    };
-
-
-    const handleScroll = event => {
-        const offsetX = event.nativeEvent.contentOffset.x;
-        const index = Math.round(offsetX / width);
-        setActiveTab(index);
-    };
-
-    const handleMomentumScrollEnd = event => {
-        const offsetX = event.nativeEvent.contentOffset.x;
-        const index = Math.round(offsetX / width);
-        setActiveTab(index);
-    };
-
-    const renderTab = (tab, index) => {
-
-        return (
-            <TouchableOpacity
-                key={index}
-                style={{
-                    paddingHorizontal: 20,
-                    paddingVertical: 10,
-                    //borderBottomWidth: activeTab === index ? 0 : 0,
-                    borderBottomColor: '#289EF5',
-                }}
-                onPress={() => handleTabPress(index)}
-            >
-                <Text
-                    style={{
-                        fontSize: 16,
-                        fontWeight: 'bold',
-                        color: activeTab === index ? '#289EF5' : '#333',
-                    }}
-                >
-                    {tab}
-                </Text>
-            </TouchableOpacity>
-        );
-    };
-
-    const scrollViewRef = useRef();
-
-    // const renderTabContent = (index) => {
-    //     // Render content for each tab using data[index]
-    //     return (
-    //         // <FlatList
-    //         //     data={data[index]}
-    //         //     renderItem={renderItem}
-    //         //     keyExtractor={(item) => item.id.toString()}
-    //         // />
-    //         <FlatList
-    //             ref={flatListRef}
-    //             data={data[activeTab]}
-    //             renderItem={renderItem}
-    //             keyExtractor={(item) => item.id.toString()}
-    //             refreshing={isLoading}
-    //         // onRefresh={() => {
-    //         //     setIsLoading(true);
-    //         //     setIsLoading(false);
-    //         // }}
-    //         />
-
-    //     );
-    // };
-
-    const renderTabContent = () => {
-        if (activeTab === 0) {
-            if (professionals.length === 0) {
-                return (
-                    <View style={styles.animationContainer}>
-                        <LottieView
-                            ref={animationRef}
-                            source={require('../../../assets/img/NoData.json')}
-                            style={styles.animation}
-                            autoPlay={true}
-                            loop={true}
-                            onLoad={() => setAnimationLoaded(true)}
-                        />
-                        <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
-                    </View>
-                );
-            } else {
-                return (
-                    <FlatList
-                        data={professionals}
-                        renderItem={renderItem}
-                        keyExtractor={(item) => item.id.toString()}
-                        refreshing={isLoading}
-                    />
-                );
-            }
-        } 
-        else if (activeTab === 1) {
-            if (keyAssociates.length === 0) {
-                return (
-                    <View style={styles.animationContainer}>
-                        <LottieView
-                            ref={animationRef}
-                            source={require('../../../assets/img/NoData.json')}
-                            style={styles.animation}
-                            autoPlay={true}
-                            loop={true}
-                            onLoad={() => setAnimationLoaded(true)}
-                        />
-                        <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
-                    </View>
-                );
-            } else {
-                return (
-                    <FlatList
-                        data={keyAssociates}
-                        renderItem={renderItem}
-                        keyExtractor={(item) => item.id.toString()}
-                        refreshing={isLoading}
-                    />
-                );
-            }
-        } 
-        else {
-            // Return manual data for other tabs
-            return (
-                <FlatList
-                    ref={flatListRef}
-                    data={data[activeTab]}
-                    renderItem={renderItem}
-                    keyExtractor={(item) => item.id.toString()}
-                    refreshing={isLoading}
-                />
-            );
-        }
-    };
-
-    // const renderTabContent = (tabIndex) => {
-    //     if (tabIndex === activeTab) {
-    //         return (
-    //             <View>
-    //                 {data[tabIndex].map(item => (
-    //                     <TouchableOpacity
-    //                         key={item.id}
-    //                         activeOpacity={0.8}
-    //                         onPress={() => navigation.navigate('ProfileScreen')}
-    //                         style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10 }}
-    //                     >
-    //                         {/* Left side text and image */}
-    //                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-    //                             {/* Image */}
-    //                             <Image
-    //                                 source={{ uri: item.image }}
-    //                                 style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10 }}
-    //                             />
-
-    //                             {/* Text */}
-    //                             <View style={{ flexDirection: 'column' }}>
-    //                                 <Text style={commonStyles.headerText4BL}>{item.title}</Text>
-    //                                 <Text style={commonStyles.headerText5G}>{item.description}</Text>
-    //                             </View>
-    //                         </View>
-
-    //                         {/* Right side button */}
-    //                         <TouchableOpacity
-    //                             style={{
-    //                                 paddingVertical: 4,
-    //                                 paddingHorizontal: width * 0.01,
-    //                                 borderRadius: 24,
-    //                                 borderColor: '#289EF5',
-    //                                 borderWidth: 1,
-    //                                 justifyContent: 'space-between',
-    //                                 alignItems: 'center',
-    //                                 //width: width * 0.2,
-    //                             }}
-    //                             onPress={() => {
-    //                                 // Handle button press logic here
-    //                             }}
-    //                         >
-    //                             <Text style={{
-    //                                 fontSize: responsiveFontSize(14),
-    //                                 alignSelf: 'center',
-    //                                 color: '#289EF5',
-    //                                 paddingHorizontal: 5,
-    //                                 textAlign: 'center',
-    //                                 fontFamily: 'DMSans-Medium',
-    //                                 lineHeight: height * 0.028 //28
-    //                             }}>Cancel</Text>
-    //                         </TouchableOpacity>
-    //                     </TouchableOpacity>
-    //                 ))}
-    //             </View>
-    //         );
-    //     } else {
-    //         return null; // If not active tab, render nothing
-    //     }
-    // };
-
-    const renderContent = () => {
-        return tabs.map((tab, index) => (
-            <View key={index} style={{}}>
-                {renderTabContent(tab, index)}
-            </View>
-        ));
-    };
     return (
-        <SafeAreaView style={styles.container}>
-
+        <View style={styles.container}>
             {isLoading ? (
                 <Animation />
             ) : (
                 <View>
-                    <View>
-                        <View style={commonStyles.wrapT}>
-                            <TouchableOpacity style={commonStyles.backContainer} activeOpacity={0.8}
-                                onPress={() => navigation.goBack()}>
-                                <Image
-                                    source={require('../../../assets/img/Back.png')}
-                                    style={commonStyles.icon}
-                                />
-                            </TouchableOpacity>
-                            <Text style={commonStyles.backText}>Pending Requests</Text>
-                            <TouchableOpacity style={commonStyles.backContainer1} activeOpacity={0.8}>
-                                <Image
-                                    source={require('../../../assets/img/Option.png')}
-                                    style={commonStyles.icon}
-                                />
-                            </TouchableOpacity>
-                        </View>
-
+                    <View style={commonStyles.wrapT}>
+                        <TouchableOpacity style={commonStyles.backContainer} activeOpacity={0.8} onPress={() => navigation.goBack()}>
+                            <Image source={require('../../../assets/img/Back.png')} style={commonStyles.icon} />
+                        </TouchableOpacity>
+                        <Text style={commonStyles.backText}>Received Requests</Text>
+                        <TouchableOpacity style={commonStyles.backContainer1} activeOpacity={0.8}>
+                            <Image source={require('../../../assets/img/Option.png')} style={commonStyles.icon} />
+                        </TouchableOpacity>
                     </View>
 
-
                     {/* Tabs */}
+                    {/* <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                        {tabs.map((tab, index) => (
+                            <View key={index}>
+                                <TouchableOpacity
+                                    style={{
+                                        height: height * 0.04,
+                                        backgroundColor: activeTab === index ? "#289EF5" : '#E8F8FF',
+                                        opacity: activeTab === index ? 1 : 1,
+                                        borderRadius: 6,
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        marginVertical: height * 0.02,
+                                        marginRight: 12,
+                                        paddingHorizontal: height * 0.01,
+                                    }}
+                                    onPress={() => handleTabPress(index)}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={{
+                                        fontSize: responsiveFontSize(15),
+                                        alignSelf: 'center',
+                                        color: activeTab === index ? 'rgba(255, 255, 255, 1)' : '#289EF5',
+                                        paddingHorizontal: 5,
+                                        textAlign: 'center',
+                                        fontFamily: 'DMSans-Medium',
+                                        lineHeight: height * 0.028 //28
+                                    }}>{tab}</Text>
+                                </TouchableOpacity>
+
+                            </View>
+                        ))}
+                    </ScrollView> */}
+
                     <View style={styles.subContainer}>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                             {tabs.map((tab, index) => (
@@ -791,8 +705,9 @@ const ReceivedReq = ({ navigation }) => {
                             ))}
                         </ScrollView>
 
+
                         <ScrollView
-                            style={{ height: height, }}
+                            style={{ height: height }}
                             horizontal
                             pagingEnabled
                             showsHorizontalScrollIndicator={false}
@@ -803,44 +718,65 @@ const ReceivedReq = ({ navigation }) => {
                                 setActiveTab(index);
                             }}
                         >
-                            {tabs.map((tab, index) => (
-                                <View key={index} style={{ width: width - width * 0.08, paddingBottom: 150, }}>
-                                    {/* Wrap each tab content with ScrollView */}
-                                    <ScrollView showsVerticalScrollIndicator={false}>
-                                        {renderTabContent(index)}
-                                    </ScrollView>
-                                </View>
-                            ))}
-                        </ScrollView>
-                        {/* <View style={{ flex: 1 }}></View>
-                            <View style={{ height: height * 0.5 }}></View>
-                            <View style={{ height: 100 }}></View> */}
-                        {/* <ScrollView
-                                horizontal
-                                pagingEnabled
-                                showsHorizontalScrollIndicator={false}
-                                ref={scrollViewRef}
-                                onScroll={event => {
-                                    const offsetX = event.nativeEvent.contentOffset.x;
-                                    const index = Math.round(offsetX / (width - width * 0.08));
-                                    setActiveTab(index);
-                                }}
-                            >
-                                {tabs.map((tab, index) => (
-                                    <View key={index} style={{ width: width - width * 0.08 }}>
-                                        {renderTabContent(index)}
+                            {data[activeTab].length > 0 ? (
+                                tabs.map((tab, index) => (
+                                    <View key={index} style={{ width: width - width * 0.08, paddingBottom: 150 }}>
+                                        {/* Wrap each tab content with ScrollView */}
+                                        <ScrollView showsVerticalScrollIndicator={false}>
+                                            {renderTabContent(index)}
+                                        </ScrollView>
                                     </View>
-                                ))}
-                            </ScrollView> */}
+                                ))
+                            ) : (
+                                <View style={styles.noDataContainer}>
+                                    {/* <Image source={require('../../../assets/img/SelectLocation.png')} style={styles.noDataImage} /> */}
+                                    <LottieView
+                                        ref={animationRef}
+                                        source={require('../../../assets/img/loader.json')}
+                                        style={styles.animation}
+                                    />
+                                    <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
+                                </View>
+                            )}
+                        </ScrollView>
                     </View>
+                    {/* Render FlatList or No Data image */}
+                    {/* {data[activeTab].length > 0 ? (
+                        <ScrollView showsVerticalScrollIndicator={false}>
+                            <FlatList
+                                data={data[activeTab].filter((item) => item.title.toLowerCase().includes(searchQuery.toLowerCase()))}
+                                keyExtractor={(item) => item.id.toString()}
+                                renderItem={renderItem}
+                                showsVerticalScrollIndicator={false}
+                            />
+                        </ScrollView>
+                    ) : (
+                                <View>
+                                    <View style={styles.noDataContainer}>
+                                      <LottieView
+                                            ref={animationRef}
+                                            source={require('../../../assets/img/NoData.json')}
+                                            style={styles.animation}
+                                        />
+                                        <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
+                                    </View>
+                        </View> 
+                    )} */}
                 </View>
             )}
+        </View>
 
-        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    noDataContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignSelf: 'center',
+        height: height,
+        width: width
+    },
     animationContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -935,30 +871,70 @@ const styles = StyleSheet.create({
     },
 });
 
+
 export default ReceivedReq;
 
 
-{/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+{/* <ScrollView>
     <TouchableOpacity
-        style={{ marginRight: 10 }}
-        onPress={() => {
-            // Handle first image press logic here
-        }}
+        activeOpacity={0.8}
+        onPress={handleNavigation}
+        style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10 }}
     >
-        <Image
-            source={require('../../../assets/img/Accept.png')}
-            style={{ width: 28, height: 28 }}
-        />
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Image
+                source={{ uri: imageUrl }}
+                style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10 }}
+            />
+
+            <View style={{ flexDirection: 'column', }}>
+                <Text style={[commonStyles.headerText4BL, {}]}>{truncatedTitle}</Text>
+                <Text style={[commonStyles.headerText5G, {}]}>{truncatedDescription}</Text>
+            </View>
+        </View>
+
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableOpacity
+                style={{ marginRight: 10 }}
+                onPress={() => handleAcceptPress(item.pr_id)}
+            >
+                <Image
+                    source={require('../../../assets/img/Accept.png')}
+                    style={{ width: 28, height: 28 }}
+                />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                onPress={() => {
+
+                }}
+            >
+                <Image
+                    source={require('../../../assets/img/Cancel.png')}
+                    style={{ width: 28, height: 28 }}
+                />
+            </TouchableOpacity>
+        </View>
     </TouchableOpacity>
 
-    <TouchableOpacity
-        onPress={() => {
-            // Handle second image press logic here
-        }}
-    >
-        <Image
-            source={require('../../../assets/img/Cancel.png')}
-            style={{ width: 28, height: 28 }}
-        />
-    </TouchableOpacity>
-</View> */}
+    <View style={{ height: 1, backgroundColor: '#ccc', marginVertical: 4 }} />
+
+    <AlertPopup
+        visible={showPopup1}
+        onRequestClose={() => setShowPopup1(false)}
+        title="Connection Request"
+        message="Do you want to accept connection request?"
+        yesLabel="Yes"
+        noLabel="No"
+        onYesPress={sendConnectionRequest}
+    />
+    <AlertPopup
+        visible={showPopup2}
+        onRequestClose={() => setShowPopup2(false)}
+        title="Connection Request"
+        message="Do you want to accept a key associate request?"
+        yesLabel="Yes"
+        noLabel="No"
+        onYesPress={sendKeyAssociateRequest}
+    />
+</ScrollView> */}

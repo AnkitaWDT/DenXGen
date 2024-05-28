@@ -120,7 +120,7 @@ const EClinicProfileCompletion3 = ({ navigation, route }) => {
                 console.log('Response from server:', responseData);
             }
         } catch (error) {
-            ToastAndroid.show('Error uploading profile image', ToastAndroid.SHORT);
+            //ToastAndroid.show('Error uploading profile image', ToastAndroid.SHORT);
         }
     };
 
@@ -181,7 +181,7 @@ const EClinicProfileCompletion3 = ({ navigation, route }) => {
                 console.log('Banner image uploaded successfully:', data);
             }
         } catch (error) {
-            ToastAndroid.show('Error uploading banner image', ToastAndroid.SHORT);
+            //ToastAndroid.show('Error uploading banner image', ToastAndroid.SHORT);
         }
     };
 

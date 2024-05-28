@@ -84,6 +84,10 @@ import Endorsement from './Connection/Endorsement';
 import MapScreen from './HomeScreen/MapScreen';
 import React, { useEffect } from 'react';
 import { Linking } from 'react-native';
+import KeyAssociates from './Connection/KeyAssociates';
+import Empaneled from './Connection/Empaneled';
+import Branches from './Connection/Branches';
+import SelectBranches from './SelectBranches';
 
 const Stack = createStackNavigator();
 
@@ -341,6 +345,11 @@ const Navigation = () => {
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
+                    name="KeyAssociates"
+                    component={KeyAssociates}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
                     name="SentReq"
                     component={SentReq}
                     options={{ headerShown: false }}
@@ -361,8 +370,18 @@ const Navigation = () => {
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
+                    name="Empaneled"
+                    component={Empaneled}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
                     name="Endorsement"
                     component={Endorsement}
+                    options={{ headerShown: false }}
+                /> 
+                <Stack.Screen
+                    name="Branches"
+                    component={Branches}
                     options={{ headerShown: false }}
                 /> 
                 <Stack.Screen
@@ -410,6 +429,11 @@ const Navigation = () => {
                 <Stack.Screen
                     name="SelectTeams"
                     component={SelectTeams}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="SelectBranches"
+                    component={SelectBranches}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen

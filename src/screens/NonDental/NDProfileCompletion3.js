@@ -95,7 +95,7 @@ const NDProfileCompletion3 = ({ navigation }) => {
             }
         } catch (error) {
             console.error('Error uploading image:', error);
-            ToastAndroid.show('Error uploading image. Please try again.', ToastAndroid.SHORT);
+            //ToastAndroid.show('Error uploading image. Please try again.', ToastAndroid.SHORT);
         }
     };
 
@@ -190,7 +190,7 @@ const NDProfileCompletion3 = ({ navigation }) => {
                 console.log('Banner image uploaded successfully:', data);
             }
         } catch (error) {
-            ToastAndroid.show('Error uploading banner image', ToastAndroid.SHORT);
+            //ToastAndroid.show('Error uploading banner image', ToastAndroid.SHORT);
         }
     };
 

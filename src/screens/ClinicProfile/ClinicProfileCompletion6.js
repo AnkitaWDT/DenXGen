@@ -67,6 +67,8 @@ const ClinicProfileCompletion6 = ({ navigation, route }) => {
     const [selectedChiefDentists, setSelectedChiefDentists] = useState([]);
     const [teamsInputs, setTeamsInputs] = useState([]);
     const [selectedTeams, setSelectedTeams] = useState([]);
+    const [branchesInputs, setBranchesInputs] = useState([]);
+    const [selectedBranches, setSelectedBranches] = useState([]);
 
 
     const handleAddDentistInput = () => {
@@ -125,6 +127,26 @@ const ClinicProfileCompletion6 = ({ navigation, route }) => {
         const updatedInputs = teamsInputs.filter((_, index) => index !== indexToRemove);
         setTeamsInputs(updatedInputs);
     };
+
+    const handleAddBranchesInput = () => {
+        if (branchesInputs.length < 5) {
+            navigation.navigate('SelectBranches', { onSelectBranches: handleSelectBranches });
+        }
+    };
+
+    const handleSelectBranches = (branches) => {
+        setSelectedBranches([...selectedBranches, branches.name]);
+        setBranchesInputs([...branchesInputs, '']);
+    };
+
+    const handleRemoveBranchesInput = (indexToRemove) => {
+        const updatedBranches = selectedBranches.filter((_, index) => index !== indexToRemove);
+        setSelectedBranches(updatedBranches);
+
+        const updatedInputs = branchesInputs.filter((_, index) => index !== indexToRemove);
+        setBranchesInputs(updatedInputs);
+    };
+
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -236,7 +258,36 @@ const ClinicProfileCompletion6 = ({ navigation, route }) => {
                                     )}
                                 </View>
 
+
                                 <View style={styles.inputContainerWithLabel}>
+                                    <Text style={[commonStyles.headerText4BL, { marginBottom: 8 }]}>
+                                        Branches <Text style={styles.requiredIndicator}>*</Text>
+                                    </Text>
+                                    {branchesInputs.map((value, index) => (
+                                        <View key={index} style={styles.inputContainer1}>
+                                            <TextInput
+                                                style={styles.inputs}
+                                                placeholder="Select Branches"
+                                                placeholderTextColor="#979797"
+                                                value={selectedBranches[index] ? selectedBranches[index] : ''}
+                                                editable={false}
+                                            />
+                                            <TouchableOpacity onPress={() => handleRemoveBranchesInput(index)} style={styles.closeContainer} activeOpacity={0.8}>
+                                                <Image
+                                                    source={require('../../../assets/img/close.png')} // Close image for removing dentist input
+                                                    style={styles.closeImage}
+                                                />
+                                            </TouchableOpacity>
+                                        </View>
+                                    ))}
+                                    {branchesInputs.length < 5 && (
+                                        <TouchableOpacity onPress={handleAddBranchesInput} style={styles.inputContainer1}>
+                                            <Text style={styles.inputsP}>Add Branches</Text>
+                                        </TouchableOpacity>
+                                    )}
+                                </View>
+
+                                {/* <View style={styles.inputContainerWithLabel}>
                                     <Text style={[commonStyles.headerText4BL, { marginBottom: 8, }]}>
                                         Branches <Text style={styles.requiredIndicator}>*</Text>
                                     </Text>
@@ -245,12 +296,10 @@ const ClinicProfileCompletion6 = ({ navigation, route }) => {
                                             style={styles.inputs}
                                             placeholder="Branches"
                                             placeholderTextColor="#979797"
-                                            //value={selectedEmail}
-                                            //onChangeText={(text) => setSelectedEmail(text)}
                                             underlineColorAndroid="transparent"
                                         />
                                     </View>
-                                </View>
+                                </View> */}
 
                                 <TouchableOpacity
                                     style={[commonStyles.button, ]}

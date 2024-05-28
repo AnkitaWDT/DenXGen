@@ -197,7 +197,7 @@ const HomePage = ({ navigation, route }) => {
       fetchPersonalProfileCount();
       fetchClinicProfileCount();
       fetchOfficeProfileCount();
-    }, [])
+    }, [fetchClinicProfileCount, fetchOfficeProfileCount, fetchPersonalProfileCount])
   );
 
   const fetchData = async () => {
@@ -1427,7 +1427,7 @@ const HomePage = ({ navigation, route }) => {
                   }}
                 >
                   {images.map((image, index) => (
-                    <View key={index} style={{ width: width - 32, height: 'auto', borderRadius: 8, overflow: 'hidden', }}>
+                    <View key={index} style={{ width: width - 32, height: 'auto', borderRadius: 8, overflow: 'hidden', marginBottom: 10}}>
                       <Image
                         source={{ uri: image }}
                         style={[{ width: '100%', aspectRatio: 16 / 6 }, imageDimensions[index]]}
@@ -1561,7 +1561,7 @@ const HomePage = ({ navigation, route }) => {
                         textAlign: 'center'
                       }]}
                         numberOfLines={2} ellipsizeMode="tail">My{"\n"}Connection</Text>
-                      <Image source={require('../../../assets/img/ManageC.png')} style={styles.imageGridC} />
+                      <Image source={require('../../../assets/img/Home-My-Connection.png')} style={styles.imageGridC} />
                     
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.boxContainer1}
@@ -1573,7 +1573,7 @@ const HomePage = ({ navigation, route }) => {
                         textAlign: 'center'
                       }]}
                         numberOfLines={2} ellipsizeMode="tail">Sent{"\n"}Requests</Text>
-                      <Image source={require('../../../assets/img/ManageC.png')} style={styles.imageGridC} />
+                      <Image source={require('../../../assets/img/Home-Sent-Req.png')} style={styles.imageGridC} />
                       
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.boxContainer1}
@@ -1585,7 +1585,7 @@ const HomePage = ({ navigation, route }) => {
                         textAlign: 'center'
                       }]}
                         numberOfLines={2} ellipsizeMode="tail">Pending{"\n"}Requests</Text>
-                      <Image source={require('../../../assets/img/ManageC.png')} style={styles.imageGridC} />
+                      <Image source={require('../../../assets/img/Home-Req-Pending.png')} style={styles.imageGridC} />
                     
                     </TouchableOpacity>
                     {/* <TouchableOpacity style={styles.boxContainer1}
@@ -1621,7 +1621,7 @@ const HomePage = ({ navigation, route }) => {
                   contentContainerStyle={{ paddingHorizontal: 0 }} // Adjust spacing between images
                 >
                   {images2.map((image, index) => (
-                    <View key={index} style={{ width: width - 32, height: 'auto', borderRadius: 8, overflow: 'hidden', }}>
+                    <View key={index} style={{ width: width - 32, height: 'auto', borderRadius: 8, overflow: 'hidden',  marginBottom: 10}}>
                       <Image
                         source={{ uri: image }}
                         style={[{ width: '100%', aspectRatio: 16 / 6 }, imageDimensions[index]]}
@@ -1780,7 +1780,7 @@ const HomePage = ({ navigation, route }) => {
                     {/* Box 2 */}
                     <TouchableOpacity
                       style={styles.boxContainerS}
-                      onPress={() => navigation.navigate('ProfileScreen', { professionalId: 1 })}
+                      onPress={() => navigation.navigate('ClinicProfileCompletion6', { cl_id: 1 })}
                       activeOpacity={0.8}
                     >
                       <View style={styles.contentContainer}>

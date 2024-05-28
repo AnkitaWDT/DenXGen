@@ -380,7 +380,7 @@ const BlockAcc = ({ navigation }) => {
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         {/* Image */}
                         <Image
-                            source={{ uri: imageUrl }}
+                            source={{ uri: item.profile_pic }}
                             style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10 }}
                         />
 

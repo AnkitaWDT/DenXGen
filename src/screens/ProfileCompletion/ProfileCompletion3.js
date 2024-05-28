@@ -120,7 +120,7 @@ const ProfileCompletion3 = ({ navigation }) => {
             }
         } catch (error) {
             console.error('Error uploading image:', error);
-            ToastAndroid.show('Error uploading image. Please try again.', ToastAndroid.SHORT);
+            //ToastAndroid.show('Error uploading image. Please try again.', ToastAndroid.SHORT);
         }
     };
 
@@ -215,7 +215,7 @@ const ProfileCompletion3 = ({ navigation }) => {
                 console.log('Banner image uploaded successfully:', data);
             }
         } catch (error) {
-            ToastAndroid.show('Error uploading banner image', ToastAndroid.SHORT);
+           //ToastAndroid.show('Error uploading banner image', ToastAndroid.SHORT);
             //console.error('Error uploading banner image:', error);
             // Handle error
         }

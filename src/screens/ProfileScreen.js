@@ -488,7 +488,7 @@ const ProfileScreen = ({ navigation, route }) => {
       const accidtyid = await AsyncStorage.getItem('selected_id');
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
       console.log('accidty', accidty);
-      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersacceptconn-ax.php?accid1=${professionalId}&accidty1=1&accid2=${accidtyid}&accidty2=${accidty}&action=connection`);
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccacceptconn-ax.php?accid1=${professionalId}&accidty1=1&accid2=${accidtyid}&accidty2=${accidty}&action=connection`);
       const data = await response.json();
       // Handle response data as needed
       console.log(response);
@@ -1618,7 +1618,139 @@ const ProfileScreen = ({ navigation, route }) => {
                <Image source={require('../../assets/img/Option.png')} style={{ width: 20, height: 20, marginLeft: width * 0.02 }} />
             </View>
           </View> */}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              {(connectionStatus === '0' || connectionStatus == null) && (
+                <TouchableOpacity
+                  style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, width: width * 0.45 }]}
+                  onPress={() => setShowPopup1(true)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={commonStyles.buttonTextS}>Connect</Text>
+                </TouchableOpacity>
+              )}
 
+              {connectionStatus === '2' && connection && (
+                <>
+                  {prid === connection.sender && (
+                    <TouchableOpacity
+                      style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01 }]}
+                      onPress={() => setShowPopup2(true)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={commonStyles.buttonTextS1}>Cancel Req.</Text>
+                    </TouchableOpacity>
+                  )}
+                  {prid === connection.reciever && (
+                    <TouchableOpacity
+                      style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01 }]}
+                      onPress={() => setShowPopup5(true)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={commonStyles.buttonTextS}>Accept Req.</Text>
+                    </TouchableOpacity>
+                  )}
+                </>
+              )}
+
+              {connectionStatus === '1' && (
+                <TouchableOpacity
+                  style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, width: width * 0.45 }]}
+                  onPress={() => setShowPopup2(true)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={commonStyles.buttonTextS}>Connected</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+          
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableOpacity onPress={() => setModalConnectVisible(true)}>
+              <Image source={require('../../assets/img/connections.png')} style={{ width: 20, height: 20 }} />
+            </TouchableOpacity>
+            <Popover
+              placement={PopoverPlacement.LEFT}
+              from={(
+                <TouchableOpacity
+                  style={commonStyles.backContainer1}
+                >
+                  <Image
+                    source={require('../../assets/img/Option.png')}
+                    style={{ width: 20, height: 20, marginLeft: width * 0.02 }}
+                  />
+                </TouchableOpacity>
+              )}>
+              <View style={styles.popover}>
+                {setEmpanel && connectionStatus === '1' && (
+                  <TouchableOpacity onPress={() => setShowPopupEmpanel(true)}>
+                    <View style={styles.popoverItemContainer}>
+                      <Image
+                        source={require('../../assets/img/Endorsement.png')}
+                        style={styles.popoverItemIcon1}
+                      />
+                      <Text style={styles.popoverItemText}>Empanel</Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+                {prtyid === '1' && connectionStatus === '1' && (
+                  <TouchableOpacity onPress={() => setShowPopupEndorse(true)}>
+                    <View style={styles.popoverItemContainer}>
+                      <Image
+                        source={require('../../assets/img/Endorsement.png')}
+                        style={styles.popoverItemIcon1}
+                      />
+                      <Text style={styles.popoverItemText}>Endorse</Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity
+                  onPress={() => setShowPopupEndorse(true)}>
+                  <View style={styles.popoverItemContainer}>
+                    <Image
+                      source={require('../../assets/img/Endorsement.png')}
+                      style={styles.popoverItemIcon1}
+                    />
+                    <Text style={styles.popoverItemText}>Endorse</Text>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity>
+                  <View style={styles.popoverItemContainer}>
+                    <Image
+                      source={require('../../assets/img/SaveCon.png')}
+                      style={styles.popoverItemIcon}
+                    />
+                    <Text style={styles.popoverItemText}>Save Contact</Text>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => setShowPopupBlock(true)}
+                >
+                  <View style={styles.popoverItemContainer}>
+                    <Image
+                      source={require('../../assets/img/Spam.png')}
+                      style={styles.popoverItemIcon}
+                    />
+                    <Text style={styles.popoverItemText}>Block Account</Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleShare}>
+                  <View style={styles.popoverItemContainer}>
+                    <Image
+                      source={require('../../assets/img/Link.png')}
+                      style={styles.popoverItemIcon}
+                    />
+                    <Text style={styles.popoverItemText}>Copy Link</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </Popover>
+            {/* <Image source={require('../../assets/img/Option.png')} style={{ width: 20, height: 20, marginLeft: width * 0.02 }} /> */}
+          </View>
+
+          </View>
           {connectionStatus === '1' && (<View style={styles.horizontalLine}></View> )}
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>

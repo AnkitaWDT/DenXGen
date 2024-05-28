@@ -189,130 +189,119 @@ const MyConnections = ({ navigation }) => {
     const [keyAssociates, setKeyAssociates] = useState([]);
 
     useEffect(() => {
-        const fetchProfessionalsData = async () => {
-            try {
-                const pr_id = await AsyncStorage.getItem('pr_id');
-                const id = parseInt(pr_id);
-                const accidty = await AsyncStorage.getItem('selected_profile_accidty');
-                const accidtyid = await AsyncStorage.getItem('selected_id');
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccconnlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=professionals`);
-                //https://temp.wedeveloptech.in/denxgen/appdata/getaccconnlist-ax.php?accid=5&accidty=1&action=professionals 
-                //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersmyconnlist-ax.php?pr_id=${id}`);
-                const data = await response.json();
-
-                // Filter out items where pr_id matches
-                const filteredData = data.data.filter(item => parseInt(item.pr_id) !== id);
-
-                setProfessionals(filteredData);
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setIsLoading(false);
-            }
-        };
-
         fetchProfessionalsData();
-    }, []);
-
-    useEffect(() => {
-        const fetchClinicsData = async () => {
-            try {
-                const pr_id = await AsyncStorage.getItem('pr_id');
-                const id = parseInt(pr_id);
-                const accidty = await AsyncStorage.getItem('selected_profile_accidty');
-                const accidtyid = await AsyncStorage.getItem('selected_id');
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccconnlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=clinics`);
-                //https://temp.wedeveloptech.in/denxgen/appdata/getaccconnlist-ax.php?accid=5&accidty=1&action=professionals 
-                //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersmyconnlist-ax.php?pr_id=${id}`);
-                const data = await response.json();
-
-                // Filter out items where pr_id matches
-                const filteredData = data.data.filter(item => parseInt(item.pr_id) !== id);
-
-                setClinics(filteredData);
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setIsLoading(false);
-            }
-        };
-
         fetchClinicsData();
-    }, []);
-
-    useEffect(() => {
-        const fetchOfficesData = async () => {
-            try {
-                const pr_id = await AsyncStorage.getItem('pr_id');
-                const id = parseInt(pr_id);
-                const accidty = await AsyncStorage.getItem('selected_profile_accidty');
-                const accidtyid = await AsyncStorage.getItem('selected_id');
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccconnlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=offices`);
-                //https://temp.wedeveloptech.in/denxgen/appdata/getaccconnlist-ax.php?accid=5&accidty=1&action=professionals 
-                //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersmyconnlist-ax.php?pr_id=${id}`);
-                const data = await response.json();
-
-                // Filter out items where pr_id matches
-                const filteredData = data.data.filter(item => parseInt(item.pr_id) !== id);
-
-                setOffices(filteredData);
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setIsLoading(false);
-            }
-        };
-
         fetchOfficesData();
-    }, []);
-
-    useEffect(() => {
-        const fetchOthersData = async () => {
-            try {
-                const pr_id = await AsyncStorage.getItem('pr_id');
-                const id = parseInt(pr_id);
-                const accidty = await AsyncStorage.getItem('selected_profile_accidty');
-                const accidtyid = await AsyncStorage.getItem('selected_id');
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccconnlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=others`);
-                //https://temp.wedeveloptech.in/denxgen/appdata/getaccconnlist-ax.php?accid=5&accidty=1&action=professionals 
-                //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersmyconnlist-ax.php?pr_id=${id}`);
-                const data = await response.json();
-
-                // Filter out items where pr_id matches
-                const filteredData = data.data.filter(item => parseInt(item.pr_id) !== id);
-
-                setOthers(filteredData);
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setIsLoading(false);
-            }
-        };
-
         fetchOthersData();
-    }, []);
-
-    useEffect(() => {
-        const fetchKeyAssociatesData = async () => {
-            try {
-                const pr_id = await AsyncStorage.getItem('pr_id');
-                const id = parseInt(pr_id);
-
-                const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getperskeymyconnlist-ax.php?pr_id=${id}`);
-                const data = await response.json();
-
-                const filteredData = data.data.filter(item => parseInt(item.pr_id) !== id);
-
-                setKeyAssociates(filteredData);
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setIsLoading(false);
-            }
-        };
-
         fetchKeyAssociatesData();
     }, []);
+
+    const fetchProfessionalsData = async () => {
+        try {
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccconnlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=professionals`);
+            const data = await response.json();
+            console.log(response);
+            console.log(data);
+
+            // Debug: Log the id value
+            console.log('ID to filter:', data.pr_id);
+
+            // Filter out items where pr_id matches id (ensure id is a string)
+            const filteredData = data.data.filter(item => item.pr_id !== String(data.pr_id));
+
+            setProfessionals(filteredData);
+            console.log(filteredData);
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setIsLoading(false);
+        }
+    };
+
+    const fetchClinicsData = async () => {
+        try {
+
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccconnlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=clinics`);
+            //https://temp.wedeveloptech.in/denxgen/appdata/getaccconnlist-ax.php?accid=5&accidty=1&action=professionals 
+            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersmyconnlist-ax.php?pr_id=${id}`);
+            const data = await response.json();
+
+            // Filter out items where pr_id matches
+            const filteredData = data.data.filter(item => item.cl_id !== String(data.cl_id));
+
+            setClinics(filteredData);
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setIsLoading(false);
+        }
+    };
+
+    const fetchOfficesData = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccconnlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=offices`);
+            //https://temp.wedeveloptech.in/denxgen/appdata/getaccconnlist-ax.php?accid=5&accidty=1&action=professionals 
+            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersmyconnlist-ax.php?pr_id=${id}`);
+            const data = await response.json();
+
+            // Filter out items where pr_id matches
+            const filteredData = data.data.filter(item => parseInt(item.pr_id) !== id);
+
+            setOffices(filteredData);
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setIsLoading(false);
+        }
+    };
+
+    const fetchOthersData = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+            const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+            const accidtyid = await AsyncStorage.getItem('selected_id');
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccconnlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=others`);
+            //https://temp.wedeveloptech.in/denxgen/appdata/getaccconnlist-ax.php?accid=5&accidty=1&action=professionals 
+            //const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getpersmyconnlist-ax.php?pr_id=${id}`);
+            const data = await response.json();
+
+            // Filter out items where pr_id matches
+            const filteredData = data.data.filter(item => parseInt(item.pr_id) !== id);
+
+            setOthers(filteredData);
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setIsLoading(false);
+        }
+    };
+
+    const fetchKeyAssociatesData = async () => {
+        try {
+            const pr_id = await AsyncStorage.getItem('pr_id');
+            const id = parseInt(pr_id);
+
+            const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getperskeymyconnlist-ax.php?pr_id=${id}`);
+            const data = await response.json();
+
+            const filteredData = data.data.filter(item => parseInt(item.pr_id) !== id);
+
+            setKeyAssociates(filteredData);
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setIsLoading(false);
+        }
+    };
 
 
     const [animationLoaded, setAnimationLoaded] = useState(false);
@@ -545,18 +534,137 @@ const MyConnections = ({ navigation }) => {
         return charWidth;
     };
 
+    const [currentItem, setCurrentItem] = useState(null);
+    const [currentContactStatus, setCurrentContactStatus] = useState(null);
+    const [currentId, setCurrentId] = useState(null);
+    const [currentAccidty, setCurrentAccidty] = useState(null);
+    const [currentContactType, setCurrentContactType] = useState(null);
+
+    const handleCancelPress = (item, contactStatus, id, accidty, contactType) => {
+        setCurrentItem(item);
+        setCurrentContactStatus(contactStatus);
+        setCurrentId(id);
+        setCurrentAccidty(accidty);
+        setCurrentContactType(contactType);
+        setShowPopup1(true);
+    };
+
+    const cancelConnectionRequest = async () => {
+        const accidtyid = await AsyncStorage.getItem('selected_id');
+        const accidtymy = await AsyncStorage.getItem('selected_profile_accidty');
+        const actionMap = {
+            0: 'connection',
+            1: 'keyassociate',
+            2: 'empaneled',
+            3: 'blocked',
+        };
+        const action = actionMap[activeTab];
+
+        const url = `https://temp.wedeveloptech.in/denxgen/appdata/reqdeletepersconn-ax.php?accid1=${accidtyid}&accidty1=${accidtymy}&accid2=${currentId}&accidty2=${currentAccidty}&action=connection`;
+        console.log(url);
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+            });
+
+            const result = await response.json();
+            console.log(`Request cancel successfully`);
+        } catch (error) {
+            console.error('Error accepting request:', error);
+        }
+
+        setShowPopup1(false);
+        fetchProfessionalsData();
+        fetchClinicsData();
+        fetchOfficesData();
+        fetchOthersData();
+        fetchKeyAssociatesData();
+    };
+
+    const handleBlockPress = (item, contactStatus, id, accidty, contactType) => {
+        setCurrentItem(item);
+        setCurrentContactStatus(contactStatus);
+        setCurrentId(id);
+        setCurrentAccidty(accidty);
+        setCurrentContactType(contactType);
+        setShowPopup2(true);
+    };
+
+    const blockConnectionRequest = async () => {
+        const accidtyid = await AsyncStorage.getItem('selected_id');
+        const accidtymy = await AsyncStorage.getItem('selected_profile_accidty');
+        const actionMap = {
+            0: 'connection',
+            1: 'keyassociate',
+            2: 'empaneled',
+            3: 'blocked',
+        };
+        const action = actionMap[activeTab];
+
+        const url = `https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${accidtyid}&accidty1=${accidtymy}&accid2=${currentId}&accidty2=${currentAccidty}&action=blocked`;
+        console.log(url);
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+            });
+
+            const result = await response.json();
+            console.log(`Blocked successfully`);
+        } catch (error) {
+            console.error('Error accepting request:', error);
+        }
+
+        setShowPopup2(false);
+        fetchProfessionalsData();
+        fetchClinicsData();
+        fetchOfficesData();
+        fetchOthersData();
+        fetchKeyAssociatesData();
+    };
+
     const renderItem = ({ item, index }) => {
+
+        const name =
+            item.name;
+
+        const contactStatus =
+            item.pr_contact_status ||
+            item.cl_contact_status ||
+            item.off_contact_status ||
+            item.contact_status ||
+            item.status;
+
+        const contactType =
+            item.pr_type ||
+            item.cl_type ||
+            item.off_type ||
+            item.contact_type ||
+            item.type;
+
+        const id =
+            item.pr_id ||
+            item.cl_id ||
+            item.off_id ||
+            item.contact_id ||
+            item.id;
+
+        let accidty;
+        if (item.pr_id) {
+            accidty = 1;
+        } else if (item.cl_id) {
+            accidty = 2;
+        } else if (item.off_id) {
+            accidty = 3;
+        } else {
+            accidty = item.con_ty;
+        }
+
 
         const truncatedTitle = truncateText(item.name, width * 0.75, 17);
         const truncatedDescription = truncateText(item.description, width * 0.85, 15);
         // const truncatedDescription = truncateText(item.specList[0].speciality, width * 0.85, 15);
-
-
-        console.log('Original title:', item.title);
-        console.log('Truncated title:', truncatedTitle);
-
-        console.log('Original description:', item.description);
-        console.log('Truncated description:', truncatedDescription);
 
         let imageUrl;
         if (item.profile_pic) {
@@ -590,7 +698,7 @@ const MyConnections = ({ navigation }) => {
                     <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                         {/* Image */}
                         <Image
-                            source={{ uri: imageUrl }}
+                            source={{ uri: item.profile_pic }}
                             style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10 }}
                         />
 
@@ -615,7 +723,7 @@ const MyConnections = ({ navigation }) => {
                                     <View style={commonStyles.popover}>
                                         <TouchableOpacity
                                             onPress={() => {
-                                                setShowPopup1(true);
+                                                handleCancelPress(item, contactStatus, id, accidty, contactType);
                                                 setShowPopover(false); // Close popover when opening popup
                                             }}
                                             activeOpacity={0.8}>
@@ -628,25 +736,25 @@ const MyConnections = ({ navigation }) => {
                                             </View>
                                         </TouchableOpacity>
 
+
                                         <AlertPopup
                                             visible={showPopup1}
-                                            onRequestClose={() => {
-                                                setShowPopup1(false);
-                                                setShowPopover(false); // Close popover when closing popup
-                                            }}
-                                            title="Remove Account?"
-                                            message="Do you want to remove Dr. Mridula Radhakrishnan account ? "
+                                            onRequestClose={() => setShowPopup1(false)}
+                                            title="Remove Account"
+                                            message="Are you sure you want to remove from connection? "
                                             yesLabel="Yes"
                                             noLabel="No"
                                             onYesPress={() => {
                                                 setShowPopup1(false);
-                                                setShowPopover(false);
-                                                //navigation.navigate('ProfileCompletion1');
+                                                cancelConnectionRequest();
                                             }}
                                         />
 
                                         <TouchableOpacity
-                                            onPress={() => setShowPopup2(true)}
+                                            onPress={() => {
+                                                handleBlockPress(item, contactStatus, id, accidty, contactType);
+                                                setShowPopover(false); // Close popover when opening popup
+                                            }}
                                             activeOpacity={0.8}>
                                             <View style={commonStyles.popoverItemContainer}>
                                                 <Image
@@ -661,15 +769,15 @@ const MyConnections = ({ navigation }) => {
                                             visible={showPopup2}
                                             onRequestClose={() => setShowPopup2(false)}
                                             title="Block Account?"
-                                            message="Do you want to block Dr. Mridula Radhakrishnan account ? "
+                                            message="Are you sure you want to block this connection? "
                                             yesLabel="Yes"
                                             noLabel="No"
                                             onYesPress={() => {
                                                 setShowPopup2(false);
-                                                setShowPopover(false);
-                                                //navigation.navigate('ProfileCompletion1');
+                                                blockConnectionRequest();
                                             }}
                                         />
+
                                     </View>
                                 </Popover>
                             </View>
