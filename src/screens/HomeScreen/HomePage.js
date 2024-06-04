@@ -231,6 +231,7 @@ const HomePage = ({ navigation, route }) => {
         const currentOffset = scrollViewRef.current.contentOffset;
         if (currentOffset) {
           scrollViewRef.current.scrollTo({
+            
             x: currentOffset.x + width,
             animated: true,
           });

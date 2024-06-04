@@ -136,7 +136,7 @@ const FiltersScreen = ({ navigation }) => {
             <ScrollView style={styles.subContainer} showsVerticalScrollIndicator={false}>
                
                 {/* Location Search Bar */}
-                <View style={styles.searchBarMap}>
+                {/* <View style={styles.searchBarMap}>
                     <View style={commonStyles.leftContainer}>
                         <View style={commonStyles.backContainerSearch}>
                             <Image
@@ -158,10 +158,10 @@ const FiltersScreen = ({ navigation }) => {
                         options={filteredLocations}
                         onSelect={handleSelectLocation}
                     />
-                )}
+                )} */}
 
                 {/* Specialty Search Bar */}
-                <View style={styles.searchBarMap}>
+                {/* <View style={styles.searchBarMap}>
                     <View style={commonStyles.leftContainer}>
                         <View style={commonStyles.backContainerSearch}>
                             <Image
@@ -183,7 +183,7 @@ const FiltersScreen = ({ navigation }) => {
                         options={filteredSpecialties}
                         onSelect={handleSelectSpecialty}
                     />
-                )}
+                )} */}
 
                 <View style={styles.availableC}>
                     <Text style={[commonStyles.headerText3BL, {

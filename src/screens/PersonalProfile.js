@@ -745,7 +745,7 @@ const PersonalProfile = ({ navigation, route }) => {
                             />
                         ) : (
                             <Image
-                                source={require('../../assets/img/ProfileHome.png')}
+                                    source={require('../../assets/img/defaultM.png')}
                                 style={styles.profilePic}
                             />
                         )}

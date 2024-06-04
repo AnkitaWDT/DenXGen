@@ -290,6 +290,52 @@ const MyProfile = ({ navigation }) => {
                         </View> */}
                             </TouchableOpacity>
 
+                                {/* Horizontal line */}
+                                <View style={{ height: 1, backgroundColor: '#ccc' }} />
+
+                                <TouchableOpacity
+                                    style={styles.CContainer}
+                                    activeOpacity={0.8}
+                                    onPress={() => {
+                                        console.log('TouchableOpacity pressed');
+                                        console.log('Selected item:', selectedItem);
+                                        // Check the selected item type
+                                        switch (selectedItem.type) {
+                                            case 'My Account':
+                                                console.log('Navigating to PersonalProfile');
+                                                navigation.navigate('ManageAddress');
+                                                break;
+                                            case 'Clinic Account':
+                                                console.log('Navigating to MyClinic');
+                                                navigation.navigate('ManageClinicAddress', { cl_id: selectedItem.id });
+                                                break;
+                                            case 'Office Account':
+                                                console.log('Navigating to My Office');
+                                                navigation.navigate('ManageOfficeAddress', { off_id: selectedItem.id });
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }}
+                                    //onPress={() => navigation.navigate('ManageAddress')}
+                                >
+                                    {/* Left side content */}
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Image source={require('../../../assets/img/AboutUs.png')} style={{ width: 24, height: 24, marginRight: 15 }} />
+                                        <Text style={styles.leftText}>Manage Address</Text>
+                                        {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 250 }}>
+                                <Text style={{ fontSize: 17, fontWeight: '400', color: 'black', fontFamily: 'Mukta-Regular' }}>Receive Request</Text>
+                                <Text style={{ fontSize: 14, fontWeight: '400', color: '#979797', fontFamily: 'Mukta-Regular' }}>(54+ others)</Text>
+                            </View> */}
+
+                                    </View>
+
+                                    {/* Right side content */}
+                                    {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={require('../../../assets/img/ViewAll.png')} style={{ width: 18, height: 18, marginRight: 10 }} />
+                        </View> */}
+                                </TouchableOpacity>
+
 
                             {/* Horizontal line */}
                             <View style={{ height: 1, backgroundColor: '#ccc' }} />

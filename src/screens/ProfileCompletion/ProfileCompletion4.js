@@ -88,6 +88,7 @@ const ProfileCompletion4 = ({ navigation }) => {
                     landmark: location.landmark,
                     address: `${location.loc_two}, ${location.city}`,
                     name: location.loc_one,
+                    loc_id: location.loc_id
                 })));
             }
             setIsLoading(false);
@@ -122,53 +123,53 @@ const ProfileCompletion4 = ({ navigation }) => {
     const [markerPosition, setMarkerPosition] = useState(null);
 
     const handleLocationPress = async () => {
-        // try {
-        //     const granted = await PermissionsAndroid.request(
-        //         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-        //     );
-        //     console.log('Location Permission Granted:', granted);
+        try {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+            );
+            console.log('Location Permission Granted:', granted);
 
-        //     if (granted) {
-        //         Geolocation.getCurrentPosition(
-        //             async (position) => {
-        //                 console.log('Position:', position);
-        //                 const { latitude, longitude } = position.coords;
-        //                 console.log('Latitude:', latitude);
-        //                 console.log('Longitude:', longitude);
-        //                 // Store the current location in AsyncStorage
-        //                 await AsyncStorage.setItem('latitude', String(latitude));
-        //                 await AsyncStorage.setItem('longitude', String(longitude));
-        //                 // Update initialRegion and markerPosition state with current location
-        //                 setInitialRegion({
-        //                     latitude: parseFloat(latitude),
-        //                     longitude: parseFloat(longitude),
-        //                     latitudeDelta: 0.0922,
-        //                     longitudeDelta: 0.0421,
-        //                 });
-        //                 setMarkerPosition({
-        //                     latitude: parseFloat(latitude),
-        //                     longitude: parseFloat(longitude),
-        //                 });
-        //                 setIsLoading(false);
-        //                 // Navigate to the MapScreen
-        //                 navigation.navigate('MapScreen');
-        //             },
-        //             (error) => {
-        //                 console.log('Error:', error);
-        //                 setIsLoading(false);
-        //                 ToastAndroid.show('Error getting location', ToastAndroid.SHORT);
-        //                 console.error(error);
-        //             }
-        //         );
-        //     } else {
-        //         setIsLoading(false);
-        //         ToastAndroid.show('Location permission denied', ToastAndroid.SHORT);
-        //         navigation.navigate('MapScreen');
-        //     }
-        // } catch (err) {
-        //     setIsLoading(false);
-        //     console.error('Error requesting location permission:', err);
-        // }
+            if (granted) {
+                Geolocation.getCurrentPosition(
+                    async (position) => {
+                        console.log('Position:', position);
+                        const { latitude, longitude } = position.coords;
+                        console.log('Latitude:', latitude);
+                        console.log('Longitude:', longitude);
+                        // Store the current location in AsyncStorage
+                        await AsyncStorage.setItem('latitude', String(latitude));
+                        await AsyncStorage.setItem('longitude', String(longitude));
+                        // Update initialRegion and markerPosition state with current location
+                        setInitialRegion({
+                            latitude: parseFloat(latitude),
+                            longitude: parseFloat(longitude),
+                            latitudeDelta: 0.0922,
+                            longitudeDelta: 0.0421,
+                        });
+                        setMarkerPosition({
+                            latitude: parseFloat(latitude),
+                            longitude: parseFloat(longitude),
+                        });
+                        setIsLoading(false);
+                        // Navigate to the MapScreen
+                        navigation.navigate('MapScreen');
+                    },
+                    (error) => {
+                        console.log('Error:', error);
+                        setIsLoading(false);
+                        ToastAndroid.show('Error getting location', ToastAndroid.SHORT);
+                        console.error(error);
+                    }
+                );
+            } else {
+                setIsLoading(false);
+                ToastAndroid.show('Location permission denied', ToastAndroid.SHORT);
+                navigation.navigate('MapScreen');
+            }
+        } catch (err) {
+            setIsLoading(false);
+            console.error('Error requesting location permission:', err);
+        }
     };
 
     const [houseNumber, setHouseNumber] = useState('');
@@ -188,19 +189,20 @@ const ProfileCompletion4 = ({ navigation }) => {
     };
 
     const openModal1 = (location) => {
-        setSelectedLocation(location); // Set the selected location
-        console.log(selectedLocation);
-        setHouseNumber(location.loc_one || ''); // Assuming loc_one corresponds to houseNumber
-        setArea(location.loc_two || ''); // Assuming loc_two corresponds to area
+        console.log('Location passed to openModal1:', location);
+
+        setSelectedLocation(location);
+        setHouseNumber(location.loc_one || '');
+        setArea(location.loc_two || '');
         setCity(location.city || '');
         setState(location.state || '');
         setPincode(location.pincode || '');
         setLandmark(location.landmark || '');
-        setLocationId(location.id || '');
-        console.log(locationId);
-        setIsModalVisible1(true); // Open the modal
-    };
+        setLocationId(location.loc_id || '');
 
+        console.log('Location ID set:', locationId);
+        setIsModalVisible1(true);
+    };
 
     const closeModal = () => {
         setIsModalVisible(false);
@@ -256,7 +258,7 @@ const ProfileCompletion4 = ({ navigation }) => {
 
         // Form data
         const formData = {
-          
+
             pr_id: id,
             loc_one: houseNumber,
             loc_two: area,
@@ -291,7 +293,9 @@ const ProfileCompletion4 = ({ navigation }) => {
     };
 
     const handleUpdate = async () => {
-     
+        setIsModalVisible1(false);
+
+
         const pr_id = await AsyncStorage.getItem('pr_id');
         const id = parseInt(pr_id);
 
@@ -310,13 +314,13 @@ const ProfileCompletion4 = ({ navigation }) => {
         console.log('Form Data:', updateData);
 
         try {
-            const locationId = locationId; // Use the id of the selected location
+            const locationId = updateData.id; // Use thde id of the selected location
             console.log('locationId', locationId);
             const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/requpdatepersonaldtls4-ax.php?id=${locationId}`, updateData);
             // const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/requpdatepersonaldtls4-ax.php`, updateData);
 
             console.log('dataresponse', response.data);
-            ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
+            ToastAndroid.show("Data Updated Successfully!", ToastAndroid.SHORT);
             console.log('Data Updated to database');
         } catch (error) {
             console.error('An error occurred:', error);
@@ -517,26 +521,68 @@ const ProfileCompletion4 = ({ navigation }) => {
                                 </View> */}
                             </View>
                                 {savedLocations.length > 0 && (
-                                    <Text style={[commonStyles.headerText4BL, {  alignSelf: 'flex-start',marginTop: moderateScale(24) }]}>Saved Locations</Text>
+                                    <Text style={[commonStyles.headerText4BL, { alignSelf: 'flex-start', marginTop: 24 }]}>Saved Locations</Text>
                                 )}
                                 {savedLocations.map((location, index) => (
                                     <TouchableOpacity key={index} style={styles.savedLocationBox} activeOpacity={0.8} onPress={() => openModal1(location)}>
-                                        <View style={styles.buttonContent}>
+                                        <View style={styles.buttonContent1}>
                                             <View style={styles.leftContainer}>
                                                 <Image source={require('../../../assets/img/HomeSaved.png')} style={styles.iconImage} />
                                                 <View>
                                                     <Text style={commonStyles.headerText4BL}>{location.name}</Text>
                                                 </View>
                                             </View>
-                                            {/* Right side content (location distance) */}
-                                            {/* <Text style={commonStyles.headerText5G}>{location.distance}</Text> */}
+                                            <Popover
+                                                placement={PopoverPlacement.LEFT}
+                                                from={(
+                                                    <TouchableOpacity
+                                                        style={commonStyles.backContainer1}
+                                                    >
+                                                        <Image
+                                                            source={require('../../../assets/img/Option.png')}
+                                                            style={{ width: 20, height: 20, marginLeft: width * 0.02 }}
+                                                        />
+                                                    </TouchableOpacity>
+                                                )}>
+                                                <View style={styles.popover}>
+
+
+                                                    <TouchableOpacity onPress={openPremium}>
+                                                        <View style={styles.popoverItemContainer}>
+                                                            <Image
+                                                                source={require('../../../assets/img/SaveCon.png')}
+                                                                style={styles.popoverItemIcon}
+                                                            />
+                                                            <Text style={styles.popoverItemText}>Add To VIC</Text>
+                                                        </View>
+                                                    </TouchableOpacity>
+
+                                                    <TouchableOpacity
+
+                                                    >
+                                                        <View style={styles.popoverItemContainer}>
+                                                            <Image
+                                                                source={require('../../../assets/img/Spam.png')}
+                                                                style={styles.popoverItemIcon}
+                                                            />
+                                                            <Text style={styles.popoverItemText}>Delete Location</Text>
+                                                        </View>
+                                                    </TouchableOpacity>
+                                                </View>
+                                                <CustomPremium
+                                                    visible={showPremium}
+                                                    onClose={closePremium}
+                                                    onContinue={openPremium}
+                                                    onSkip={closePremium}
+                                                    mainText="You have reached your limit" // Pass your main text as a prop
+                                                />
+                                            </Popover>
                                         </View>
                                         <View style={styles.textContainer}>
                                             <Text style={commonStyles.headerText3G}>{location.address}</Text>
                                         </View>
                                     </TouchableOpacity>
                                 ))}
-
                                 <Modal
                                     visible={isModalVisible1}
                                     transparent

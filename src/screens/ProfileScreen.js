@@ -601,6 +601,7 @@ const ProfileScreen = ({ navigation, route }) => {
 
       const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=connection`);
       const data = await response.json();
+      console.log(data);
       console.log('sent req');
       console.log(response);// Check if the request was successful, and update UI accordingly
       if (data.code === 1) {
@@ -1129,7 +1130,7 @@ const ProfileScreen = ({ navigation, route }) => {
               />
             ) : (
               <Image
-                source={require('../../assets/img/ProfileHome.png')}
+                  source={require('../../assets/img/defaultM.png')}
                 style={styles.profilePic}
               />
             )}
@@ -1704,7 +1705,7 @@ const ProfileScreen = ({ navigation, route }) => {
                     </View>
                   </TouchableOpacity>
                 )}
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() => setShowPopupEndorse(true)}>
                   <View style={styles.popoverItemContainer}>
                     <Image
@@ -1713,7 +1714,7 @@ const ProfileScreen = ({ navigation, route }) => {
                     />
                     <Text style={styles.popoverItemText}>Endorse</Text>
                   </View>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 <TouchableOpacity>
                   <View style={styles.popoverItemContainer}>

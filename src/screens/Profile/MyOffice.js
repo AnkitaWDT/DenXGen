@@ -535,7 +535,7 @@ const MyOffice = ({ navigation, route }) => {
                             />
                         ) : (
                             <Image
-                                source={require('../../../assets/img/ProfileHome.png')}
+                                    source={require('../../../assets/img/defaultOffice2.png')}
                                 style={styles.profilePic}
                             />
                         )}

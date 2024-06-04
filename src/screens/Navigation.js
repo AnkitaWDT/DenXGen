@@ -88,6 +88,9 @@ import KeyAssociates from './Connection/KeyAssociates';
 import Empaneled from './Connection/Empaneled';
 import Branches from './Connection/Branches';
 import SelectBranches from './SelectBranches';
+import ManageAddress from './Profile/ManageAddress';
+import ManageClinicAddress from './Profile/ManageClinicAddress';
+import ManageOfficeAddress from './Profile/ManageOfficeAddress';
 
 const Stack = createStackNavigator();
 
@@ -536,6 +539,21 @@ const Navigation = () => {
                     component={MapScreen}
                     options={{ headerShown: false }}
                 />
+                <Stack.Screen
+                    name="ManageAddress"
+                    component={ManageAddress}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="ManageClinicAddress"
+                    component={ManageClinicAddress}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="ManageOfficeAddress"
+                    component={ManageOfficeAddress}
+                    options={{ headerShown: false }}
+                />
                 {/* <Stack.Screen
                     name="RegistrationInformation"
                     component={RegistrationInformation}
@@ -598,11 +616,7 @@ const Navigation = () => {
                     component={Animation}
                     options={{ headerShown: false }}
                 />
-                <Stack.Screen
-                    name="ManageAddress"
-                    component={ManageAddress}
-                    options={{ headerShown: false }}
-                />
+               
                 <Stack.Screen
                     name="MyConnections"
                     component={MyConnections}

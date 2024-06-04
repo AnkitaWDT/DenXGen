@@ -170,16 +170,16 @@ const OTPScreen = ({ navigation, route }) => {
                     console.log("Status:", data.data.status);
                     console.log("IsRegistered:", data.data.isregistered);
 
-                    // const playerId = await AsyncStorage.getItem('playerId');
-                    // if (playerId) {
-                    //     // Make API call to send player ID
-                    //     const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/reqplayerid-ax.php?pr_id=${pr_id}&playerid=${playerId}`);
-                    //     console.log('Player ID sent to server:', response.data);
-                    // } else {
-                    //     // Player ID not found in local storage
-                    //     console.log('Player ID not found');
-                    //     // Handle the case where player ID is not found, if needed
-                    // }
+                    const playerId = await AsyncStorage.getItem('playerId');
+                    if (playerId) {
+                        // Make API call to send player ID
+                        const response = await axios.get(`https://temp.wedeveloptech.in/denxgen/appdata/reqplayerid-ax.php?pr_id=${pr_id}&playerid=${playerId}`);
+                        console.log('Player ID sent to server:', response.data);
+                    } else {
+                        // Player ID not found in local storage
+                        console.log('Player ID not found');
+                        // Handle the case where player ID is not found, if needed
+                    }
 
                     if (parseInt(data.data.isregistered) === 0) {
                         navigation.replace('SelectCategory'); 

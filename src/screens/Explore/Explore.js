@@ -13,6 +13,7 @@ import { moderateScale } from 'react-native-size-matters';
 import defaultMaleImage from '../../../assets/img/defaultM.png';
 import defaultFemaleImage from '../../../assets/img/defaultF.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const { width, height } = Dimensions.get('window');
 const responsiveFontSize = (size) => {
@@ -85,7 +86,15 @@ const Explore = ({navigation, route}) => {
     }
   };
 
-  const fetchContacts = () => {
+  useEffect(() => {
+    fetchContacts();
+    fetchRegisteredNumbers();
+  }, []);
+
+  const [contacts, setContacts] = useState([]);
+  const [registeredNumbers, setRegisteredNumbers] = useState([]);
+
+   const fetchContacts = () => {
     Contacts.getAll().then(contacts => {
 
       setContacts(contacts);
@@ -100,6 +109,66 @@ const Explore = ({navigation, route}) => {
       });
   };
 
+
+  // const fetchContacts = () => {
+  //   Contacts.getAll().then(contacts => {
+  //     // Sort contacts by displayName
+  //     const sortedContacts = contacts.sort((a, b) =>
+  //       a.displayName.localeCompare(b.displayName)
+  //     );
+
+  //     setContacts(sortedContacts);
+  //     sortedContacts.forEach(contact => {
+  //       console.log(contact);
+  //       console.log(contact.displayName);
+  //       console.log(contact.phoneNumbers);
+  //     });
+  //   })
+  //     .catch(error => {
+  //       console.error('Error fetching contacts:', error);
+  //     });
+  // };
+
+  const fetchRegisteredNumbers = async () => {
+    try {
+      const response = await axios.get('https://temp.wedeveloptech.in/denxgen/appdata/getcontactlist-ax.php');
+      const phoneNumbers = response.data.data.map(item => item.phoneno);
+      setRegisteredNumbers(phoneNumbers);
+    } catch (error) {
+      console.error('Error fetching registered numbers:', error);
+    }
+  };
+
+  const isRegistered = (phoneNumber) => {
+    // Remove non-numeric characters from the phone number
+    const cleanedPhoneNumber = phoneNumber.replace(/\D/g, '');
+
+    // Remove country code if present
+    const countryCodeRemoved = cleanedPhoneNumber.startsWith('91') ? cleanedPhoneNumber.substring(2) : cleanedPhoneNumber;
+
+    // Remove leading zeroes if present
+    const standardizedPhoneNumber = countryCodeRemoved.replace(/^0+/, '');
+
+    return registeredNumbers.includes(standardizedPhoneNumber);
+  };
+
+
+
+  // const fetchContacts = () => {
+  //   Contacts.getAll().then(contacts => {
+
+  //     setContacts(contacts);
+  //     contacts.forEach(contact => {
+  //       console.log(contact);
+  //       console.log(contact.displayName);
+  //       console.log(contact.phoneNumbers);
+  //     });
+  //   })
+  //     .catch(error => {
+  //       console.error('Error fetching contacts:', error);
+  //     });
+  // };
+
   const openContactDetails = (contact) => {
     console.log(JSON.stringify(contact));
     Contacts.openExistingContact(contact);
@@ -109,7 +178,7 @@ const Explore = ({navigation, route}) => {
   console.log(initialTab);
   const [selectedTab, setSelectedTab] = useState(initialTab || 0);
   // const [selectedTab, setSelectedTab] = useState(0);
-  const [contacts, setContacts] = useState([]);
+  //const [contacts, setContacts] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
@@ -165,6 +234,12 @@ const Explore = ({navigation, route}) => {
       );
       setFilteredData(filtered);
     }
+    else if (selectedTab === 2) {
+      const filtered = othersData.filter((item) =>
+        item.name && item.name.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
     else{}
   };
 
@@ -190,10 +265,12 @@ const Explore = ({navigation, route}) => {
   const fetchProfessionalsData = async () => {
     try {
 
-      const pr_id = await AsyncStorage.getItem('pr_id');
+     const pr_id = await AsyncStorage.getItem('pr_id');
       const id = parseInt(pr_id);
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallacountslist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=professionals`);
 
-      const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getprofessionallist-ax.php');
       const json = await response.json();
       //console.log(json);
       
@@ -217,7 +294,12 @@ const Explore = ({navigation, route}) => {
 
   const fetchClinicsData = async () => {
     try {
-      const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getcliniclistall-ax.php');
+      const pr_id = await AsyncStorage.getItem('pr_id');
+      const id = parseInt(pr_id);
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallacountslist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=clinics`);
+
       const json = await response.json();
       if (json.code === 1) {
         setClinicsData(json.data);
@@ -237,7 +319,12 @@ const Explore = ({navigation, route}) => {
 
   const fetchOfficeData = async () => {
     try {
-      const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getofficelistall-ax.php');
+      const pr_id = await AsyncStorage.getItem('pr_id');
+      const id = parseInt(pr_id);
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallacountslist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=offices`);
+
       const json = await response.json();
       if (json.code === 1) {
         setOfficeData(json.data);
@@ -250,6 +337,35 @@ const Explore = ({navigation, route}) => {
     }
   };
 
+  const [othersData, setOthersData] = useState([]);
+  useEffect(() => {
+    fetchOthersData();
+  }, [selectedTab]);
+
+  const fetchOthersData = async () => {
+    try {
+
+      const pr_id = await AsyncStorage.getItem('pr_id');
+      const id = parseInt(pr_id);
+      const accidty = await AsyncStorage.getItem('selected_profile_accidty');
+      const accidtyid = await AsyncStorage.getItem('selected_id');
+      const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallacountslist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=others`);
+
+      const json = await response.json();
+      //console.log(json);
+
+      if (json.code === 1) {
+        const filteredData = json.data.filter(professional => parseInt(professional.id) !== id);
+        console.log(filteredData);
+        setOthersData(filteredData);
+      } else {
+        // Handle error
+      }
+    } catch (error) {
+      // Handle error
+      console.error(error);
+    }
+  };
   const renderTabContent = () => {
     
     switch (selectedTab) {
@@ -343,15 +459,15 @@ const Explore = ({navigation, route}) => {
                       </View>
                       {/* Render specialty */}
                       <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
-                        {item.specList.length > 0 ? item.specList[0].speciality : 'No specialty'}
+                        {item.speciality}
                       </Text>
                       {/* Render location */}
                       <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                          <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
+                          {/* <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
                             {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
-                          </Text>
+                          </Text> */}
                         </View>
                       </View>
                       {/* Add more texts or components if needed */}
@@ -444,15 +560,15 @@ const Explore = ({navigation, route}) => {
                       </View>
                       {/* Render specialty */}
                       <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
-                        {item.specList.length > 0 ? item.specList[0].speciality : 'No specialty'}
+                        {item.service}
                       </Text>
                       {/* Render location */}
                       <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                          <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
+                          {/* <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
                             {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
-                          </Text>
+                          </Text> */}
                         </View>
                       </View>
                       {/* Add more texts or components if needed */}
@@ -553,15 +669,15 @@ const Explore = ({navigation, route}) => {
                       </View>
                       {/* Render specialty */}
                       <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
-                        {item.servList.length > 0 ? item.servList[0].service : 'No service'}
+                        {item.services}
                       </Text>
                       {/* Render location */}
                       <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                          <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
+                          {/* <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
                             {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
-                          </Text>
+                          </Text> */}
                         </View>
                       </View>
                       {/* Add more texts or components if needed */}
@@ -654,15 +770,15 @@ const Explore = ({navigation, route}) => {
                       </View>
                       {/* Render specialty */}
                       <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
-                          {item.servList.length > 0 ? item.servList[0].service : 'No service'}
+                          {item.speciality}
                       </Text>
                       {/* Render location */}
                       <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                            <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]} numberOfLines={1}>
+                            {/* <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]} numberOfLines={1}>
                             {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
-                          </Text>
+                          </Text> */}
                         </View>
                       </View>
                       {/* Add more texts or components if needed */}
@@ -763,15 +879,15 @@ const Explore = ({navigation, route}) => {
                       </View>
                       {/* Render specialty */}
                       <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
-                        {item.servList.length > 0 ? item.servList[0].service : 'No service'}
+                        {item.speciality}
                       </Text>
                       {/* Render location */}
                       <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                          <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
+                          {/* <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
                             {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
-                          </Text>
+                          </Text> */}
                         </View>
                       </View>
                       {/* Add more texts or components if needed */}
@@ -864,15 +980,15 @@ const Explore = ({navigation, route}) => {
                       </View>
                       {/* Render specialty */}
                       <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
-                        {item.servList.length > 0 ? item.servList[0].service : 'No service'}
+                        {item.speciality}
                       </Text>
                       {/* Render location */}
                       <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                          <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]} numberOfLines={1}>
+                          {/* <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]} numberOfLines={1}>
                             {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
-                          </Text>
+                          </Text> */}
                         </View>
                       </View>
                       {/* Add more texts or components if needed */}
@@ -888,109 +1004,209 @@ const Explore = ({navigation, route}) => {
           <ScrollView nestedScrollEnabled={true}
             contentContainerStyle={{ paddingBottom: height * 0.5 }}
             showsVerticalScrollIndicator={false}>
-            {/* List of items */}
-            {filteredData.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                style={{
-                  paddingHorizontal: 9,
-                  borderWidth: 0.5,
-                  borderRadius: 8,
-                  borderColor: '#979797',
-                  marginBottom: 16,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  //height: 80,
-                  paddingVertical: 8,
-                  backgroundColor: '#FEFCFC'
-                }}
-                activeOpacity={0.8}
-                onPress={() => navigation.navigate('ProfileScreen', { professionalId: 1 })}
-              >
-                {/* Left side image and text */}
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  {item.img ? (
-                    <Image source={{ uri: item.img }} style={styles.profileImage} />
-                  ) : (
-                    <Image source={renderDefaultImage(item.gender)} style={styles.profileImage} />
-                  )}
-                  <View style={{ flex: 1, }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
-                      <Text style={[commonStyles.headerText4BL, { lineHeight: 24, }]} numberOfLines={1}>{item.title}</Text>
-                      <Popover
-                        placement={PopoverPlacement.LEFT}
-                        from={(
-                          <TouchableOpacity
-                          >
-                            <Image
-                              source={require('../../../assets/img/ViewM.png')}
-                              style={{ width: 3, height: 13, marginRight: 5 }}
-                            />
-                          </TouchableOpacity>
-                        )}>
-                        <View style={commonStyles.popover}>
-                          <TouchableOpacity>
-                            <View style={commonStyles.popoverItemContainer}>
+            {searchQuery !== '' ? (
+              filteredData.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={{
+                    paddingHorizontal: 9,
+                    borderWidth: 0.5,
+                    borderRadius: 8,
+                    borderColor: '#979797',
+                    marginBottom: 16,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    //height: 80,
+                    paddingVertical: 8,
+                    backgroundColor: '#FEFCFC'
+                  }}
+                  activeOpacity={0.8}
+                  onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.id })}
+                >
+                  {/* Left side image and text */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {item.profile_pic ? (
+                      <Image source={{ uri: item.profile_pic }} style={styles.profileImage} />
+                    ) : (
+                      <Image source={renderDefaultImage(item.gender)} style={styles.profileImage} />
+                    )}
+                    <View style={{ flex: 1, }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
+                        <Text style={[commonStyles.headerText4BL, { lineHeight: 24, }]} numberOfLines={1}>{item.name}</Text>
+                        <Popover
+                          placement={PopoverPlacement.LEFT}
+                          from={(
+                            <TouchableOpacity
+                            >
                               <Image
-                                source={require('../../../assets/img/Bookmark.png')}
-                                style={commonStyles.popoverItemIcon}
+                                source={require('../../../assets/img/ViewM.png')}
+                                style={{ width: 3, height: 13, marginRight: 5 }}
                               />
-                              <Text style={commonStyles.popoverItemText}>Save PDF</Text>
-                            </View>
-                          </TouchableOpacity>
+                            </TouchableOpacity>
+                          )}>
+                          <View style={commonStyles.popover}>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Bookmark.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Save PDF</Text>
+                              </View>
+                            </TouchableOpacity>
 
-                          <TouchableOpacity>
-                            <View style={commonStyles.popoverItemContainer}>
-                              <Image
-                                source={require('../../../assets/img/SaveCon.png')}
-                                style={commonStyles.popoverItemIcon}
-                              />
-                              <Text style={commonStyles.popoverItemText}>Save Contact</Text>
-                            </View>
-                          </TouchableOpacity>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/SaveCon.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Save Contact</Text>
+                              </View>
+                            </TouchableOpacity>
 
-                          <TouchableOpacity>
-                            <View style={commonStyles.popoverItemContainer}>
-                              <Image
-                                source={require('../../../assets/img/Spam.png')}
-                                style={commonStyles.popoverItemIcon}
-                              />
-                              <Text style={commonStyles.popoverItemText}>Report Spam</Text>
-                            </View>
-                          </TouchableOpacity>
-                          <TouchableOpacity>
-                            <View style={commonStyles.popoverItemContainer}>
-                              <Image
-                                source={require('../../../assets/img/Link.png')}
-                                style={commonStyles.popoverItemIcon}
-                              />
-                              <Text style={commonStyles.popoverItemText}>Copy Link</Text>
-                            </View>
-                          </TouchableOpacity>
-                        </View>
-                      </Popover>
-                    </View>
-
-                    <Text style={[commonStyles.headerText5G, {
-                      lineHeight: 22, marginRight: 50,
-                    }]} numberOfLines={1}>{item.description}</Text>
-
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
-
-                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                        <Text style={[commonStyles.headerText5BL, {
-                          marginLeft: 4, lineHeight: 22
-                        }]} numberOfLines={1}>{item.location}</Text>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Spam.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Report Spam</Text>
+                              </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Link.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Copy Link</Text>
+                              </View>
+                            </TouchableOpacity>
+                          </View>
+                        </Popover>
                       </View>
+                      {/* Render specialty */}
+                      <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                       {item.service}
+                      </Text>
+                      {/* Render location */}
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
+                          <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
+                            {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
+                          </Text>
+                        </View>
+                      </View>
+                      {/* Add more texts or components if needed */}
                     </View>
-
-                    {/* Add more texts or components if needed */}
                   </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+                </TouchableOpacity>
+              ))
+            ) : (
+              othersData.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={{
+                    paddingHorizontal: 9,
+                    borderWidth: 0.5,
+                    borderRadius: 8,
+                    borderColor: '#979797',
+                    marginBottom: 16,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    //height: 80,
+                    paddingVertical: 8,
+                    backgroundColor: '#FEFCFC'
+                  }}
+                  activeOpacity={0.8}
+                  onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.id })}
+                >
+                  {/* Left side image and text */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {item.profile_pic ? (
+                      <Image source={{ uri: item.profile_pic }} style={styles.profileImage} />
+                    ) : (
+                      <Image source={renderDefaultImage(item.gender)} style={styles.profileImage} />
+                    )}
+                    <View style={{ flex: 1, }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
+                        <Text style={[commonStyles.headerText4BL, { lineHeight: 24, }]} numberOfLines={1}>{item.name}</Text>
+                        <Popover
+                          placement={PopoverPlacement.LEFT}
+                          from={(
+                            <TouchableOpacity
+                            >
+                              <Image
+                                source={require('../../../assets/img/ViewM.png')}
+                                style={{ width: 3, height: 13, marginRight: 5 }}
+                              />
+                            </TouchableOpacity>
+                          )}>
+                          <View style={commonStyles.popover}>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Bookmark.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Save PDF</Text>
+                              </View>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/SaveCon.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Save Contact</Text>
+                              </View>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Spam.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Report Spam</Text>
+                              </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Link.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Copy Link</Text>
+                              </View>
+                            </TouchableOpacity>
+                          </View>
+                        </Popover>
+                      </View>
+                      {/* Render specialty */}
+                      <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                        {item.speciality}
+                      </Text>
+                      {/* Render location */}
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
+                          {/* <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
+                            {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
+                          </Text> */}
+                        </View>
+                      </View>
+                      {/* Add more texts or components if needed */}
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))
+            )}
           </ScrollView>
         );
       case 4:
@@ -1015,28 +1231,11 @@ const Explore = ({navigation, route}) => {
                     alignItems: 'center',
                     width: width * 0.2,
                   }}
-                  // onPress={() => {
-                  //   const options = {
-                  //     message: 'Check out this awesome app!',
-                  //     url: 'https://play.google.com/store/apps/details?id=com.cheersbyunited',
-                  //     title: 'Download the App',
-                  //   };
-
-
-
-                  //   Share.open(options)
-                  //     .then((res) => {
-                  //       console.log(res);
-                  //     })
-                  //     .catch((err) => {
-                  //       err && console.log(err);
-                  //     });
-                  // }}
                   onPress={() => {
                     const phoneNumber = contact.phoneNumbers[0].number;
                     console.log(phoneNumber);
                     const message = 'Hey, I would like to invite you to join my app! Install it from the Link: ]';
-                    const playStoreLink = 'https://play.google.com/store/apps/details?id=com.cheersbyunited'; // Replace with your app's Play Store link
+                    const playStoreLink = 'https://play.google.com/store/apps/details?id=com.cheersbyunited'; 
                     const smsUrl = `sms:${phoneNumber}?body=${encodeURIComponent(`${message}\n${playStoreLink}`)}`;
                     Linking.openURL(smsUrl);
                   }}
@@ -1048,9 +1247,70 @@ const Explore = ({navigation, route}) => {
                     paddingHorizontal: 5,
                     textAlign: 'center',
                     fontFamily: 'DMSans-Medium',
-                    lineHeight: height * 0.028 //28
+                    lineHeight: 28
                   }}>Invite</Text>
                 </TouchableOpacity>
+                {/* {isRegistered(contact.phoneNumbers[0].number) ? (
+                  <TouchableOpacity
+                    style={{
+                      paddingVertical: 3,
+                      paddingHorizontal: width * 0.01,
+                      borderRadius: 6,
+                      borderColor: '#289EF5',
+                      borderWidth: 1,
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      width: width * 0.22,
+                      backgroundColor: '#289EF5'
+                    }}
+                    onPress={() => {
+                      const phoneNumber = contact.phoneNumbers[0].number;
+                      console.log('Connect with', phoneNumber);
+                    }}
+                  >
+                    <Text style={{
+                      fontSize: responsiveFontSize(14),
+                      alignSelf: 'center',
+                      color: '#FEFCFC',
+                      paddingHorizontal: 5,
+                      textAlign: 'center',
+                      fontFamily: 'DMSans-Medium',
+                      lineHeight: height * 0.028 //28
+                    }}>Connect</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={{
+                      paddingVertical: 3,
+                      paddingHorizontal: width * 0.01,
+                      borderRadius: 6,
+                      borderColor: '#289EF5',
+                      borderWidth: 1,
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      width: width * 0.22,
+                    }}
+                    onPress={() => {
+                      const phoneNumber = contact.phoneNumbers[0].number;
+                      const message = 'Hey, I would like to invite you to join my app! Install it from the Link:';
+                      const playStoreLink = 'https://play.google.com/store/apps/details?id=com.cheersbyunited'; // Replace with your app's Play Store link
+                      const smsUrl = `sms:${phoneNumber}?body=${encodeURIComponent(`${message}\n${playStoreLink}`)}`;
+                      Linking.openURL(smsUrl);
+                    }}
+                  >
+                    <Text style={{
+                      fontSize: responsiveFontSize(14),
+                      alignSelf: 'center',
+                      color: '#289EF5',
+                      paddingHorizontal: 5,
+                      textAlign: 'center',
+                      fontFamily: 'DMSans-Medium',
+                      lineHeight: height * 0.028 //28
+                    }}>Invite</Text>
+                  </TouchableOpacity>
+                )} */}
+             
+
               </View>
             ))}
           </ScrollView>
@@ -1175,12 +1435,13 @@ const Explore = ({navigation, route}) => {
               />
             </View>
 
-            <View style={commonStyles.backContainerFilter}>
-              <Image
-                source={require('../../../assets/img/filter.png')}
-                style={commonStyles.icon}
-              />
-            </View>
+                <TouchableOpacity style={commonStyles.backContainerFilter}
+                  onPress={() => navigation.navigate('FiltersScreen')}>
+                  <Image
+                    source={require('../../../assets/img/filter.png')}
+                    style={commonStyles.icon}
+                  />
+                </TouchableOpacity>
 
           </View>
         </View>
@@ -1211,7 +1472,7 @@ const Explore = ({navigation, route}) => {
         </ScrollView>
 
         {/* Render selected tab content */}
-        {renderTabContent()}
+            {contacts.length > 0 && renderTabContent()}
     </View>
       )}
 

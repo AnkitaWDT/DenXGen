@@ -333,7 +333,7 @@ const MyConnections = ({ navigation }) => {
 
     const handleTabPress = async (index) => {
         setActiveTab(index);
-        console.log('Data for tab', index, ':', data[index]);
+        //console.log('Data for tab', index, ':', data[index]);
         renderTabContent(index);
         renderTabContent(data[index]);
         // setIsLoading(true); // Show loading indicator while fetching data
@@ -666,16 +666,18 @@ const MyConnections = ({ navigation }) => {
         const truncatedDescription = truncateText(item.description, width * 0.85, 15);
         // const truncatedDescription = truncateText(item.specList[0].speciality, width * 0.85, 15);
 
-        let imageUrl;
-        if (item.profile_pic) {
-            imageUrl = item.profile_pic;
-        } else {
-            if (item.gender === 1) {
-                imageUrl = '../../../assets/img/defaultMale.png'; // Path to your default male image
-            } else {
-                imageUrl = '../../../assets/img/defaultFemale.png'; // Path to your default female image
-            }
-        }
+        // let imageUrl;
+        // if (item.profile_pic) {
+        //     imageUrl = item.profile_pic;
+        // } else {
+        //     if (item.gender === 1) {
+        //         imageUrl = '../../../assets/img/defaultMale.png'; // Path to your default male image
+        //     } else {
+        //         imageUrl = '../../../assets/img/defaultFemale.png'; // Path to your default female image
+        //     }
+        // }
+
+        console.log(item.profile_pic);
 
         const handleNavigation = () => {
             if (activeTab === 0 || activeTab === 3) {
