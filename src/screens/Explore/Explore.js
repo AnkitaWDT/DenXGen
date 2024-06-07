@@ -22,23 +22,23 @@ const responsiveFontSize = (size) => {
   return Math.round(PixelRatio.roundToNearestPixel(newSize));
 };
 
-const Explore = ({navigation, route}) => {
-      const data = [
-        // Data for Tab 1
-        { id: 1, title: 'Ankita Iyer', description: 'Dental Technicians Bachelors in Dental Technicians', location: 'Ghatkopar, India', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww', gender: 1 },
-        { id: 2, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU', gender: 2 },
-        { id: 3, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: null, gender: 1 },
-        { id: 4, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww', gender: 1 },
-        { id: 5, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU', gender: 2 },
-        { id: 6, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: null, gender: 2 },
-        { id: 7, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww', gender: 1 },
-        { id: 8, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU', gender: 2 },
-        { id: 9, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: null, gender: 1 },
-        { id: 10, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww', gender: 1 },
-        { id: 11, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU', gender: 2 },
-        { id: 12, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: null, gender: 2 },
+const Explore = ({ navigation, route }) => {
+  const data = [
+    // Data for Tab 1
+    { id: 1, title: 'Ankita Iyer', description: 'Dental Technicians Bachelors in Dental Technicians', location: 'Ghatkopar, India', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww', gender: 1 },
+    { id: 2, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU', gender: 2 },
+    { id: 3, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: null, gender: 1 },
+    { id: 4, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww', gender: 1 },
+    { id: 5, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU', gender: 2 },
+    { id: 6, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: null, gender: 2 },
+    { id: 7, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww', gender: 1 },
+    { id: 8, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU', gender: 2 },
+    { id: 9, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: null, gender: 1 },
+    { id: 10, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8fDB8fHww', gender: 1 },
+    { id: 11, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHxFVs25QxhqeWwnKvnc6OateNXW_0EH7VAQ&usqp=CAU', gender: 2 },
+    { id: 12, title: 'Ankita Iyer', description: 'Bachelors in Dental Technicians..', location: 'Ghatkopar, India', img: null, gender: 2 },
 
-    ];
+  ];
 
 
   // useEffect(() => {
@@ -86,15 +86,7 @@ const Explore = ({navigation, route}) => {
     }
   };
 
-  useEffect(() => {
-    fetchContacts();
-    fetchRegisteredNumbers();
-  }, []);
-
-  const [contacts, setContacts] = useState([]);
-  const [registeredNumbers, setRegisteredNumbers] = useState([]);
-
-   const fetchContacts = () => {
+  const fetchContacts = () => {
     Contacts.getAll().then(contacts => {
 
       setContacts(contacts);
@@ -109,66 +101,6 @@ const Explore = ({navigation, route}) => {
       });
   };
 
-
-  // const fetchContacts = () => {
-  //   Contacts.getAll().then(contacts => {
-  //     // Sort contacts by displayName
-  //     const sortedContacts = contacts.sort((a, b) =>
-  //       a.displayName.localeCompare(b.displayName)
-  //     );
-
-  //     setContacts(sortedContacts);
-  //     sortedContacts.forEach(contact => {
-  //       console.log(contact);
-  //       console.log(contact.displayName);
-  //       console.log(contact.phoneNumbers);
-  //     });
-  //   })
-  //     .catch(error => {
-  //       console.error('Error fetching contacts:', error);
-  //     });
-  // };
-
-  const fetchRegisteredNumbers = async () => {
-    try {
-      const response = await axios.get('https://temp.wedeveloptech.in/denxgen/appdata/getcontactlist-ax.php');
-      const phoneNumbers = response.data.data.map(item => item.phoneno);
-      setRegisteredNumbers(phoneNumbers);
-    } catch (error) {
-      console.error('Error fetching registered numbers:', error);
-    }
-  };
-
-  const isRegistered = (phoneNumber) => {
-    // Remove non-numeric characters from the phone number
-    const cleanedPhoneNumber = phoneNumber.replace(/\D/g, '');
-
-    // Remove country code if present
-    const countryCodeRemoved = cleanedPhoneNumber.startsWith('91') ? cleanedPhoneNumber.substring(2) : cleanedPhoneNumber;
-
-    // Remove leading zeroes if present
-    const standardizedPhoneNumber = countryCodeRemoved.replace(/^0+/, '');
-
-    return registeredNumbers.includes(standardizedPhoneNumber);
-  };
-
-
-
-  // const fetchContacts = () => {
-  //   Contacts.getAll().then(contacts => {
-
-  //     setContacts(contacts);
-  //     contacts.forEach(contact => {
-  //       console.log(contact);
-  //       console.log(contact.displayName);
-  //       console.log(contact.phoneNumbers);
-  //     });
-  //   })
-  //     .catch(error => {
-  //       console.error('Error fetching contacts:', error);
-  //     });
-  // };
-
   const openContactDetails = (contact) => {
     console.log(JSON.stringify(contact));
     Contacts.openExistingContact(contact);
@@ -178,11 +110,11 @@ const Explore = ({navigation, route}) => {
   console.log(initialTab);
   const [selectedTab, setSelectedTab] = useState(initialTab || 0);
   // const [selectedTab, setSelectedTab] = useState(0);
-  //const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredData, setFilteredData] = useState(data); 
+  const [filteredData, setFilteredData] = useState(data);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -234,13 +166,13 @@ const Explore = ({navigation, route}) => {
       );
       setFilteredData(filtered);
     }
-    else if (selectedTab === 2) {
+    else if (selectedTab === 3) {
       const filtered = othersData.filter((item) =>
         item.name && item.name.toLowerCase().includes(query.toLowerCase())
       );
       setFilteredData(filtered);
     }
-    else{}
+    else { }
   };
 
 
@@ -265,15 +197,16 @@ const Explore = ({navigation, route}) => {
   const fetchProfessionalsData = async () => {
     try {
 
-     const pr_id = await AsyncStorage.getItem('pr_id');
+      const pr_id = await AsyncStorage.getItem('pr_id');
       const id = parseInt(pr_id);
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
       const accidtyid = await AsyncStorage.getItem('selected_id');
       const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallacountslist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=professionals`);
 
+
       const json = await response.json();
       //console.log(json);
-      
+
       if (json.code === 1) {
         const filteredData = json.data.filter(professional => parseInt(professional.id) !== id);
         console.log(filteredData);
@@ -299,8 +232,7 @@ const Explore = ({navigation, route}) => {
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
       const accidtyid = await AsyncStorage.getItem('selected_id');
       const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallacountslist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=clinics`);
-
-      const json = await response.json();
+ const json = await response.json();
       if (json.code === 1) {
         setClinicsData(json.data);
       } else {
@@ -324,8 +256,7 @@ const Explore = ({navigation, route}) => {
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
       const accidtyid = await AsyncStorage.getItem('selected_id');
       const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallacountslist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=offices`);
-
-      const json = await response.json();
+ const json = await response.json();
       if (json.code === 1) {
         setOfficeData(json.data);
       } else {
@@ -350,14 +281,9 @@ const Explore = ({navigation, route}) => {
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
       const accidtyid = await AsyncStorage.getItem('selected_id');
       const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getallacountslist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=others`);
-
-      const json = await response.json();
-      //console.log(json);
-
+const json = await response.json();
       if (json.code === 1) {
-        const filteredData = json.data.filter(professional => parseInt(professional.id) !== id);
-        console.log(filteredData);
-        setOthersData(filteredData);
+        setOthersData(json.data);
       } else {
         // Handle error
       }
@@ -366,8 +292,9 @@ const Explore = ({navigation, route}) => {
       console.error(error);
     }
   };
+
   const renderTabContent = () => {
-    
+
     switch (selectedTab) {
       case 0:
         return (
@@ -392,7 +319,7 @@ const Explore = ({navigation, route}) => {
                     backgroundColor: '#FEFCFC'
                   }}
                   activeOpacity={0.8}
-                  onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.id })}
+                  onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.pr_id })}
                 >
                   {/* Left side image and text */}
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -465,9 +392,7 @@ const Explore = ({navigation, route}) => {
                       <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                          {/* <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
-                            {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
-                          </Text> */}
+                         
                         </View>
                       </View>
                       {/* Add more texts or components if needed */}
@@ -493,7 +418,7 @@ const Explore = ({navigation, route}) => {
                     backgroundColor: '#FEFCFC'
                   }}
                   activeOpacity={0.8}
-                  onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.id })}
+                  onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.pr_id })}
                 >
                   {/* Left side image and text */}
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -560,15 +485,13 @@ const Explore = ({navigation, route}) => {
                       </View>
                       {/* Render specialty */}
                       <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
-                        {item.service}
+                        {item.speciality}
                       </Text>
                       {/* Render location */}
                       <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                          {/* <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
-                            {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
-                          </Text> */}
+                        
                         </View>
                       </View>
                       {/* Add more texts or components if needed */}
@@ -669,7 +592,7 @@ const Explore = ({navigation, route}) => {
                       </View>
                       {/* Render specialty */}
                       <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
-                        {item.services}
+                        {item.service}
                       </Text>
                       {/* Render location */}
                       <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
@@ -686,7 +609,7 @@ const Explore = ({navigation, route}) => {
                 </TouchableOpacity>
               ))
             ) : (
-                clinicsData.map((item) => (
+              clinicsData.map((item) => (
                 <TouchableOpacity
                   key={item.id}
                   style={{
@@ -703,7 +626,7 @@ const Explore = ({navigation, route}) => {
                     backgroundColor: '#FEFCFC'
                   }}
                   activeOpacity={0.8}
-                    onPress={() => navigation.navigate('ClinicProfile', { cl_id: item.cl_id })}
+                  onPress={() => navigation.navigate('ClinicProfile', { cl_id: item.cl_id })}
                 >
                   {/* Left side image and text */}
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -715,68 +638,68 @@ const Explore = ({navigation, route}) => {
                     <View style={{ flex: 1, }}>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
                         <Text style={[commonStyles.headerText4BL, { lineHeight: 24, }]} numberOfLines={1}>{item.name}</Text>
-                          <Popover
-                            placement={PopoverPlacement.LEFT}
-                            from={(
-                              <TouchableOpacity
-                              >
+                        <Popover
+                          placement={PopoverPlacement.LEFT}
+                          from={(
+                            <TouchableOpacity
+                            >
+                              <Image
+                                source={require('../../../assets/img/ViewM.png')}
+                                style={{ width: 3, height: 13, marginRight: 5 }}
+                              />
+                            </TouchableOpacity>
+                          )}>
+                          <View style={commonStyles.popover}>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
                                 <Image
-                                  source={require('../../../assets/img/ViewM.png')}
-                                  style={{ width: 3, height: 13, marginRight: 5 }}
+                                  source={require('../../../assets/img/Bookmark.png')}
+                                  style={commonStyles.popoverItemIcon}
                                 />
-                              </TouchableOpacity>
-                            )}>
-                            <View style={commonStyles.popover}>
-                              <TouchableOpacity>
-                                <View style={commonStyles.popoverItemContainer}>
-                                  <Image
-                                    source={require('../../../assets/img/Bookmark.png')}
-                                    style={commonStyles.popoverItemIcon}
-                                  />
-                                  <Text style={commonStyles.popoverItemText}>Save PDF</Text>
-                                </View>
-                              </TouchableOpacity>
+                                <Text style={commonStyles.popoverItemText}>Save PDF</Text>
+                              </View>
+                            </TouchableOpacity>
 
-                              <TouchableOpacity>
-                                <View style={commonStyles.popoverItemContainer}>
-                                  <Image
-                                    source={require('../../../assets/img/SaveCon.png')}
-                                    style={commonStyles.popoverItemIcon}
-                                  />
-                                  <Text style={commonStyles.popoverItemText}>Save Contact</Text>
-                                </View>
-                              </TouchableOpacity>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/SaveCon.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Save Contact</Text>
+                              </View>
+                            </TouchableOpacity>
 
-                              <TouchableOpacity>
-                                <View style={commonStyles.popoverItemContainer}>
-                                  <Image
-                                    source={require('../../../assets/img/Spam.png')}
-                                    style={commonStyles.popoverItemIcon}
-                                  />
-                                  <Text style={commonStyles.popoverItemText}>Report Spam</Text>
-                                </View>
-                              </TouchableOpacity>
-                              <TouchableOpacity>
-                                <View style={commonStyles.popoverItemContainer}>
-                                  <Image
-                                    source={require('../../../assets/img/Link.png')}
-                                    style={commonStyles.popoverItemIcon}
-                                  />
-                                  <Text style={commonStyles.popoverItemText}>Copy Link</Text>
-                                </View>
-                              </TouchableOpacity>
-                            </View>
-                          </Popover>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Spam.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Report Spam</Text>
+                              </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity>
+                              <View style={commonStyles.popoverItemContainer}>
+                                <Image
+                                  source={require('../../../assets/img/Link.png')}
+                                  style={commonStyles.popoverItemIcon}
+                                />
+                                <Text style={commonStyles.popoverItemText}>Copy Link</Text>
+                              </View>
+                            </TouchableOpacity>
+                          </View>
+                        </Popover>
                       </View>
                       {/* Render specialty */}
                       <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
-                          {item.speciality}
+                        {item.service}
                       </Text>
                       {/* Render location */}
                       <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                            {/* <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]} numberOfLines={1}>
+                          {/* <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]} numberOfLines={1}>
                             {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
                           </Text> */}
                         </View>
@@ -1022,7 +945,7 @@ const Explore = ({navigation, route}) => {
                     backgroundColor: '#FEFCFC'
                   }}
                   activeOpacity={0.8}
-                  onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.id })}
+                  onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.pr_id })}
                 >
                   {/* Left side image and text */}
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -1089,15 +1012,13 @@ const Explore = ({navigation, route}) => {
                       </View>
                       {/* Render specialty */}
                       <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
-                       {item.service}
+                        {item.speciality}
                       </Text>
                       {/* Render location */}
                       <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                          <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
-                            {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
-                          </Text>
+                        
                         </View>
                       </View>
                       {/* Add more texts or components if needed */}
@@ -1123,7 +1044,7 @@ const Explore = ({navigation, route}) => {
                     backgroundColor: '#FEFCFC'
                   }}
                   activeOpacity={0.8}
-                  onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.id })}
+                  onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.pr_id })}
                 >
                   {/* Left side image and text */}
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -1231,11 +1152,28 @@ const Explore = ({navigation, route}) => {
                     alignItems: 'center',
                     width: width * 0.2,
                   }}
+                  // onPress={() => {
+                  //   const options = {
+                  //     message: 'Check out this awesome app!',
+                  //     url: 'https://play.google.com/store/apps/details?id=com.cheersbyunited',
+                  //     title: 'Download the App',
+                  //   };
+
+
+
+                  //   Share.open(options)
+                  //     .then((res) => {
+                  //       console.log(res);
+                  //     })
+                  //     .catch((err) => {
+                  //       err && console.log(err);
+                  //     });
+                  // }}
                   onPress={() => {
                     const phoneNumber = contact.phoneNumbers[0].number;
                     console.log(phoneNumber);
                     const message = 'Hey, I would like to invite you to join my app! Install it from the Link: ]';
-                    const playStoreLink = 'https://play.google.com/store/apps/details?id=com.cheersbyunited'; 
+                    const playStoreLink = 'https://play.google.com/store/apps/details?id=com.cheersbyunited'; // Replace with your app's Play Store link
                     const smsUrl = `sms:${phoneNumber}?body=${encodeURIComponent(`${message}\n${playStoreLink}`)}`;
                     Linking.openURL(smsUrl);
                   }}
@@ -1247,70 +1185,9 @@ const Explore = ({navigation, route}) => {
                     paddingHorizontal: 5,
                     textAlign: 'center',
                     fontFamily: 'DMSans-Medium',
-                    lineHeight: 28
+                    lineHeight: height * 0.028 //28
                   }}>Invite</Text>
                 </TouchableOpacity>
-                {/* {isRegistered(contact.phoneNumbers[0].number) ? (
-                  <TouchableOpacity
-                    style={{
-                      paddingVertical: 3,
-                      paddingHorizontal: width * 0.01,
-                      borderRadius: 6,
-                      borderColor: '#289EF5',
-                      borderWidth: 1,
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      width: width * 0.22,
-                      backgroundColor: '#289EF5'
-                    }}
-                    onPress={() => {
-                      const phoneNumber = contact.phoneNumbers[0].number;
-                      console.log('Connect with', phoneNumber);
-                    }}
-                  >
-                    <Text style={{
-                      fontSize: responsiveFontSize(14),
-                      alignSelf: 'center',
-                      color: '#FEFCFC',
-                      paddingHorizontal: 5,
-                      textAlign: 'center',
-                      fontFamily: 'DMSans-Medium',
-                      lineHeight: height * 0.028 //28
-                    }}>Connect</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    style={{
-                      paddingVertical: 3,
-                      paddingHorizontal: width * 0.01,
-                      borderRadius: 6,
-                      borderColor: '#289EF5',
-                      borderWidth: 1,
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      width: width * 0.22,
-                    }}
-                    onPress={() => {
-                      const phoneNumber = contact.phoneNumbers[0].number;
-                      const message = 'Hey, I would like to invite you to join my app! Install it from the Link:';
-                      const playStoreLink = 'https://play.google.com/store/apps/details?id=com.cheersbyunited'; // Replace with your app's Play Store link
-                      const smsUrl = `sms:${phoneNumber}?body=${encodeURIComponent(`${message}\n${playStoreLink}`)}`;
-                      Linking.openURL(smsUrl);
-                    }}
-                  >
-                    <Text style={{
-                      fontSize: responsiveFontSize(14),
-                      alignSelf: 'center',
-                      color: '#289EF5',
-                      paddingHorizontal: 5,
-                      textAlign: 'center',
-                      fontFamily: 'DMSans-Medium',
-                      lineHeight: height * 0.028 //28
-                    }}>Invite</Text>
-                  </TouchableOpacity>
-                )} */}
-             
-
               </View>
             ))}
           </ScrollView>
@@ -1397,43 +1274,70 @@ const Explore = ({navigation, route}) => {
       {isLoading ? (
         <Animation />
       ) : (
-    <View>
-        {/* Header */}
         <View>
-          <View style={commonStyles.wrapT}>
-            <TouchableOpacity style={commonStyles.backContainer}  activeOpacity={0.8}>
-              {/* <Image
+          {/* Header */}
+          <View>
+            <View style={commonStyles.wrapT}>
+              <TouchableOpacity style={commonStyles.backContainer} activeOpacity={0.8}>
+                {/* <Image
                                 source={require('../../assets/img/Back.png')}
                                 style={commonStyles.icon}
                             /> */}
-            </TouchableOpacity>
-            <Text style={commonStyles.backText}>Explore</Text>
-            <TouchableOpacity style={commonStyles.backContainer1}  activeOpacity={0.8}>
-              <Image
-                source={require('../../../assets/img/Option.png')}
-                style={commonStyles.icon}
-              />
-            </TouchableOpacity>
-          </View>
-
-
-          <View style={commonStyles.searchBarContainer}>
-            <View style={commonStyles.leftContainer}>
-              <View style={commonStyles.backContainerSearch}>
+              </TouchableOpacity>
+              <Text style={commonStyles.backText}>Explore</Text>
+              <TouchableOpacity style={commonStyles.backContainer1} activeOpacity={0.8}>
                 <Image
-                  source={require('../../../assets/img/Search.png')}
+                  source={require('../../../assets/img/Option.png')}
                   style={commonStyles.icon}
                 />
-              </View>
-              <TextInput
-                style={commonStyles.searchInput}
-                placeholder="Search"
-                placeholderTextColor='grey'
-                value={searchQuery}
-                onChangeText={handleSearch}
-                    numberOfLines={1}
-              />
+              </TouchableOpacity>
             </View>
+
+
+            <View style={commonStyles.searchBarContainer}>
+              <View style={commonStyles.leftContainer}>
+                <View style={commonStyles.backContainerSearch}>
+                  <Image
+                    source={require('../../../assets/img/Search.png')}
+                    style={commonStyles.icon}
+                  />
+                </View>
+                <TextInput
+                  style={commonStyles.searchInput}
+                  placeholder="Search"
+                  placeholderTextColor='grey'
+                  value={searchQuery}
+                  onChangeText={handleSearch}
+                  numberOfLines={1}
+                />
+              </View>
+
+              <TouchableOpacity style={commonStyles.backContainerFilter} onPress={() => navigation.navigate('FiltersScreen')}>
+                <Image
+                  source={require('../../../assets/img/filter.png')}
+                  style={commonStyles.icon}
+                />
+              </TouchableOpacity>
+
+            </View>
+              {/* <TouchableOpacity onPress={() => navigation.navigate('FiltersScreen')} style={commonStyles.searchBarContainer} activeOpacity={0.8}>
+                <View style={commonStyles.leftContainer}>
+                  <View style={commonStyles.backContainerSearch}>
+                    <Image
+                      source={require('../../../assets/img/Search.png')}
+                      style={commonStyles.icon}
+                    />
+                  </View>
+                  <TextInput
+                    style={commonStyles.searchInput}
+                    placeholder="Search"
+                    placeholderTextColor="grey"
+                    value={searchQuery}
+                    onChangeText={handleSearch}
+                    numberOfLines={1}
+                    editable={false}
+                  />
+                </View>
 
                 <TouchableOpacity style={commonStyles.backContainerFilter}
                   onPress={() => navigation.navigate('FiltersScreen')}>
@@ -1443,37 +1347,37 @@ const Explore = ({navigation, route}) => {
                   />
                 </TouchableOpacity>
 
+              </TouchableOpacity> */}
           </View>
+
+          {/* Tabs */}
+          <ScrollView style={styles.tabContainer} horizontal showsHorizontalScrollIndicator={false}>
+            {/* Tab buttons */}
+            {[0, 1, 2, 3, 4].map((index) => (
+              <TouchableOpacity
+                key={index}
+                style={[styles.tabItem, selectedTab === index && styles.selectedTabItem]}
+                //onPress={() => setSelectedTab(index)}
+                onPress={() => handleTabChange(index)}
+                activeOpacity={0.8}
+              >
+                {/* Tab icon */}
+                {/* Your tab icon component here */}
+                {/* Tab text */}
+                <Text style={[styles.tabText, selectedTab === index && styles.selectedTabText]}>
+                  {index === 0 ? "Professionals" :
+                    index === 1 ? "Clinics" :
+                      index === 2 ? "Office" :
+                        index === 3 ? "Others" :
+                          "Contacts"}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          {/* Render selected tab content */}
+          {renderTabContent()}
         </View>
-
-        {/* Tabs */}
-        <ScrollView style={styles.tabContainer} horizontal showsHorizontalScrollIndicator={false}>
-          {/* Tab buttons */}
-          {[0, 1, 2, 3, 4].map((index) => (
-            <TouchableOpacity
-              key={index}
-              style={[styles.tabItem, selectedTab === index && styles.selectedTabItem]}
-              //onPress={() => setSelectedTab(index)}
-              onPress={() => handleTabChange(index)}
-              activeOpacity={0.8}
-            >
-              {/* Tab icon */}
-              {/* Your tab icon component here */}
-              {/* Tab text */}
-              <Text style={[styles.tabText, selectedTab === index && styles.selectedTabText]}>
-                {index === 0 ? "Professionals" :
-                  index === 1 ? "Clinics" :
-                    index === 2 ? "Office" :
-                      index === 3 ? "Others" :
-                        "Contacts"}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        {/* Render selected tab content */}
-            {contacts.length > 0 && renderTabContent()}
-    </View>
       )}
 
     </SafeAreaView>
@@ -1556,7 +1460,7 @@ const styles = {
     // Button text styles
     // Style for text inside buttons
   },
-  profileImage:{
+  profileImage: {
     height: 55,
     width: 55,
     borderRadius: 36,

@@ -328,7 +328,7 @@ const EditOfficeProfile = ({ navigation, route }) => {
 
                 <View style={{ paddingVertical: height * 0.008, }}></View>
                 {/* <View style={styles.horizontalLine}></View> */}
-                <View style={styles.shadow}>
+                {/* <View style={styles.shadow}>
                     <View style={{ backgroundColor: '#fff' }}>
                         <View style={{ borderRadius: 10, paddingHorizontal: 20, }}>
 
@@ -421,7 +421,7 @@ const EditOfficeProfile = ({ navigation, route }) => {
                     }}
                 />
 
-                <View style={{ paddingVertical: height * 0.008, }}></View>
+                <View style={{ paddingVertical: height * 0.008, }}></View> */}
                 {/* <View style={styles.horizontalLine}></View> */}
                 <View style={styles.shadow}>
                     <View style={{ backgroundColor: '#fff' }}>

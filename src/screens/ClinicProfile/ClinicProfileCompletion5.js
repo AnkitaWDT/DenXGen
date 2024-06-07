@@ -321,7 +321,7 @@ const ClinicProfileCompletion5 = ({ navigation, route }) => {
 
             console.log('dataresponse', response.data);
             ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
-            navigation.navigate('ClinicProfileCompletion6', { cl_id: cl_id });
+            navigation.navigate('ClinicProfileCompletion7', { cl_id: cl_id });
             //navigation.navigate('ClinicProfileCompletion6');
         } catch (error) {
             console.error('An error occurred:', error);

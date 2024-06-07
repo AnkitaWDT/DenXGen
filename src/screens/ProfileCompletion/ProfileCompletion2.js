@@ -275,7 +275,7 @@ const ProfileCompletion2 = ({ navigation }) => {
 
     const fetchKeyForteData = async () => {
         try {
-            const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getkeyforlist-ax.php');
+                   const response = await fetch('https://temp.wedeveloptech.in/denxgen/appdata/getkeyforlist-ax.php');
             const data = await response.json();
             const storedId = await AsyncStorage.getItem('pr_ty_id');
             const filteredData = data.data.filter(item => item.pr_ty_id === storedId);

@@ -707,12 +707,10 @@ const HomePage = ({ navigation, route }) => {
         } else if (gotosteps >= 5 && gotosteps < 6) {
           screenName = 'ClinicProfileCompletion5';
         } else if (gotosteps >= 6 && gotosteps < 7) {
-          screenName = 'ClinicProfileCompletion6';
-        } else if (gotosteps >= 7 && gotosteps < 8) {
           screenName = 'ClinicProfileCompletion7';
-        } else if (gotosteps >= 8 && gotosteps < 9) {
+        } else if (gotosteps >= 7 && gotosteps < 8) {
           screenName = 'ClinicProfileCompletion8';
-        }
+        } 
         break;
       case 'Office Account':
         if (gotosteps >= 2 && gotosteps < 3) {
@@ -724,12 +722,10 @@ const HomePage = ({ navigation, route }) => {
         } else if (gotosteps >= 5 && gotosteps < 6) {
           screenName = 'OfficeProfileCompletion5';
         } else if (gotosteps >= 6 && gotosteps < 7) {
-          screenName = 'OfficeProfileCompletion6';
-        } else if (gotosteps >= 7 && gotosteps < 8) {
           screenName = 'OfficeProfileCompletion7';
-        } else if (gotosteps >= 8 && gotosteps < 9) {
+        } else if (gotosteps >= 7 && gotosteps < 8) {
           screenName = 'OfficeProfileCompletion8';
-        }
+        } 
         break;
       default:
         break;
@@ -865,7 +861,7 @@ const HomePage = ({ navigation, route }) => {
 
           </View>
       </View>
-          <View style={commonStyles.searchBarContainer}>
+              <TouchableOpacity onPress={() => navigation.navigate('FiltersScreen')} style={commonStyles.searchBarContainer} activeOpacity={0.8}>
             <View style={commonStyles.leftContainer}>
               <View style={commonStyles.backContainerSearch}>
                 <Image
@@ -880,6 +876,7 @@ const HomePage = ({ navigation, route }) => {
                 value={searchQuery}
                 onChangeText={handleSearch}
                     numberOfLines={1}
+                    editable={false}
               />
             </View>
 
@@ -891,7 +888,7 @@ const HomePage = ({ navigation, route }) => {
               />
             </TouchableOpacity>
 
-          </View>
+              </TouchableOpacity>
         </View>
             <Modal
               visible={modalVisible}

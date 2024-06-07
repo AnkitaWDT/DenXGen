@@ -53,6 +53,8 @@ const ProfileScreen = ({ navigation, route }) => {
 
   const { professionalId } = route.params;
 
+  console.log(professionalId);
+
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -203,7 +205,7 @@ const ProfileScreen = ({ navigation, route }) => {
       const data = await response.json();
       if (data) {
         setDropCardData(data.data);
-        console.log('dropCardData',dropCardData);
+        console.log('dropCardData', dropCardData);
         // Check if any data items have pr_id matching the professionalId
         const match = data.data.some(item => item.pr_id === professionalId);
         if (match) {
@@ -270,7 +272,7 @@ const ProfileScreen = ({ navigation, route }) => {
   const fetchConnectionStatus = async () => {
     try {
       const pr_id = await AsyncStorage.getItem('pr_id');
-      
+
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
       const accidtyid = await AsyncStorage.getItem('selected_id');
       setPrid(accidtyid);
@@ -478,7 +480,7 @@ const ProfileScreen = ({ navigation, route }) => {
       console.error(error);
     }
   };
-  
+
 
   const acceptConnReq = async () => {
     try {
@@ -571,7 +573,7 @@ const ProfileScreen = ({ navigation, route }) => {
     }
   };
 
-    const sendEmpanelRequest = async () => {
+  const sendEmpanelRequest = async () => {
     try {
       const pr_id = await AsyncStorage.getItem('pr_id');
       const id = parseInt(pr_id);
@@ -597,11 +599,10 @@ const ProfileScreen = ({ navigation, route }) => {
       const id = parseInt(pr_id);
       const accidtyid = await AsyncStorage.getItem('selected_id');
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
-      console.log('accidty',accidty);
+      console.log('accidty', accidty);
 
       const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/reqaccconn-ax.php?accid1=${accidtyid}&accidty1=${accidty}&accid2=${professionalId}&accidty2=1&action=connection`);
       const data = await response.json();
-      console.log(data);
       console.log('sent req');
       console.log(response);// Check if the request was successful, and update UI accordingly
       if (data.code === 1) {
@@ -793,18 +794,18 @@ const ProfileScreen = ({ navigation, route }) => {
               onRequestClose={closeModalV}
             >
               <TouchableWithoutFeedback onPress={closeModalV}>
-              <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)', justifyContent: 'center', alignItems: 'center' }}>
-                <TouchableOpacity style={{ position: 'absolute', top: 20, right: 20 }} onPress={closeModalV}>
-                  <Text style={{ color: 'white', fontSize: 20 }}>X</Text>
-                </TouchableOpacity>
+                <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)', justifyContent: 'center', alignItems: 'center' }}>
+                  <TouchableOpacity style={{ position: 'absolute', top: 20, right: 20 }} onPress={closeModalV}>
+                    <Text style={{ color: 'white', fontSize: 20 }}>X</Text>
+                  </TouchableOpacity>
 
-                <Video
-                  source={{ uri: profileData && profileData.profile_video ? profileData.profile_video : null }}
-                  style={{ width: width, height: height - 40 }}
-                  controls={true}
-                  resizeMode="contain"
-                />
-              </View>
+                  <Video
+                    source={{ uri: profileData && profileData.profile_video ? profileData.profile_video : null }}
+                    style={{ width: width, height: height - 40 }}
+                    controls={true}
+                    resizeMode="contain"
+                  />
+                </View>
               </TouchableWithoutFeedback>
             </Modal>
             <View style={styles.imageGrid}>
@@ -866,7 +867,7 @@ const ProfileScreen = ({ navigation, route }) => {
                 </View>
               </TouchableWithoutFeedback>
             </Modal>
-         
+
           </ScrollView>
         );
       case 1:
@@ -1130,7 +1131,7 @@ const ProfileScreen = ({ navigation, route }) => {
               />
             ) : (
               <Image
-                  source={require('../../assets/img/defaultM.png')}
+                source={require('../../assets/img/ProfileHome.png')}
                 style={styles.profilePic}
               />
             )}
@@ -1173,11 +1174,11 @@ const ProfileScreen = ({ navigation, route }) => {
 
             {/* <Text style={[commonStyles.headerText2BL, {
               marginVertical: 3,
-            }]} numberOfLines={1} ellipsizeMode="tail">{profileData ? profileData.profession : null} ┃ {profileData && profileData.specList.length > 0 ? profileData.specList[0].speciality : null} ┃ {profileData ? profileData.experience : null}</Text> */}
+            }]} numberOfLines={1} ellipsizeMode="tail">{profileData ? profileData.profession : null} â”ƒ {profileData && profileData.specList.length > 0 ? profileData.specList[0].speciality : null} â”ƒ {profileData ? profileData.experience : null}</Text> */}
             <Text style={[commonStyles.headerText2BL, { marginVertical: 3 }]} numberOfLines={1} ellipsizeMode="tail">
               {profileData ? profileData.profession : null}
-              {profileData && profileData.specList.length > 0 && profileData.specList[0].speciality ? ' ┃ ' + profileData.specList[0].speciality : ''}
-              {profileData && profileData.experience ? ' ┃ ' + profileData.experience : ''}
+              {profileData && profileData.specList.length > 0 && profileData.specList[0].speciality ? ' â”ƒ ' + profileData.specList[0].speciality : ''}
+              {profileData && profileData.experience ? ' â”ƒ ' + profileData.experience : ''}
             </Text>
 
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}>
@@ -1199,21 +1200,21 @@ const ProfileScreen = ({ navigation, route }) => {
               </View>
             )}
             {endData.length > 0 ? (
-            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}
-            onPress={() => setModalEndorseVisible(true)}
-            >
-              <Image source={require('../../assets/img/EndorseB.png')} style={{ width: 15, height: 12, }} />
-              {/* <Text style={[commonStyles.headerText5BL, {
+              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginBottom: moderateScale(10), }}
+                onPress={() => setModalEndorseVisible(true)}
+              >
+                <Image source={require('../../assets/img/EndorseB.png')} style={{ width: 15, height: 12, }} />
+                {/* <Text style={[commonStyles.headerText5BL, {
                 paddingHorizontal: 8,
                 lineHeight: 18
 
               }]}>1 Endorsement</Text> */}
-            
-              <Text style={[commonStyles.headerText5BL, { paddingHorizontal: 8, lineHeight: 18 }]}>
+
+                <Text style={[commonStyles.headerText5BL, { paddingHorizontal: 8, lineHeight: 18 }]}>
                   {endData.length} Endorsements
-              </Text>
-            
-            </TouchableOpacity>
+                </Text>
+
+              </TouchableOpacity>
             ) : null}
 
             <Modal
@@ -1279,7 +1280,7 @@ const ProfileScreen = ({ navigation, route }) => {
                               alignItems: 'center',
                             }]}>
                               <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#979797' }}>
-                                  {endorsement.name ? endorsement.name.charAt(0).toUpperCase() : ''}
+                                {endorsement.name ? endorsement.name.charAt(0).toUpperCase() : ''}
                               </Text>
                             </View>
                           )}
@@ -1302,7 +1303,7 @@ const ProfileScreen = ({ navigation, route }) => {
                         </View>
                       </TouchableOpacity>
                     ))}
-                    
+
                   </ScrollView>
                 </TouchableOpacity>
               </TouchableOpacity>
@@ -1665,37 +1666,48 @@ const ProfileScreen = ({ navigation, route }) => {
               )}
             </View>
 
-          
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <TouchableOpacity onPress={() => setModalConnectVisible(true)}>
-              <Image source={require('../../assets/img/connections.png')} style={{ width: 20, height: 20 }} />
-            </TouchableOpacity>
-            <Popover
-              placement={PopoverPlacement.LEFT}
-              from={(
-                <TouchableOpacity
-                  style={commonStyles.backContainer1}
-                >
-                  <Image
-                    source={require('../../assets/img/Option.png')}
-                    style={{ width: 20, height: 20, marginLeft: width * 0.02 }}
-                  />
-                </TouchableOpacity>
-              )}>
-              <View style={styles.popover}>
-                {setEmpanel && connectionStatus === '1' && (
-                  <TouchableOpacity onPress={() => setShowPopupEmpanel(true)}>
-                    <View style={styles.popoverItemContainer}>
-                      <Image
-                        source={require('../../assets/img/Endorsement.png')}
-                        style={styles.popoverItemIcon1}
-                      />
-                      <Text style={styles.popoverItemText}>Empanel</Text>
-                    </View>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <TouchableOpacity onPress={() => setModalConnectVisible(true)}>
+                <Image source={require('../../assets/img/connections.png')} style={{ width: 20, height: 20 }} />
+              </TouchableOpacity>
+              <Popover
+                placement={PopoverPlacement.LEFT}
+                from={(
+                  <TouchableOpacity
+                    style={commonStyles.backContainer1}
+                  >
+                    <Image
+                      source={require('../../assets/img/Option.png')}
+                      style={{ width: 20, height: 20, marginLeft: width * 0.02 }}
+                    />
                   </TouchableOpacity>
-                )}
-                {prtyid === '1' && connectionStatus === '1' && (
-                  <TouchableOpacity onPress={() => setShowPopupEndorse(true)}>
+                )}>
+                <View style={styles.popover}>
+                  {setEmpanel && connectionStatus === '1' && (
+                    <TouchableOpacity onPress={() => setShowPopupEmpanel(true)}>
+                      <View style={styles.popoverItemContainer}>
+                        <Image
+                          source={require('../../assets/img/Endorsement.png')}
+                          style={styles.popoverItemIcon1}
+                        />
+                        <Text style={styles.popoverItemText}>Empanel</Text>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                  {prtyid === '1' && connectionStatus === '1' && (
+                    <TouchableOpacity onPress={() => setShowPopupEndorse(true)}>
+                      <View style={styles.popoverItemContainer}>
+                        <Image
+                          source={require('../../assets/img/Endorsement.png')}
+                          style={styles.popoverItemIcon1}
+                        />
+                        <Text style={styles.popoverItemText}>Endorse</Text>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                  <TouchableOpacity
+                    onPress={() => setShowPopupEndorse(true)}>
                     <View style={styles.popoverItemContainer}>
                       <Image
                         source={require('../../assets/img/Endorsement.png')}
@@ -1704,59 +1716,48 @@ const ProfileScreen = ({ navigation, route }) => {
                       <Text style={styles.popoverItemText}>Endorse</Text>
                     </View>
                   </TouchableOpacity>
-                )}
-                {/* <TouchableOpacity
-                  onPress={() => setShowPopupEndorse(true)}>
-                  <View style={styles.popoverItemContainer}>
-                    <Image
-                      source={require('../../assets/img/Endorsement.png')}
-                      style={styles.popoverItemIcon1}
-                    />
-                    <Text style={styles.popoverItemText}>Endorse</Text>
-                  </View>
-                </TouchableOpacity> */}
 
-                <TouchableOpacity>
-                  <View style={styles.popoverItemContainer}>
-                    <Image
-                      source={require('../../assets/img/SaveCon.png')}
-                      style={styles.popoverItemIcon}
-                    />
-                    <Text style={styles.popoverItemText}>Save Contact</Text>
-                  </View>
-                </TouchableOpacity>
+                  <TouchableOpacity>
+                    <View style={styles.popoverItemContainer}>
+                      <Image
+                        source={require('../../assets/img/SaveCon.png')}
+                        style={styles.popoverItemIcon}
+                      />
+                      <Text style={styles.popoverItemText}>Save Contact</Text>
+                    </View>
+                  </TouchableOpacity>
 
-                <TouchableOpacity
-                  onPress={() => setShowPopupBlock(true)}
-                >
-                  <View style={styles.popoverItemContainer}>
-                    <Image
-                      source={require('../../assets/img/Spam.png')}
-                      style={styles.popoverItemIcon}
-                    />
-                    <Text style={styles.popoverItemText}>Block Account</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleShare}>
-                  <View style={styles.popoverItemContainer}>
-                    <Image
-                      source={require('../../assets/img/Link.png')}
-                      style={styles.popoverItemIcon}
-                    />
-                    <Text style={styles.popoverItemText}>Copy Link</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </Popover>
-            {/* <Image source={require('../../assets/img/Option.png')} style={{ width: 20, height: 20, marginLeft: width * 0.02 }} /> */}
-          </View>
+                  <TouchableOpacity
+                    onPress={() => setShowPopupBlock(true)}
+                  >
+                    <View style={styles.popoverItemContainer}>
+                      <Image
+                        source={require('../../assets/img/Spam.png')}
+                        style={styles.popoverItemIcon}
+                      />
+                      <Text style={styles.popoverItemText}>Block Account</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={handleShare}>
+                    <View style={styles.popoverItemContainer}>
+                      <Image
+                        source={require('../../assets/img/Link.png')}
+                        style={styles.popoverItemIcon}
+                      />
+                      <Text style={styles.popoverItemText}>Copy Link</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </Popover>
+              {/* <Image source={require('../../assets/img/Option.png')} style={{ width: 20, height: 20, marginLeft: width * 0.02 }} /> */}
+            </View>
 
           </View>
-          {connectionStatus === '1' && (<View style={styles.horizontalLine}></View> )}
+          {connectionStatus === '1' && (<View style={styles.horizontalLine}></View>)}
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-           
-            <View style={{ flexDirection: 'row', marginVertical: height * 0.005 }}>    
+
+            <View style={{ flexDirection: 'row', marginVertical: height * 0.005 }}>
               {connectionStatus === '1' && (
                 <>
                   {keyAssociateStatus === '0' && (
@@ -1787,16 +1788,16 @@ const ProfileScreen = ({ navigation, route }) => {
                     </TouchableOpacity>
                   )}
                 </>
-              )}         
+              )}
               {setEmpanel && connectionStatus === '1' && (
                 <>
-                {empaneledStatus === '0' && (
-                  <TouchableOpacity onPress={() => setShowPopupEmpanel(true)}
+                  {empaneledStatus === '0' && (
+                    <TouchableOpacity onPress={() => setShowPopupEmpanel(true)}
                       style={[commonStyles.buttonS, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10, width: width * 0.45 }]}
-                    activeOpacity={0.8}>
-                    <Text style={commonStyles.buttonTextS}>Empanel</Text>
-                  </TouchableOpacity>
-                )}
+                      activeOpacity={0.8}>
+                      <Text style={commonStyles.buttonTextS}>Empanel</Text>
+                    </TouchableOpacity>
+                  )}
                   {empaneledStatus === '2' && (
                     <TouchableOpacity
                       style={[commonStyles.buttonS1, { marginBottom: height * 0.01, marginTop: height * 0.01, marginLeft: 10, width: width * 0.45 }]}
@@ -1817,8 +1818,8 @@ const ProfileScreen = ({ navigation, route }) => {
                   )}
                 </>
               )}
-             
-    
+
+
               {/* {buttonState === 'RemoveKey' && (
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <>

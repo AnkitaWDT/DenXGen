@@ -10,6 +10,8 @@ import customMarkerImage from '../../../assets/img/LocationPin.png';
 import { ScrollView } from 'react-native-gesture-handler';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { moderateScale } from 'react-native-size-matters';
+import { TextInput as TextInputPaper } from 'react-native-paper';
+import axios from 'axios';
 
 const { width, height } = Dimensions.get('window');
 
@@ -19,7 +21,7 @@ const MapScreen = ({ navigation }) => {
     const [markerPosition, setMarkerPosition] = useState(null);
     const [distance, setDistance] = useState(null);
     const [prevMarkerPosition, setPrevMarkerPosition] = useState(null);
-    const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisible, setModalVisible] = useState(true);
     const [locationInfo, setLocationInfo] = useState(null);
 
     const [modalVisibleS, setModalVisibleS] = useState(false);
@@ -85,7 +87,7 @@ const MapScreen = ({ navigation }) => {
             const longitude = await AsyncStorage.getItem('longitude');
 
             if (latitude && longitude) {
-                Geocoder.init('AIzaSyDGce21Ka5lP7WmaCaAQ2k0O6Zd2aN_fSA');
+                Geocoder.init('AIzaSyA0S-GTdzmauef2wwA75Oo05zqWZdnZN58');
                 const res = await Geocoder.from({ latitude, longitude });
 
                 if (res.results.length > 0) {
@@ -387,7 +389,7 @@ const MapScreen = ({ navigation }) => {
     };
 
     useEffect(() => {
-        Geocoder.init('AIzaSyDGce21Ka5lP7WmaCaAQ2k0O6Zd2aN_fSA');
+        Geocoder.init('AIzaSyA0S-GTdzmauef2wwA75Oo05zqWZdnZN58'); // Replace with your API key
 
         const fetchLocationInfo = async (latitude, longitude) => {
             try {
@@ -398,20 +400,22 @@ const MapScreen = ({ navigation }) => {
 
                 if (res.results.length > 0) {
                     const addressComponents = res.results[0].address_components;
+                    const geometry = res.results[0].geometry;
 
                     let locationInfo = {
-                        name: '', // Add name property to store the name of the location
+                        name: '',
                         political1: '',
                         political2: '',
                         city: '',
                         route: '',
                         long: '',
-                        components: [], // Store component names and values
-                        state: '', // Initialize state property
-                        pincode: '' // Initialize pincode property
+                        components: [],
+                        state: '',
+                        pincode: '',
+                        latitude: geometry.location.lat,
+                        longitude: geometry.location.lng
                     };
 
-                    // Extract address components
                     for (let component of addressComponents) {
                         let componentType = component.types[0];
                         let componentName = component.long_name;
@@ -423,22 +427,22 @@ const MapScreen = ({ navigation }) => {
                                 break;
                             case 'postal_code':
                                 componentLabel = 'Pincode';
-                                locationInfo.pincode = componentName; // Store pincode separately
+                                locationInfo.pincode = componentName;
                                 break;
                             case 'locality':
                                 componentLabel = 'City';
-                                locationInfo.city = componentName; // Store city separately
+                                locationInfo.city = componentName;
                                 break;
                             case 'administrative_area_level_1':
                                 componentLabel = 'State';
-                                locationInfo.state = componentName; // Store state separately
+                                locationInfo.state = componentName;
                                 break;
                             case 'country':
                                 componentLabel = 'Country';
                                 break;
                             case 'route':
                                 componentLabel = 'Route';
-                                locationInfo.route = componentName; // Store route separately
+                                locationInfo.route = componentName;
                                 break;
                             case 'political':
                                 if (!locationInfo.political1) {
@@ -452,15 +456,12 @@ const MapScreen = ({ navigation }) => {
                                 break;
                         }
 
-                        // Store component name and value
                         locationInfo.components.push({ label: componentLabel, value: componentName });
                     }
 
-                    // Construct long address
                     const longAddressComponents = ['sublocality', 'locality', 'administrative_area_level_1', 'country', 'postal_code'];
                     locationInfo.long = longAddressComponents.map(componentType => locationInfo[componentType]).filter(Boolean).join(', ');
 
-                    // Get the name of the location
                     locationInfo.name = res.results[0].formatted_address;
 
                     setLocationInfo(locationInfo);
@@ -475,6 +476,40 @@ const MapScreen = ({ navigation }) => {
             fetchLocationInfo(markerPosition.latitude, markerPosition.longitude);
         }
     }, [markerPosition]);
+
+    const [flat, setFlat] = useState('');
+
+    const handleSubmit = async () => {
+
+         const pr_id = await AsyncStorage.getItem('pr_id');
+        console.log(pr_id);
+        const id = parseInt(pr_id);
+
+        if (locationInfo) {
+            const logData = {
+                 pr_id: id,
+                ltd: locationInfo.latitude,
+                ltg: locationInfo.longitude,
+                locality: `${locationInfo.political1}, ${locationInfo.political2}`,
+                city: locationInfo.city,
+                state: locationInfo.state,
+                pincode: locationInfo.pincode,
+                address: flat,
+            };
+            console.log(logData);
+
+             try {
+            const response = await axios.post(`https://temp.wedeveloptech.in/denxgen/appdata/reqpersonaldtls4-ax.php`, logData);
+
+            console.log('dataresponse', response.data);
+            ToastAndroid.show("Data Added Successfully!", ToastAndroid.SHORT);
+            console.log('Data Added to database');
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+        }
+setModalVisible(false);
+    };
 
     const handleLocationSelection = (location) => {
         // Here you can handle the selection of a nearby location
@@ -616,7 +651,7 @@ const MapScreen = ({ navigation }) => {
                                 onPress={handleSelectLocation}
                                 fetchDetails={true}
                                 query={{
-                                    key: 'AIzaSyDGce21Ka5lP7WmaCaAQ2k0O6Zd2aN_fSA',
+                                    key: 'AIzaSyA0S-GTdzmauef2wwA75Oo05zqWZdnZN58',
                                     language: 'en',
                                 }}
                                 timeout={20000}
@@ -751,12 +786,12 @@ const MapScreen = ({ navigation }) => {
                     </View>
 
                     {/* Right side button */}
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         style={styles.uploadButtonS}
                         onPress={() => navigation.navigate('ManageAddress')}
                     >
                         <Text style={styles.buttonTextU}>Change</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
                 {/* <View style={styles.buttonContainer}>
           <Button title="Confirm" onPress={handleConfirmButtonPress} />
@@ -779,15 +814,57 @@ const MapScreen = ({ navigation }) => {
                         style={styles.modalContainer}
                         onPress={() => setModalVisible(false)}
                     >
-                        <TouchableOpacity style={styles.modalContent}
+                        <TouchableOpacity style={styles.modalContent1}
                             activeOpacity={1}
                             onPress={() => { }}>
                             <ScrollView>
                               
                                 <View style={styles.horizontalLineM}></View>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                                    <Text style={styles.modalHeaderText}>Enter Complete Address
-                                    </Text>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',  }}>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 4, width: '100%' }}>
+                                        {/* Left side text and image */}
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                          
+                                        </View>
+
+                                        {/* Right side button */}
+                                        <TouchableOpacity
+                                            style={[styles.uploadButtonS, { borderWidth: 1, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, borderColor: '#979797', }]}
+                                            onPress={() => setModalVisible(false)}
+                                        >
+                                            <Text style={styles.buttonTextU}>Locate on Map</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    <TouchableOpacity onPress={() => setModalVisible(false)}>
+                                        <Image
+                                            source={require('../../../assets/img/closeM.png')}
+                                            style={styles.closeImage}
+                                        />
+                                    </TouchableOpacity>
+                                </View>
+                              
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10, width: '100%' }}>
+                                        {/* Left side text and image */}
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                            {/* Image */}
+                                            <Image
+                                                source={require('../../../assets/img/pindrop.png')}
+                                                style={{ width: 15, height: 22, marginRight: 10, alignSelf: 'center' }}
+                                            />
+                                            <View>
+                                                {locationInfo && (
+                                                    <>
+                                                        <Text style={commonStyles.headerText2BL}>{locationInfo.political1}</Text>
+                                                        <Text style={commonStyles.headerText5G}>{locationInfo.political2}</Text>
+                                                    </>
+                                                )}
+                                            </View>
+
+
+                                        </View>
+
+                                    </View>
                                     <TouchableOpacity onPress={() => setModalVisible(false)}>
                                         <Image
                                             source={require('../../../assets/img/closeM.png')}
@@ -796,80 +873,96 @@ const MapScreen = ({ navigation }) => {
                                     </TouchableOpacity>
                                 </View>
                                 <View style={styles.inputContainerWithLabel}>
-                                    <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>
+                                    {/* <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>
                                         Flat / House no / Floor / Building
-                                    </Text>
+                                    </Text> */}
                                     <View style={styles.inputContainer1}>
                                         <TextInput
                                             style={styles.inputs}
-                                            placeholder=""
+                                            placeholder="Flat / House no / Floor / Building"
                                             placeholderTextColor="#979797"
                                             underlineColorAndroid="transparent"
+                                            value={flat}
+                                            onChangeText={setFlat}
                                         />
                                     </View>
                                 </View>
                                 <View style={styles.inputContainerWithLabel}>
-                                    <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>
+                                    {/* <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>
                                         Area / Sector / Locality
-                                    </Text>
+                                    </Text> */}
                                     <View style={styles.inputContainer1}>
                                         <TextInput
                                             style={[styles.inputs, { textAlign: 'left' }]}
-                                            placeholder=""
+                                            placeholder="Area / Sector / Locality"
                                             placeholderTextColor="#979797"
                                             underlineColorAndroid="transparent"
                                             selection={{ start: 0, end: 0 }}
-                                            //value="Godrej & Boyce Industry Estate, Vikhroli West, Mumbai"
-                                            value={`${locationInfo?.route ? locationInfo.route + ', ' : ''}${locationInfo?.political1 ? locationInfo.political1 + ', ' : ''}${locationInfo?.political2 ? locationInfo.political2 : ''}`}
+                                            editable={false}
+                                            //value={`${locationInfo?.political2 ? locationInfo.political2 : ''}`}
+                                            value={`${locationInfo?.political1 ? locationInfo.political1 + ', ' : ''}${locationInfo?.political2 ? locationInfo.political2 : ''}`}
                                         />
                                     </View>
                                 </View>
 
                                 <View style={styles.inputContainerWithLabel}>
-                                    <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>
+                                    {/* <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>
                                         City
-                                    </Text>
+                                    </Text> */}
                                     <View style={styles.inputContainer1}>
                                         <TextInput
                                             style={styles.inputs}
-                                            placeholder=""
+                                            placeholder="City"
                                             placeholderTextColor="#979797"
                                             value={`${locationInfo?.city ? locationInfo.city : ''}`}
+                                            editable={false}
                                             underlineColorAndroid="transparent"
                                         />
                                     </View>
+                                    {/* <TextInputPaper
+                                        label="Outlined input not editable"
+                                        mode="outlined"
+                                        disabled={true}
+                                    />
+                                    <TextInputPaper
+                                        label="Outlined input not editable"
+                                        mode="outlined"
+                                        disabled={true}
+                                    /> */}
                                 </View>
 
                                 <View style={styles.inputRow}>
                                     <View style={[styles.inputContainer, {}]}>
-                                        <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>State</Text>
+                                        {/* <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>State</Text> */}
                                         <View style={[styles.inputContainer1, { width: width * 0.43 }]}>
                                             <TextInput
                                                 style={[styles.inputs, { textAlign: 'left' }]}
-                                                placeholder=""
+                                                placeholder="State"
                                                 placeholderTextColor="#000000"
                                                 underlineColorAndroid="transparent"
                                                 selection={{ start: 0, end: 0 }}
+                                                editable={false}
                                                 value={locationInfo?.state || ''}
                                             />
                                         </View>
                                     </View>
                                     <View style={[styles.inputContainer, {}]}>
-                                        <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>Pincode</Text>
+                                        {/* <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>Pincode</Text> */}
                                         <View style={[styles.inputContainer1, { width: width * 0.43 }]}>
                                             <TextInput
                                                 style={[styles.inputs, { textAlign: 'left' }]}
-                                                placeholder=""
+                                                placeholder="Pincode"
                                                 placeholderTextColor="#979797"
                                                 underlineColorAndroid="transparent"
                                                 selection={{ start: 0, end: 0 }}
+                                                editable={false}
                                                 value={locationInfo?.pincode || ''}
                                             />
                                         </View>
                                     </View>
                                 </View>
 
-                                <View style={styles.inputContainerWithLabel}>
+                                {/* <View style={styles.inputContainerWithLabel}>
                                     <Text style={[commonStyles.headerText3BL, { marginBottom: moderateScale(8), }]}>
                                         Nearby Landmark
                                     </Text>
@@ -881,10 +974,10 @@ const MapScreen = ({ navigation }) => {
                                             underlineColorAndroid="transparent"
                                         />
                                     </View>
-                                </View>
+                                </View> */}
 
 
-                                <TouchableOpacity style={[commonStyles.button]} onPress={() => setModalVisible(true)} activeOpacity={0.8}>
+                                <TouchableOpacity style={[commonStyles.button]} onPress={handleSubmit} activeOpacity={0.8}>
                                     <Text style={commonStyles.buttonText}>Submit</Text>
                                 </TouchableOpacity>
                             </ScrollView>
@@ -914,10 +1007,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         borderColor: '#1C1C1C',
         borderWidth: 0.5,
-        borderRadius: 24,
+        borderRadius: 12,
         alignSelf: 'center',
         backgroundColor: '#FEFCFC',
-        height: moderateScale(41),
+        height: 40,
         width: '100%',
         marginBottom: moderateScale(16),
         justifyContent: 'space-between',
@@ -1114,6 +1207,14 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         width: width,
         maxHeight: height * 0.85,
+        flex: 1
+    },
+    modalContent1: {
+        backgroundColor: '#f9f9f9',
+        padding: 20,
+        borderRadius: 10,
+        width: width,
+        maxHeight: height * 0.55,
         flex: 1
     },
     modalHeaderText: {

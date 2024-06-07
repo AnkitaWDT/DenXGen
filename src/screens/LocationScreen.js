@@ -34,42 +34,42 @@ const LocationScreen = ({ navigation }) => {
     }, []);
 
     const handleLocationSubmit = async () => {
-        // try {
-        //     const granted = await PermissionsAndroid.request(
-        //         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-        //     );
-        //     console.log('Location Permission Granted:', granted); // Add this line
+        try {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+            );
+            console.log('Location Permission Granted:', granted); // Add this line
 
-        //     if (granted) {
-        //         Geolocation.getCurrentPosition(
-        //             position => {
-        //                 console.log('Position:', position); // Add this line
-        //                 const { latitude, longitude } = position.coords;
-        //                 console.log('Latitude:', latitude); // Add this line
-        //                 console.log('Longitude:', longitude); // Add this line
-        //                 setLatitude(latitude);
-        //                 setLongitude(longitude);
-        //                 setIsLoading(false);
-        //                 storeLocation(latitude, longitude, position);
-        //             },
-        //             error => {
-        //                 console.log('Error:', error); // Add this line
-        //                 setIsLoading(false);
-        //                 ToastAndroid.show('Error getting location', ToastAndroid.SHORT);
-        //                 console.error(error);
-        //             }
-        //         );
+            if (granted) {
+                Geolocation.getCurrentPosition(
+                    position => {
+                        console.log('Position:', position); // Add this line
+                        const { latitude, longitude } = position.coords;
+                        console.log('Latitude:', latitude); // Add this line
+                        console.log('Longitude:', longitude); // Add this line
+                        setLatitude(latitude);
+                        setLongitude(longitude);
+                        setIsLoading(false);
+                        storeLocation(latitude, longitude, position);
+                    },
+                    error => {
+                        console.log('Error:', error); // Add this line
+                        setIsLoading(false);
+                        ToastAndroid.show('Error getting location', ToastAndroid.SHORT);
+                        console.error(error);
+                    }
+                );
 
-        //         navigation.navigate('WelcomeScreen');
-        //     } else {
-        //         setIsLoading(false);
-        //         ToastAndroid.show('Location permission denied', ToastAndroid.SHORT);
-        //         navigation.navigate('WelcomeScreen');
-        //     }
-        // } catch (err) {
-        //     setIsLoading(false);
-        //     console.error('Error requesting location permission:', err); // Add this line
-        // }
+                navigation.navigate('WelcomeScreen');
+            } else {
+                setIsLoading(false);
+                ToastAndroid.show('Location permission denied', ToastAndroid.SHORT);
+                navigation.navigate('WelcomeScreen');
+            }
+        } catch (err) {
+            setIsLoading(false);
+            console.error('Error requesting location permission:', err); // Add this line
+        }
 
         navigation.navigate('WelcomeScreen');
     };

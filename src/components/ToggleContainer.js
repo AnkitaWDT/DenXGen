@@ -3,11 +3,13 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import commonStyles from './CommonStyles';
 
-const ToggleContainer = ({ text, imageSource1, imageSource2 }) => {
+const ToggleContainer = ({ text, imageSource1, imageSource2, onToggle }) => {
     const [isImageVisible, setIsImageVisible] = useState(false);
 
     const toggleImage = () => {
-        setIsImageVisible(!isImageVisible);
+        const newVisibility = !isImageVisible;
+        setIsImageVisible(newVisibility);
+        onToggle(text, newVisibility);
     };
 
     return (
@@ -20,6 +22,7 @@ const ToggleContainer = ({ text, imageSource1, imageSource2 }) => {
         </TouchableOpacity>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {

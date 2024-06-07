@@ -26,6 +26,8 @@ import Geolocation from '@react-native-community/geolocation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ProgressBar } from 'react-native-paper';
 import axios from 'axios';
+import Popover, { PopoverPlacement } from 'react-native-popover-view';
+import CustomPremium from '../../components/CustomPremium';
 
 const { width, height } = Dimensions.get('window');
 
@@ -85,10 +87,12 @@ const ProfileCompletion4 = ({ navigation }) => {
                     city: location.city,
                     state: location.state,
                     pincode: location.pincode,
-                    landmark: location.landmark,
-                    address: `${location.loc_two}, ${location.city}`,
-                    name: location.loc_one,
-                    loc_id: location.loc_id
+                    locality: location.locality,
+                    address: location.address,
+                    name: location.locality,
+                    loc_id: location.loc_id,
+                    ltd: location.ltd,
+                    ltg: location.ltg
                 })));
             }
             setIsLoading(false);
@@ -365,7 +369,7 @@ const ProfileCompletion4 = ({ navigation }) => {
 
                             <View style={styles.buttonContainer}>
                                 {/* Add Address Button */}
-                                <TouchableOpacity style={styles.buttonAdd} activeOpacity={0.8} onPress={openModal}>
+                                    <TouchableOpacity style={styles.buttonAdd} activeOpacity={0.8} onPress={() => navigation.navigate('FiltersScreen')}>
                                     <View style={styles.buttonContent}>
                                         <View style={styles.leftContainer}>
                                             <Image source={require('../../../assets/img/AddAddress.png')} style={styles.iconImageAdd} />
@@ -532,7 +536,7 @@ const ProfileCompletion4 = ({ navigation }) => {
                                                     <Text style={commonStyles.headerText4BL}>{location.name}</Text>
                                                 </View>
                                             </View>
-                                            <Popover
+                                            {/* <Popover
                                                 placement={PopoverPlacement.LEFT}
                                                 from={(
                                                     <TouchableOpacity
@@ -555,7 +559,7 @@ const ProfileCompletion4 = ({ navigation }) => {
                                                             />
                                                             <Text style={styles.popoverItemText}>Add To VIC</Text>
                                                         </View>
-                                                    </TouchableOpacity>
+                                                    </TouchableOpacity> 
 
                                                     <TouchableOpacity
 
@@ -575,11 +579,11 @@ const ProfileCompletion4 = ({ navigation }) => {
                                                     onContinue={openPremium}
                                                     onSkip={closePremium}
                                                     mainText="You have reached your limit" // Pass your main text as a prop
-                                                />
-                                            </Popover>
+                                                /> 
+                                            </Popover> */}
                                         </View>
                                         <View style={styles.textContainer}>
-                                            <Text style={commonStyles.headerText3G}>{location.address}</Text>
+                                            <Text style={commonStyles.headerText3G}>{location.city}</Text>
                                         </View>
                                     </TouchableOpacity>
                                 ))}
