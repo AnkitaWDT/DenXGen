@@ -12,11 +12,11 @@ export default function Animation() {
 
     return (
         <View style={styles.animationContainer}>
-            <LottieView
+            {/* <LottieView
                 ref={animationRef}
                 source={require('../../assets/img/loader.json')}
                 style={styles.animation}
-            />
+            /> */}
         </View>
     );
 }

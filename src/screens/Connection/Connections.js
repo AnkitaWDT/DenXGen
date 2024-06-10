@@ -18,31 +18,144 @@ const responsiveFontSize = (size) => {
     return Math.round(PixelRatio.roundToNearestPixel(newSize));
 };
 
+const SkeletonPlaceholder = () => {
+    return (
+        <View style={styles.container1}>
+            {/* Skeleton UI components */}
+            <View style={styles.skeletonContainer}>
+                {/* Left side content skeleton */}
+                <View style={styles.leftContent}>
+                    <View style={[styles.imageSkeleton, { marginRight: 15 }]} />
+                    <View style={[styles.textSkeleton, { width: '50%',  }]} />
+                </View>
+                {/* Middle content skeleton */}
+                <View style={styles.middleContent}>
+                    <View style={[styles.textSkeleton, {  width: '70%' }]} />
+                </View>
+                {/* Right side content skeleton */}
+                <View style={styles.rightContent}>
+                    <View style={styles.imageSkeleton} />
+                </View>
+            </View>
+            <View style={styles.skeletonContainer}>
+                {/* Left side content skeleton */}
+                <View style={styles.leftContent}>
+                    <View style={[styles.imageSkeleton, { marginRight: 15 }]} />
+                    <View style={[styles.textSkeleton, { width: '50%', marginBottom: 8 }]} />
+                </View>
+                {/* Middle content skeleton */}
+                <View style={styles.middleContent}>
+                    <View style={[styles.textSkeleton, { marginBottom: 8, width: '70%' }]} />
+                </View>
+                {/* Right side content skeleton */}
+                <View style={styles.rightContent}>
+                    <View style={styles.imageSkeleton} />
+                </View>
+            </View>
+            <View style={styles.skeletonContainer}>
+                {/* Left side content skeleton */}
+                <View style={styles.leftContent}>
+                    <View style={[styles.imageSkeleton, { marginRight: 15 }]} />
+                    <View style={[styles.textSkeleton, { width: '50%', marginBottom: 8 }]} />
+                </View>
+                {/* Middle content skeleton */}
+                <View style={styles.middleContent}>
+                    <View style={[styles.textSkeleton, { marginBottom: 8, width: '70%' }]} />
+                </View>
+                {/* Right side content skeleton */}
+                <View style={styles.rightContent}>
+                    <View style={styles.imageSkeleton} />
+                </View>
+            </View>
+            <View style={styles.skeletonContainer}>
+                {/* Left side content skeleton */}
+                <View style={styles.leftContent}>
+                    <View style={[styles.imageSkeleton, { marginRight: 15 }]} />
+                    <View style={[styles.textSkeleton, { width: '50%', marginBottom: 8 }]} />
+                </View>
+                {/* Middle content skeleton */}
+                <View style={styles.middleContent}>
+                    <View style={[styles.textSkeleton, { marginBottom: 8, width: '70%' }]} />
+                </View>
+                {/* Right side content skeleton */}
+                <View style={styles.rightContent}>
+                    <View style={styles.imageSkeleton} />
+                </View>
+            </View>
+            <View style={styles.skeletonContainer}>
+                {/* Left side content skeleton */}
+                <View style={styles.leftContent}>
+                    <View style={[styles.imageSkeleton, { marginRight: 15 }]} />
+                    <View style={[styles.textSkeleton, { width: '50%', marginBottom: 8 }]} />
+                </View>
+                {/* Middle content skeleton */}
+                <View style={styles.middleContent}>
+                    <View style={[styles.textSkeleton, { marginBottom: 8, width: '70%' }]} />
+                </View>
+                {/* Right side content skeleton */}
+                <View style={styles.rightContent}>
+                    <View style={styles.imageSkeleton} />
+                </View>
+            </View>
+            <View style={styles.skeletonContainer}>
+                {/* Left side content skeleton */}
+                <View style={styles.leftContent}>
+                    <View style={[styles.imageSkeleton, { marginRight: 15 }]} />
+                    <View style={[styles.textSkeleton, { width: '50%', marginBottom: 8 }]} />
+                </View>
+                {/* Middle content skeleton */}
+                <View style={styles.middleContent}>
+                    <View style={[styles.textSkeleton, { marginBottom: 8, width: '70%' }]} />
+                </View>
+                {/* Right side content skeleton */}
+                <View style={styles.rightContent}>
+                    <View style={styles.imageSkeleton} />
+                </View>
+            </View>
+            <View style={styles.skeletonContainer}>
+                {/* Left side content skeleton */}
+                <View style={styles.leftContent}>
+                    <View style={[styles.imageSkeleton, { marginRight: 15 }]} />
+                    <View style={[styles.textSkeleton, { width: '50%', marginBottom: 8 }]} />
+                </View>
+                {/* Middle content skeleton */}
+                <View style={styles.middleContent}>
+                    <View style={[styles.textSkeleton, { marginBottom: 8, width: '70%' }]} />
+                </View>
+                {/* Right side content skeleton */}
+                <View style={styles.rightContent}>
+                    <View style={styles.imageSkeleton} />
+                </View>
+            </View>
+        </View>
+    );
+};
+
 
 const Connections = ({ navigation }) => {
 
 
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        // Simulate an asynchronous operation (e.g., fetching data) before rendering the profile screen
-        const fakeAsyncOperation = async () => {
-            // Add any asynchronous logic here if needed
-            // For now, just simulate a delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
+    // useEffect(() => {
+    //     // Simulate an asynchronous operation (e.g., fetching data) before rendering the profile screen
+    //     const fakeAsyncOperation = async () => {
+    //         // Add any asynchronous logic here if needed
+    //         // For now, just simulate a delay
+    //         await new Promise(resolve => setTimeout(resolve, 3000));
 
-            // Set loading state to false after the delay
-            setIsLoading(false);
-        };
+    //         // Set loading state to false after the delay
+    //         //setIsLoading(false);
+    //     };
 
-        // Execute the fakeAsyncOperation
-        fakeAsyncOperation();
-    }, []);
+    //     // Execute the fakeAsyncOperation
+    //     fakeAsyncOperation();
+    // }, []);
 
     const [accidtyid, setAccidtyid] = useState(null);
 
     useEffect(() => {
-           fetchAccidtyid();
+        fetchAccidtyid();
     }, []);
 
     const fetchAccidtyid = async () => {
@@ -64,21 +177,41 @@ const Connections = ({ navigation }) => {
         totalPendingReq: 0
     });
 
+    // Removed fetchDataCounts from the dependency array to avoid infinite loop
     useEffect(() => {
         fetchDataCounts();
     }, []);
 
-
     useFocusEffect(
         React.useCallback(() => {
-            fetchDataCounts();
-            fetchAccidtyid();
-        }, [])
-    );
+            const fetchData = async () => {
+                try {
+                    // Simulate a delay or any asynchronous logic
+                    await new Promise(resolve => setTimeout(resolve, 1000));
 
+                    // Fetch data
+                    await fetchDataCounts();
+                    await fetchAccidtyid();
+
+                    // Set loading state to false after fetching data
+                    setIsLoading(false);
+                } catch (error) {
+                    console.error('Error in fetchData:', error);
+                }
+            };
+
+            // Call the fetchData function immediately
+            fetchData();
+
+            // Cleanup function not needed in this case
+            // Return an empty function
+            return () => { };
+        }, []) // Empty dependency array to run effect only once on mount
+    );
 
     const fetchDataCounts = async () => {
         try {
+            console.log('loading', isLoading)
             const accidty = await AsyncStorage.getItem('selected_profile_accidty');
             const accidtyid = await AsyncStorage.getItem('selected_id');
             const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyacclistcount-ax.php?accid=${accidtyid}&accidty=${accidty}`);
@@ -86,164 +219,164 @@ const Connections = ({ navigation }) => {
             console.log(data);
             setDataCounts(data.data);
             console.log(dataCounts);
+            console.log('loading', isLoading)
         } catch (error) {
             console.error('Error fetching data counts:', error);
         }
     };
-
     return (
         <SafeAreaView style={styles.container}>
-            {isLoading ? (
-                <Animation />
-            ) : (
+            <View>
                 <View>
-                    <View>
-                        <View style={commonStyles.wrapT}>
-                            <TouchableOpacity style={commonStyles.backContainer} activeOpacity={0.8}>
-                                <Image
-                                    //source={require('../../../assets/img/Back.png')}
-                                    style={commonStyles.icon}
-                                />
-                            </TouchableOpacity>
-                            <Text style={commonStyles.backText}>Connections</Text>
-                            <TouchableOpacity style={commonStyles.backContainer1} activeOpacity={0.8}>
-                                <Image
-                                    source={require('../../../assets/img/Option.png')}
-                                    style={commonStyles.icon}
-                                />
-                            </TouchableOpacity>
-                        </View>
+                    <View style={commonStyles.wrapT}>
+                        <TouchableOpacity style={commonStyles.backContainer} activeOpacity={0.8}>
+                            <Image
+                                //source={require('../../../assets/img/Back.png')}
+                                style={commonStyles.icon}
+                            />
+                        </TouchableOpacity>
+                        <Text style={commonStyles.backText}>Connections</Text>
+                        <TouchableOpacity style={commonStyles.backContainer1} activeOpacity={0.8}>
+                            <Image
+                                source={require('../../../assets/img/Option.png')}
+                                style={commonStyles.icon}
+                            />
+                        </TouchableOpacity>
                     </View>
+                </View>
 
-                    <ScrollView style={styles.subContainer}>
-                        <View>
-                            {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
-                            <TouchableOpacity
-                                style={styles.CContainer}
-                                onPress={() => navigation.navigate('MyConnections')}
-                                activeOpacity={0.8}
-                            >
-                                {/* Left side content */}
-                                <View style={styles.leftContent}>
-                                        <Image source={require('../../../assets/img/MyConnectCC.png')} style={styles.image} />
-                                    <Text style={styles.leftText}>My Connections</Text>
-                                </View>
+                <ScrollView style={styles.subContainer}>
+                    {isLoading === true ? ( // Corrected syntax here
+                        <SkeletonPlaceholder />
+                    ) : (
+                    <View>
+                        {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
+                        <TouchableOpacity
+                            style={styles.CContainer}
+                            onPress={() => navigation.navigate('MyConnections')}
+                            activeOpacity={0.8}
+                        >
+                            {/* Left side content */}
+                            <View style={styles.leftContent}>
+                                <Image source={require('../../../assets/img/MyConnectCC.png')} style={styles.image} />
+                                <Text style={styles.leftText}>My Connections</Text>
+                            </View>
 
-                                {/* Middle content */}
-                                <View style={styles.middleContent}>
-                                        <Text style={styles.middleText}>({dataCounts.totalConnections} others)</Text>
-                                </View>
+                            {/* Middle content */}
+                            <View style={styles.middleContent}>
+                                <Text style={styles.middleText}>({dataCounts.totalConnections} others)</Text>
+                            </View>
 
-                                {/* Right side content */}
-                                <View style={styles.rightContent}>
-                                    <Image source={require('../../../assets/img/ViewAll.png')} style={styles.imageR} />
-                                </View>
-                            </TouchableOpacity>
+                            {/* Right side content */}
+                            <View style={styles.rightContent}>
+                                <Image source={require('../../../assets/img/ViewAll.png')} style={styles.imageR} />
+                            </View>
+                        </TouchableOpacity>
 
-                                {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
-                                <TouchableOpacity
-                                    style={styles.CContainer}
-                                    onPress={() => navigation.navigate('KeyAssociates')}
-                                    activeOpacity={0.8}
-                                >
-                                    {/* Left side content */}
-                                    <View style={styles.leftContent}>
-                                        <Image source={require('../../../assets/img/MyConnectCC.png')} style={styles.image} />
-                                        <Text style={styles.leftText}>Key Associates</Text>
-                                    </View>
+                        {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
+                        <TouchableOpacity
+                            style={styles.CContainer}
+                            onPress={() => navigation.navigate('KeyAssociates')}
+                            activeOpacity={0.8}
+                        >
+                            {/* Left side content */}
+                            <View style={styles.leftContent}>
+                                <Image source={require('../../../assets/img/MyConnectCC.png')} style={styles.image} />
+                                <Text style={styles.leftText}>Key Associates</Text>
+                            </View>
 
-                                    {/* Middle content */}
-                                    <View style={styles.middleContent}>
-                                        <Text style={styles.middleText}>({dataCounts.totalKeyAssociates} others)</Text>
-                                    </View>
+                            {/* Middle content */}
+                            <View style={styles.middleContent}>
+                                <Text style={styles.middleText}>({dataCounts.totalKeyAssociates} others)</Text>
+                            </View>
 
-                                    {/* Right side content */}
-                                    <View style={styles.rightContent}>
-                                        <Image source={require('../../../assets/img/ViewAll.png')} style={styles.imageR} />
-                                    </View>
-                                </TouchableOpacity>
+                            {/* Right side content */}
+                            <View style={styles.rightContent}>
+                                <Image source={require('../../../assets/img/ViewAll.png')} style={styles.imageR} />
+                            </View>
+                        </TouchableOpacity>
 
-                                {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
+                        {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
 
-                                <TouchableOpacity
-                                    style={styles.CContainer}
-                                    onPress={() => navigation.navigate('DropCards')}
-                                    activeOpacity={0.8}
-                                >
-                                    {/* Left side content */}
-                                    <View style={styles.leftContent}>
-                                        <Image source={require('../../../assets/img/CardsDropCC.png')} style={styles.image} />
-                                        <Text style={styles.leftText}>Cards Dropped</Text>
-                                    </View>
+                        <TouchableOpacity
+                            style={styles.CContainer}
+                            onPress={() => navigation.navigate('DropCards')}
+                            activeOpacity={0.8}
+                        >
+                            {/* Left side content */}
+                            <View style={styles.leftContent}>
+                                <Image source={require('../../../assets/img/CardsDropCC.png')} style={styles.image} />
+                                <Text style={styles.leftText}>Cards Dropped</Text>
+                            </View>
 
-                                    {/* Middle content */}
-                                    <View style={styles.middleContent}>
-                                        <Text style={styles.middleText}>({dataCounts.totalCardsRecvd} others)</Text>
-                                    </View>
+                            {/* Middle content */}
+                            <View style={styles.middleContent}>
+                                <Text style={styles.middleText}>({dataCounts.totalCardsRecvd} others)</Text>
+                            </View>
 
-                                    {/* Right side content */}
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', flex: 1 }}>
-                                        <Image source={require('../../../assets/img/ViewAll.png')} style={{ width: 18, height: 18, marginLeft: 10 }} />
-                                    </View>
-                                </TouchableOpacity>
+                            {/* Right side content */}
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', flex: 1 }}>
+                                <Image source={require('../../../assets/img/ViewAll.png')} style={{ width: 18, height: 18, marginLeft: 10 }} />
+                            </View>
+                        </TouchableOpacity>
 
-                                {/* Horizontal line */}
-                                {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
+                        {/* Horizontal line */}
+                        {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
 
-                                <TouchableOpacity
-                                    style={styles.CContainer}
-                                    onPress={() => navigation.navigate('ReceivedReq')}
-                                    activeOpacity={0.8}
-                                >
-                                    {/* Left side content */}
-                                    <View style={styles.leftContent}>
-                                        <Image source={require('../../../assets/img/PendingReqCC.png')} style={styles.imageL} />
-                                        <Text style={styles.leftText}>Pending Requests</Text>
-                                    </View>
+                        <TouchableOpacity
+                            style={styles.CContainer}
+                            onPress={() => navigation.navigate('ReceivedReq')}
+                            activeOpacity={0.8}
+                        >
+                            {/* Left side content */}
+                            <View style={styles.leftContent}>
+                                <Image source={require('../../../assets/img/PendingReqCC.png')} style={styles.imageL} />
+                                <Text style={styles.leftText}>Pending Requests</Text>
+                            </View>
 
-                                    {/* Middle content */}
-                                    <View style={styles.middleContent}>
-                                        <Text style={styles.middleText}>({dataCounts.totalPendingReq} others)</Text>
-                                    </View>
+                            {/* Middle content */}
+                            <View style={styles.middleContent}>
+                                <Text style={styles.middleText}>({dataCounts.totalPendingReq} others)</Text>
+                            </View>
 
-                                    {/* Right side content */}
-                                    <View style={styles.rightContent}>
-                                        <Image source={require('../../../assets/img/ViewAll.png')} style={styles.imageR} />
-                                    </View>
-                                </TouchableOpacity>
+                            {/* Right side content */}
+                            <View style={styles.rightContent}>
+                                <Image source={require('../../../assets/img/ViewAll.png')} style={styles.imageR} />
+                            </View>
+                        </TouchableOpacity>
 
-                            {/* Horizontal line */}
-                            {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
+                        {/* Horizontal line */}
+                        {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
 
-                            <TouchableOpacity
-                                style={styles.CContainer}
-                                activeOpacity={0.8}
-                                onPress={() => navigation.navigate('SentReq')}
-                            >
-                                {/* Left side content */}
-                                <View style={styles.leftContent}>
-                                        <Image source={require('../../../assets/img/EmpCC.png')} style={styles.imageL} />
-                                    <Text style={styles.leftText}>Sent Requests</Text>
-                                </View>
+                        <TouchableOpacity
+                            style={styles.CContainer}
+                            activeOpacity={0.8}
+                            onPress={() => navigation.navigate('SentReq')}
+                        >
+                            {/* Left side content */}
+                            <View style={styles.leftContent}>
+                                <Image source={require('../../../assets/img/EmpCC.png')} style={styles.imageL} />
+                                <Text style={styles.leftText}>Sent Requests</Text>
+                            </View>
 
-                                {/* Middle content */}
-                                <View style={styles.middleContent}>
-                                    {/* <Text style={styles.middleText}>(10+ others)</Text> */}
-                                </View>
+                            {/* Middle content */}
+                            <View style={styles.middleContent}>
+                                {/* <Text style={styles.middleText}>(10+ others)</Text> */}
+                            </View>
 
-                                {/* Right side content */}
-                                <View style={styles.rightContent}>
-                                    <Image source={require('../../../assets/img/ViewAll.png')} style={styles.imageR} />
-                                </View>
-                            </TouchableOpacity>
-
-                          
+                            {/* Right side content */}
+                            <View style={styles.rightContent}>
+                                <Image source={require('../../../assets/img/ViewAll.png')} style={styles.imageR} />
+                            </View>
+                        </TouchableOpacity>
 
 
-                            {/* Horizontal line */}
-                            {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
 
-                            {/* <TouchableOpacity
+
+                        {/* Horizontal line */}
+                        {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
+
+                        {/* <TouchableOpacity
                                 style={styles.CContainer}
                                 onPress={() => navigation.navigate('BlockAcc')}
                                 activeOpacity={0.8}
@@ -262,58 +395,58 @@ const Connections = ({ navigation }) => {
                                 </View>
                             </TouchableOpacity> */}
 
-                            {/* Horizontal line */}
-                            {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
+                        {/* Horizontal line */}
+                        {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
 
-                                <TouchableOpacity
-                                    style={styles.CContainer}
-                                    onPress={() => navigation.navigate('Endorsement')}
-                                    activeOpacity={0.8}
-                                >
-                                    {/* Left side content */}
-                                    <View style={styles.leftContent}>
-                                        <Image source={require('../../../assets/img/Endment.png')} style={styles.imageE} />
-                                        <Text style={styles.leftText}>Endorsement</Text>
-                                    </View>
+                        <TouchableOpacity
+                            style={styles.CContainer}
+                            onPress={() => navigation.navigate('Endorsement')}
+                            activeOpacity={0.8}
+                        >
+                            {/* Left side content */}
+                            <View style={styles.leftContent}>
+                                <Image source={require('../../../assets/img/Endment.png')} style={styles.imageE} />
+                                <Text style={styles.leftText}>Endorsement</Text>
+                            </View>
 
-                                    {/* Middle content */}
-                                    <View style={styles.middleContent}>
-                                        {/* <Text style={styles.middleText}>(02 others)</Text> */}
-                                    </View>
+                            {/* Middle content */}
+                            <View style={styles.middleContent}>
+                                {/* <Text style={styles.middleText}>(02 others)</Text> */}
+                            </View>
 
-                                    {/* Right side content */}
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', flex: 1 }}>
-                                        <Image source={require('../../../assets/img/ViewAll.png')} style={{ width: 18, height: 18, marginLeft: 10 }} />
-                                    </View>
-                                </TouchableOpacity>
+                            {/* Right side content */}
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', flex: 1 }}>
+                                <Image source={require('../../../assets/img/ViewAll.png')} style={{ width: 18, height: 18, marginLeft: 10 }} />
+                            </View>
+                        </TouchableOpacity>
 
-                                {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
+                        {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
 
-                                <TouchableOpacity
-                                    style={styles.CContainer}
-                                    onPress={() => navigation.navigate('Empaneled')}
-                                    activeOpacity={0.8}
-                                >
-                                    {/* Left side content */}
-                                    <View style={styles.leftContent}>
-                                        <Image source={require('../../../assets/img/SentReqCC.png')} style={styles.imageL} />
-                                        <Text style={styles.leftText}>Empaneled</Text>
-                                    </View>
+                        <TouchableOpacity
+                            style={styles.CContainer}
+                            onPress={() => navigation.navigate('Empaneled')}
+                            activeOpacity={0.8}
+                        >
+                            {/* Left side content */}
+                            <View style={styles.leftContent}>
+                                <Image source={require('../../../assets/img/SentReqCC.png')} style={styles.imageL} />
+                                <Text style={styles.leftText}>Empaneled</Text>
+                            </View>
 
-                                    {/* Middle content */}
-                                    <View style={styles.middleContent}>
-                                        {/* <Text style={styles.middleText}>(02 others)</Text> */}
-                                    </View>
+                            {/* Middle content */}
+                            <View style={styles.middleContent}>
+                                {/* <Text style={styles.middleText}>(02 others)</Text> */}
+                            </View>
 
-                                    {/* Right side content */}
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', flex: 1 }}>
-                                        <Image source={require('../../../assets/img/ViewAll.png')} style={{ width: 18, height: 18, marginLeft: 10 }} />
-                                    </View>
-                                </TouchableOpacity>
+                            {/* Right side content */}
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', flex: 1 }}>
+                                <Image source={require('../../../assets/img/ViewAll.png')} style={{ width: 18, height: 18, marginLeft: 10 }} />
+                            </View>
+                        </TouchableOpacity>
 
-                                {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
+                        {/* <View style={{ height: 1, backgroundColor: '#ccc' }} /> */}
 
-                                {/* <TouchableOpacity
+                        {/* <TouchableOpacity
                                     style={styles.CContainer}
                                     onPress={() => navigation.navigate('Branches')}
                                     activeOpacity={0.8}
@@ -332,36 +465,36 @@ const Connections = ({ navigation }) => {
                                     </View>
                                 </TouchableOpacity> */}
 
-                                {accidtyid === '2' || accidtyid === '3' ? (
-                                    <TouchableOpacity
-                                        style={styles.CContainer}
-                                        onPress={() => navigation.navigate('Branches')}
-                                        activeOpacity={0.8}
-                                    >
-                                        {/* Left side content */}
-                                        <View style={styles.leftContent}>
-                                            <Image source={require('../../../assets/img/Endment.png')} style={styles.imageE} />
-                                            <Text style={styles.leftText}>Branches</Text>
-                                        </View>
+                        {accidtyid === '2' || accidtyid === '3' ? (
+                            <TouchableOpacity
+                                style={styles.CContainer}
+                                onPress={() => navigation.navigate('Branches')}
+                                activeOpacity={0.8}
+                            >
+                                {/* Left side content */}
+                                <View style={styles.leftContent}>
+                                    <Image source={require('../../../assets/img/Endment.png')} style={styles.imageE} />
+                                    <Text style={styles.leftText}>Branches</Text>
+                                </View>
 
-                                        {/* Middle content */}
-                                        <View style={styles.middleContent}>
-                                            {/* <Text style={styles.middleText}>(22+ others)</Text> */}
-                                        </View>
+                                {/* Middle content */}
+                                <View style={styles.middleContent}>
+                                    {/* <Text style={styles.middleText}>(22+ others)</Text> */}
+                                </View>
 
-                                        {/* Right side content */}
-                                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', flex: 1 }}>
-                                            <Image source={require('../../../assets/img/ViewAll.png')} style={{ width: 18, height: 18, marginLeft: 10 }} />
-                                        </View>
-                                    </TouchableOpacity>
-                                ) : null}
+                                {/* Right side content */}
+                                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', flex: 1 }}>
+                                    <Image source={require('../../../assets/img/ViewAll.png')} style={{ width: 18, height: 18, marginLeft: 10 }} />
+                                </View>
+                            </TouchableOpacity>
+                        ) : null}
 
 
 
-                        </View>
-                    </ScrollView>
-                </View>
-            )}
+                    </View>
+                    )}
+                </ScrollView>
+            </View>
         </SafeAreaView>
     );
 };
@@ -433,6 +566,29 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'flex-end',
         flex: 1,
+    },
+
+    skeletonContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: moderateScale(8),
+        paddingVertical: moderateScale(11),
+        backgroundColor: '#fff',
+        paddingHorizontal: moderateScale(14),
+        borderColor: '#979797',
+        borderWidth: 0.2,
+        borderRadius: 24,
+    },
+    imageSkeleton: {
+        width: 24,
+        height: 24,
+        backgroundColor: '#E0E0E0',
+        borderRadius: 12,
+    },
+    textSkeleton: {
+        height: 20,
+        backgroundColor: '#E0E0E0',
+        borderRadius: 5,
     },
 });
 

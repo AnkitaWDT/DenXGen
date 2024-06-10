@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import SplashScreen from './SplashScreen';
 import OnBoardScreen from './OnBoarding/OnBoardingScreen';
 import LoginScreen from './Login/LoginScreen';
@@ -108,7 +108,13 @@ const Navigation = () => {
     
     return (
         <NavigationContainer linking={LinkingConfig}>
-            <Stack.Navigator>
+            <Stack.Navigator
+                screenOptions={{
+                    gestureEnabled: true,
+                    gestureDirection: 'horizontal',
+                    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                }}
+            >
                 <Stack.Screen
                     name="SplashScreen"
                     component={SplashScreen}

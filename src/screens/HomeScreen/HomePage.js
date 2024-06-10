@@ -861,7 +861,7 @@ const HomePage = ({ navigation, route }) => {
 
           </View>
       </View>
-              <TouchableOpacity onPress={() => navigation.navigate('FiltersScreen')} style={commonStyles.searchBarContainer} activeOpacity={0.8}>
+              {/* <TouchableOpacity onPress={() => navigation.navigate('FiltersScreen')} style={commonStyles.searchBarContainer} activeOpacity={0.8}>
             <View style={commonStyles.leftContainer}>
               <View style={commonStyles.backContainerSearch}>
                 <Image
@@ -888,7 +888,7 @@ const HomePage = ({ navigation, route }) => {
               />
             </TouchableOpacity>
 
-              </TouchableOpacity>
+              </TouchableOpacity> */}
         </View>
             <Modal
               visible={modalVisible}
@@ -1960,7 +1960,7 @@ const styles = StyleSheet.create({
   },
   topView: {
     //flex: 0.25,
-    height: 150,
+    height: 80,
     backgroundColor: '#289EF5',
     borderBottomStartRadius: 20,
     borderBottomEndRadius: 20,

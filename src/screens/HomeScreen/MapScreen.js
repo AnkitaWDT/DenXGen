@@ -87,7 +87,7 @@ const MapScreen = ({ navigation }) => {
             const longitude = await AsyncStorage.getItem('longitude');
 
             if (latitude && longitude) {
-                Geocoder.init('AIzaSyA0S-GTdzmauef2wwA75Oo05zqWZdnZN58');
+                Geocoder.init('API_KEY');
                 const res = await Geocoder.from({ latitude, longitude });
 
                 if (res.results.length > 0) {
@@ -153,7 +153,7 @@ const MapScreen = ({ navigation }) => {
     // Function to filter nearby locations within a certain radius
     // const fetchNearbyLocations = async (currentLocation, markerPosition, radius) => {
     //     try {
-    //         const apiKey = 'AIzaSyDGce21Ka5lP7WmaCaAQ2k0O6Zd2aN_fSA';
+    //         const apiKey = '';
     //         const { latitude, longitude } = markerPosition;
     //         console.log(markerPosition);
     //         const apiUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=500&key=${apiKey}`;
@@ -389,8 +389,7 @@ const MapScreen = ({ navigation }) => {
     };
 
     useEffect(() => {
-        Geocoder.init('AIzaSyA0S-GTdzmauef2wwA75Oo05zqWZdnZN58'); // Replace with your API key
-
+        Geocoder.init('API_KEY');//
         const fetchLocationInfo = async (latitude, longitude) => {
             try {
                 const res = await Geocoder.from({ latitude, longitude });
@@ -651,7 +650,7 @@ setModalVisible(false);
                                 onPress={handleSelectLocation}
                                 fetchDetails={true}
                                 query={{
-                                    key: 'AIzaSyA0S-GTdzmauef2wwA75Oo05zqWZdnZN58',
+                                    key: 'API_KEY',
                                     language: 'en',
                                 }}
                                 timeout={20000}

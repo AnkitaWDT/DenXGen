@@ -21,6 +21,43 @@ const responsiveFontSize = (size) => {
     return Math.round(PixelRatio.roundToNearestPixel(newSize));
 };
 
+const SkeletonPlaceholder = () => {
+    // Create an array with a length of 10 to render 10 placeholders
+    const skeletonItems = Array.from({ length: 10 }, (_, index) => index);
+
+    return (
+        <>
+            {skeletonItems.map((item) => (
+                <View key={item} style={styles.skeletonContainer}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10, backgroundColor: '#979797', }} />
+                        <View style={{ flexDirection: 'column' }}>
+                            <View style={{ width: 150, height: 20, marginBottom: 4, backgroundColor: '#979797', }} />
+                            <View style={{ width: 100, height: 16, backgroundColor: '#979797', }} />
+                        </View>
+                    </View>
+                    <View
+                        style={{
+                            paddingVertical: 4,
+                            paddingHorizontal: 10,
+                            borderRadius: 24,
+                            borderColor: '#979797',
+                            backgroundColor: '#979797',
+                            borderWidth: 1,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            width: 80,
+                            height: 30,
+                        }}
+                    />
+                </View>
+            ))}
+        </>
+    );
+};
+
+
+
 const SentReq = ({ navigation }) => {
     const [activeTab, setActiveTab] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
@@ -188,6 +225,7 @@ const SentReq = ({ navigation }) => {
 
     const fetchConnectionsData = async () => {
         try {
+            setIsLoading(true); 
             const accidty = await AsyncStorage.getItem('selected_profile_accidty');
             const accidtyid = await AsyncStorage.getItem('selected_id');
             const response = await fetch(`https://temp.wedeveloptech.in/denxgen/appdata/getmyaccsentreqlist-ax.php?accid=${accidtyid}&accidty=${accidty}&action=connections`);
@@ -213,10 +251,10 @@ const SentReq = ({ navigation }) => {
 
             setConnections(filteredData);
             console.log(filteredData);
-            setIsLoading(false);
         } catch (error) {
             console.error('Error fetching data:', error);
-            setIsLoading(false);
+        } finally {
+            setIsLoading(false); // Set isLoading to false after data fetching completes (whether successful or not)
         }
     };
 
@@ -393,11 +431,19 @@ const SentReq = ({ navigation }) => {
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             // Set loading state to false after the delay
-            setIsLoading(false);
+            //setIsLoading(false);
         };
 
         // Execute the fakeAsyncOperation
         fakeAsyncOperation();
+    }, []);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 5000); // Show skeleton for at least 5 seconds
+
+        return () => clearTimeout(timer); // Cleanup the timer on unmount
     }, []);
 
 
@@ -486,7 +532,21 @@ const SentReq = ({ navigation }) => {
 
     const renderTabContent = () => {
         if (activeTab === 0) {
-            if (connections.length === 0) {
+            if (isLoading) {
+                // Render Skeleton UI while loading
+                return <SkeletonPlaceholder />;
+            } else if (connections.length > 0) {
+                // Render FlatList with data
+                return (
+                    <FlatList
+                        data={connections}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item.name.toString()}
+                        refreshing={isLoading}
+                    />
+                );
+            } else {
+                // Render No Data Found
                 return (
                     <View style={styles.animationContainer}>
                         <LottieView
@@ -500,17 +560,9 @@ const SentReq = ({ navigation }) => {
                         <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
                     </View>
                 );
-            } else {
-                return (
-                    <FlatList
-                        data={connections}
-                        renderItem={renderItem}
-                        keyExtractor={(item) => item.name.toString()}
-                        refreshing={isLoading}
-                    />
-                );
             }
         }
+
         else if (activeTab === 1) {
             if (keyAssociates.length === 0) {
                 return (
@@ -641,8 +693,8 @@ const SentReq = ({ navigation }) => {
     };
 
     const renderItem = ({ item, index }) => {
-        const name =
-            item.name;
+        const speciality =
+            item.speciality || item.service || null;
 
         const contactStatus =
             item.pr_contact_status ||
@@ -669,7 +721,7 @@ const SentReq = ({ navigation }) => {
 
 
         const truncatedTitle = truncateText(item.name, width * 0.75, 17);
-        const truncatedDescription = truncateText(item.description, width * 0.85, 15);
+        const truncatedDescription = truncateText(speciality, width * 0.85, 15);
         // const truncatedDescription = truncateText(item.specList[0].speciality, width * 0.85, 15);
 
 
@@ -773,22 +825,19 @@ const SentReq = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            {isLoading ? (
-                <Animation />
-            ) : (
-                <View>
-                    <View style={commonStyles.wrapT}>
-                        <TouchableOpacity style={commonStyles.backContainer} activeOpacity={0.8} onPress={() => navigation.goBack()}>
-                            <Image source={require('../../../assets/img/Back.png')} style={commonStyles.icon} />
-                        </TouchableOpacity>
-                        <Text style={commonStyles.backText}>Sent Requests</Text>
-                        <TouchableOpacity style={commonStyles.backContainer1} activeOpacity={0.8}>
-                            <Image source={require('../../../assets/img/Option.png')} style={commonStyles.icon} />
-                        </TouchableOpacity>
-                    </View>
+            <View>
+                <View style={commonStyles.wrapT}>
+                    <TouchableOpacity style={commonStyles.backContainer} activeOpacity={0.8} onPress={() => navigation.goBack()}>
+                        <Image source={require('../../../assets/img/Back.png')} style={commonStyles.icon} />
+                    </TouchableOpacity>
+                    <Text style={commonStyles.backText}>Sent Requests</Text>
+                    <TouchableOpacity style={commonStyles.backContainer1} activeOpacity={0.8}>
+                        <Image source={require('../../../assets/img/Option.png')} style={commonStyles.icon} />
+                    </TouchableOpacity>
+                </View>
 
-                    {/* Tabs */}
-                    {/* <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {/* Tabs */}
+                {/* <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                         {tabs.map((tab, index) => (
                             <View key={index}>
                                 <TouchableOpacity
@@ -821,77 +870,77 @@ const SentReq = ({ navigation }) => {
                         ))}
                     </ScrollView> */}
 
-                    <View style={styles.subContainer}>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                            {tabs.map((tab, index) => (
-                                <View key={index}>
-                                    <TouchableOpacity
-                                        style={{
-                                            height: height * 0.04,
-                                            backgroundColor: activeTab === index ? "#289EF5" : '#E8F8FF',
-                                            opacity: activeTab === index ? 1 : 1,
-                                            borderRadius: 6,
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            marginVertical: height * 0.02,
-                                            marginRight: 12,
-                                            paddingHorizontal: height * 0.01,
-                                        }}
-                                        onPress={() => handleTabPress(index)}
-                                        activeOpacity={0.8}
-                                    >
-                                        <Text style={{
-                                            fontSize: responsiveFontSize(15),
-                                            alignSelf: 'center',
-                                            color: activeTab === index ? 'rgba(255, 255, 255, 1)' : '#289EF5',
-                                            paddingHorizontal: 5,
-                                            textAlign: 'center',
-                                            fontFamily: 'DMSans-Medium',
-                                            lineHeight: height * 0.028 //28
-                                        }}>{tab}</Text>
-                                    </TouchableOpacity>
+                <View style={styles.subContainer}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                        {tabs.map((tab, index) => (
+                            <View key={index}>
+                                <TouchableOpacity
+                                    style={{
+                                        height: height * 0.04,
+                                        backgroundColor: activeTab === index ? "#289EF5" : '#E8F8FF',
+                                        opacity: activeTab === index ? 1 : 1,
+                                        borderRadius: 6,
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        marginVertical: height * 0.02,
+                                        marginRight: 12,
+                                        paddingHorizontal: height * 0.01,
+                                    }}
+                                    onPress={() => handleTabPress(index)}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={{
+                                        fontSize: responsiveFontSize(15),
+                                        alignSelf: 'center',
+                                        color: activeTab === index ? 'rgba(255, 255, 255, 1)' : '#289EF5',
+                                        paddingHorizontal: 5,
+                                        textAlign: 'center',
+                                        fontFamily: 'DMSans-Medium',
+                                        lineHeight: height * 0.028 //28
+                                    }}>{tab}</Text>
+                                </TouchableOpacity>
 
+                            </View>
+                        ))}
+                    </ScrollView>
+
+
+                    <ScrollView
+                        style={{ height: height }}
+                        horizontal
+                        pagingEnabled
+                        showsHorizontalScrollIndicator={false}
+                        ref={scrollViewRef}
+                        onScroll={event => {
+                            const offsetX = event.nativeEvent.contentOffset.x;
+                            const index = Math.round(offsetX / (width - width * 0.08));
+                            setActiveTab(index);
+                        }}
+                    >
+                        {data[activeTab].length > 0 ? (
+                            tabs.map((tab, index) => (
+                                <View key={index} style={{ width: width - width * 0.08, paddingBottom: 150 }}>
+                                    {/* Wrap each tab content with ScrollView */}
+                                    <ScrollView showsVerticalScrollIndicator={false}>
+                                        {renderTabContent(index)}
+                                    </ScrollView>
                                 </View>
-                            ))}
-                        </ScrollView>
-
-
-                        <ScrollView
-                            style={{ height: height }}
-                            horizontal
-                            pagingEnabled
-                            showsHorizontalScrollIndicator={false}
-                            ref={scrollViewRef}
-                            onScroll={event => {
-                                const offsetX = event.nativeEvent.contentOffset.x;
-                                const index = Math.round(offsetX / (width - width * 0.08));
-                                setActiveTab(index);
-                            }}
-                        >
-                            {data[activeTab].length > 0 ? (
-                                tabs.map((tab, index) => (
-                                    <View key={index} style={{ width: width - width * 0.08, paddingBottom: 150 }}>
-                                        {/* Wrap each tab content with ScrollView */}
-                                        <ScrollView showsVerticalScrollIndicator={false}>
-                                            {renderTabContent(index)}
-                                        </ScrollView>
-                                    </View>
-                                ))
-                            ) : (
-                                <View style={styles.noDataContainer}>
-                                    {/* <Image source={require('../../../assets/img/SelectLocation.png')} style={styles.noDataImage} /> */}
-                                    <LottieView
-                                        ref={animationRef}
-                                        source={require('../../../assets/img/loader.json')}
-                                        style={styles.animation}
-                                    />
-                                    <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
-                                </View>
-                            )}
-                        </ScrollView>
-                    </View>
-                    {/* Render FlatList or No Data image */}
-                    {/* {data[activeTab].length > 0 ? (
+                            ))
+                        ) : (
+                            <View style={styles.noDataContainer}>
+                                {/* <Image source={require('../../../assets/img/SelectLocation.png')} style={styles.noDataImage} /> */}
+                                <LottieView
+                                    ref={animationRef}
+                                    source={require('../../../assets/img/loader.json')}
+                                    style={styles.animation}
+                                />
+                                <Text style={[commonStyles.headerText4BL, {}]}>No Data Found</Text>
+                            </View>
+                        )}
+                    </ScrollView>
+                </View>
+                {/* Render FlatList or No Data image */}
+                {/* {data[activeTab].length > 0 ? (
                         <ScrollView showsVerticalScrollIndicator={false}>
                             <FlatList
                                 data={data[activeTab].filter((item) => item.title.toLowerCase().includes(searchQuery.toLowerCase()))}
@@ -912,14 +961,25 @@ const SentReq = ({ navigation }) => {
                                     </View>
                         </View> 
                     )} */}
-                </View>
-            )}
+            </View>
         </View>
 
     );
 };
 
 const styles = StyleSheet.create({
+    skeletonContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: moderateScale(11),
+        backgroundColor: '#E0E0E0',
+        paddingHorizontal: moderateScale(14),
+        borderColor: '#979797',
+        borderWidth: 0.2,
+        borderRadius: 24,
+        justifyContent: 'space-between',
+        marginVertical: 10,
+    },
     noDataContainer: {
         justifyContent: 'center',
         alignItems: 'center',

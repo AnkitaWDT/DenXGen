@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, Image, TouchableOpacity, ScrollView, FlatList, PixelRatio, TouchableWithoutFeedback, Dimensions, TextInput, SafeAreaView, Linking } from 'react-native';
 import commonStyles from '../../components/CommonStyles';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
@@ -14,6 +14,7 @@ import defaultMaleImage from '../../../assets/img/defaultM.png';
 import defaultFemaleImage from '../../../assets/img/defaultF.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 const { width, height } = Dimensions.get('window');
 const responsiveFontSize = (size) => {
@@ -64,6 +65,27 @@ const Explore = ({ navigation, route }) => {
   //     }
   //   }
   // }, []);
+
+  const [scrollViewWidth, setScrollViewWidth] = useState(0);
+  const scrollViewRef = useRef(null);
+  const tabRefs = useRef([]);
+
+  useEffect(() => {
+    if (tabRefs.current[selectedTab]) {
+      tabRefs.current[selectedTab].measureLayout(
+        scrollViewRef.current,
+        (x, y, width, height) => {
+          let scrollPos = x + width / 2 - scrollViewWidth / 2;
+          if (scrollPos < 0) {
+            scrollPos = 0;
+          } else if (scrollPos + scrollViewWidth > scrollViewWidth) {
+            scrollPos = scrollViewWidth - scrollViewWidth;
+          }
+          scrollViewRef.current.scrollTo({ x: scrollPos, animated: true });
+        }
+      );
+    }
+  }, [selectedTab, scrollViewWidth]);
 
 
   const handleTabChange = async (index) => {
@@ -189,6 +211,12 @@ const Explore = ({ navigation, route }) => {
     return gender === "Male" ? defaultMaleImage : defaultFemaleImage;
   };
 
+  const [professionalsLoading, setProfessionalsLoading] = useState(true);
+  const [clinicsLoading, setClinicsLoading] = useState(true);
+  const [officesLoading, setOfficesLoading] = useState(true);
+  const [othersLoading, setOthersLoading] = useState(true);
+
+
   const [professionalsData, setProfessionalsData] = useState([]);
   useEffect(() => {
     fetchProfessionalsData();
@@ -196,7 +224,7 @@ const Explore = ({ navigation, route }) => {
 
   const fetchProfessionalsData = async () => {
     try {
-
+      setProfessionalsLoading(true);
       const pr_id = await AsyncStorage.getItem('pr_id');
       const id = parseInt(pr_id);
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
@@ -214,9 +242,11 @@ const Explore = ({ navigation, route }) => {
       } else {
         // Handle error
       }
+      setProfessionalsLoading(false);
     } catch (error) {
       // Handle error
       console.error(error);
+      setProfessionalsLoading(false);
     }
   };
 
@@ -227,6 +257,7 @@ const Explore = ({ navigation, route }) => {
 
   const fetchClinicsData = async () => {
     try {
+       setClinicsLoading(true);
       const pr_id = await AsyncStorage.getItem('pr_id');
       const id = parseInt(pr_id);
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
@@ -238,9 +269,12 @@ const Explore = ({ navigation, route }) => {
       } else {
         // Handle error
       }
+     
+       setClinicsLoading(false);
     } catch (error) {
       // Handle error
       console.error(error);
+      setClinicsLoading(false);
     }
   };
 
@@ -251,6 +285,7 @@ const Explore = ({ navigation, route }) => {
 
   const fetchOfficeData = async () => {
     try {
+       setOfficesLoading(true);
       const pr_id = await AsyncStorage.getItem('pr_id');
       const id = parseInt(pr_id);
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
@@ -262,9 +297,11 @@ const Explore = ({ navigation, route }) => {
       } else {
         // Handle error
       }
+       setOfficesLoading(false);
     } catch (error) {
       // Handle error
       console.error(error);
+       setOfficesLoading(false);
     }
   };
 
@@ -275,7 +312,7 @@ const Explore = ({ navigation, route }) => {
 
   const fetchOthersData = async () => {
     try {
-
+      setOthersLoading(true);
       const pr_id = await AsyncStorage.getItem('pr_id');
       const id = parseInt(pr_id);
       const accidty = await AsyncStorage.getItem('selected_profile_accidty');
@@ -287,9 +324,11 @@ const json = await response.json();
       } else {
         // Handle error
       }
+      setOthersLoading(false);
     } catch (error) {
       // Handle error
       console.error(error);
+      setOthersLoading(false);
     }
   };
 
@@ -314,7 +353,7 @@ const json = await response.json();
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    //height: 80,
+                    minHeight: 85,
                     paddingVertical: 8,
                     backgroundColor: '#FEFCFC'
                   }}
@@ -389,116 +428,159 @@ const json = await response.json();
                         {item.speciality}
                       </Text>
                       {/* Render location */}
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                         
+                      {item.locality !== null && item.pincode !== null && item.locality !== '' && item.pincode !== '' && (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12, marginRight: 8 }} />
+                            <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                              {item.locality}, {item.pincode}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
+                      )}
+
                       {/* Add more texts or components if needed */}
                     </View>
                   </View>
                 </TouchableOpacity>
               ))
             ) : (
-              professionalsData.map((item) => (
-                <TouchableOpacity
-                  key={item.id}
-                  style={{
-                    paddingHorizontal: 9,
-                    borderWidth: 0.5,
-                    borderRadius: 8,
-                    borderColor: '#979797',
-                    marginBottom: 16,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    //height: 80,
-                    paddingVertical: 8,
-                    backgroundColor: '#FEFCFC'
-                  }}
-                  activeOpacity={0.8}
-                  onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.pr_id })}
-                >
-                  {/* Left side image and text */}
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    {item.profile_pic ? (
-                      <Image source={{ uri: item.profile_pic }} style={styles.profileImage} />
-                    ) : (
-                      <Image source={renderDefaultImage(item.gender)} style={styles.profileImage} />
-                    )}
-                    <View style={{ flex: 1, }}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
-                        <Text style={[commonStyles.headerText4BL, { lineHeight: 24, }]} numberOfLines={1}>{item.name}</Text>
-                        <Popover
-                          placement={PopoverPlacement.LEFT}
-                          from={(
-                            <TouchableOpacity
-                            >
-                              <Image
-                                source={require('../../../assets/img/ViewM.png')}
-                                style={{ width: 3, height: 13, marginRight: 5 }}
-                              />
-                            </TouchableOpacity>
-                          )}>
-                          <View style={commonStyles.popover}>
-                            <TouchableOpacity>
-                              <View style={commonStyles.popoverItemContainer}>
-                                <Image
-                                  source={require('../../../assets/img/Bookmark.png')}
-                                  style={commonStyles.popoverItemIcon}
-                                />
-                                <Text style={commonStyles.popoverItemText}>Save PDF</Text>
-                              </View>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity>
-                              <View style={commonStyles.popoverItemContainer}>
-                                <Image
-                                  source={require('../../../assets/img/SaveCon.png')}
-                                  style={commonStyles.popoverItemIcon}
-                                />
-                                <Text style={commonStyles.popoverItemText}>Save Contact</Text>
-                              </View>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity>
-                              <View style={commonStyles.popoverItemContainer}>
-                                <Image
-                                  source={require('../../../assets/img/Spam.png')}
-                                  style={commonStyles.popoverItemIcon}
-                                />
-                                <Text style={commonStyles.popoverItemText}>Report Spam</Text>
-                              </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity>
-                              <View style={commonStyles.popoverItemContainer}>
-                                <Image
-                                  source={require('../../../assets/img/Link.png')}
-                                  style={commonStyles.popoverItemIcon}
-                                />
-                                <Text style={commonStyles.popoverItemText}>Copy Link</Text>
-                              </View>
-                            </TouchableOpacity>
-                          </View>
-                        </Popover>
-                      </View>
-                      {/* Render specialty */}
-                      <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
-                        {item.speciality}
-                      </Text>
-                      {/* Render location */}
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                professionalsLoading ? (
+                  // Generate 10 SkeletonPlaceholder components
+                  Array.from({ length: 10 }).map((_, index) => (
+                    <SkeletonPlaceholder key={index}>
+                      <View
+                        style={{
+                          paddingHorizontal: 9,
+                          borderWidth: 0.5,
+                          borderRadius: 8,
+                          borderColor: '#979797',
+                          marginBottom: 16,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          minHeight: 85,
+                          paddingVertical: 8,
+                          backgroundColor: '#FEFCFC'
+                        }}
+                      >
+                        {/* Skeleton placeholder layout */}
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                        
+                          <View style={{ width: 60, height: 60, borderRadius: 50, marginRight: 20 }} />
+                          <View>
+                            <View style={{ width: 120, height: 20, marginBottom: 6 }} />
+                            <View style={{ width: 150, height: 14 }} />
+                          </View>
                         </View>
                       </View>
-                      {/* Add more texts or components if needed */}
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              ))
+                    </SkeletonPlaceholder>
+                  ))
+                ) : (
+                    professionalsData.map((item) => (
+                      <TouchableOpacity
+                        key={item.id}
+                        style={{
+                          paddingHorizontal: 9,
+                          borderWidth: 0.5,
+                          borderRadius: 8,
+                          borderColor: '#979797',
+                          marginBottom: 16,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          minHeight: 85,
+                          paddingVertical: 8,
+                          backgroundColor: '#FEFCFC'
+                        }}
+                        activeOpacity={0.8}
+                        onPress={() => navigation.navigate('ProfileScreen', { professionalId: item.pr_id })}
+                      >
+                        {/* Left side image and text */}
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          {item.profile_pic ? (
+                            <Image source={{ uri: item.profile_pic }} style={styles.profileImage} />
+                          ) : (
+                            <Image source={renderDefaultImage(item.gender)} style={styles.profileImage} />
+                          )}
+                          <View style={{ flex: 1, }}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', }}>
+                              <Text style={[commonStyles.headerText4BL, { lineHeight: 24, }]} numberOfLines={1}>{item.name}</Text>
+                              <Popover
+                                placement={PopoverPlacement.LEFT}
+                                from={(
+                                  <TouchableOpacity
+                                  >
+                                    <Image
+                                      source={require('../../../assets/img/ViewM.png')}
+                                      style={{ width: 3, height: 13, marginRight: 5 }}
+                                    />
+                                  </TouchableOpacity>
+                                )}>
+                                <View style={commonStyles.popover}>
+                                  <TouchableOpacity>
+                                    <View style={commonStyles.popoverItemContainer}>
+                                      <Image
+                                        source={require('../../../assets/img/Bookmark.png')}
+                                        style={commonStyles.popoverItemIcon}
+                                      />
+                                      <Text style={commonStyles.popoverItemText}>Save PDF</Text>
+                                    </View>
+                                  </TouchableOpacity>
+
+                                  <TouchableOpacity>
+                                    <View style={commonStyles.popoverItemContainer}>
+                                      <Image
+                                        source={require('../../../assets/img/SaveCon.png')}
+                                        style={commonStyles.popoverItemIcon}
+                                      />
+                                      <Text style={commonStyles.popoverItemText}>Save Contact</Text>
+                                    </View>
+                                  </TouchableOpacity>
+
+                                  <TouchableOpacity>
+                                    <View style={commonStyles.popoverItemContainer}>
+                                      <Image
+                                        source={require('../../../assets/img/Spam.png')}
+                                        style={commonStyles.popoverItemIcon}
+                                      />
+                                      <Text style={commonStyles.popoverItemText}>Report Spam</Text>
+                                    </View>
+                                  </TouchableOpacity>
+                                  <TouchableOpacity>
+                                    <View style={commonStyles.popoverItemContainer}>
+                                      <Image
+                                        source={require('../../../assets/img/Link.png')}
+                                        style={commonStyles.popoverItemIcon}
+                                      />
+                                      <Text style={commonStyles.popoverItemText}>Copy Link</Text>
+                                    </View>
+                                  </TouchableOpacity>
+                                </View>
+                              </Popover>
+                            </View>
+                            {/* Render specialty */}
+                            <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                              {item.speciality}
+                            </Text>
+                            {/* Render location */}
+                            {item.locality !== null && item.pincode !== null && item.locality !== '' && item.pincode !== '' && (
+                              <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                  <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12, marginRight: 8 }} />
+                                  <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                                    {item.locality}, {item.pincode}
+                                  </Text>
+                                </View>
+                              </View>
+                            )}
+
+                            {/* Add more texts or components if needed */}
+                          </View>
+                        </View>
+                      </TouchableOpacity>
+
+                    ))
+                )
             )}
           </ScrollView>
         );
@@ -520,7 +602,7 @@ const json = await response.json();
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    //height: 80,
+                    minHeight: 85,
                     paddingVertical: 8,
                     backgroundColor: '#FEFCFC'
                   }}
@@ -595,20 +677,54 @@ const json = await response.json();
                         {item.service}
                       </Text>
                       {/* Render location */}
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                          {/* <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
-                            {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
-                          </Text> */}
+                      {item.locality !== null && item.pincode !== null && item.locality !== '' && item.pincode !== '' && (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12, marginRight: 8 }} />
+                            <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                              {item.locality}, {item.pincode}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
+                      )}
+
                       {/* Add more texts or components if needed */}
                     </View>
                   </View>
                 </TouchableOpacity>
               ))
             ) : (
+              clinicsLoading ? (
+                // Generate 10 SkeletonPlaceholder components
+                Array.from({ length: 10 }).map((_, index) => (
+                  <SkeletonPlaceholder key={index}>
+                    <View
+                      style={{
+                        paddingHorizontal: 9,
+                        borderWidth: 0.5,
+                        borderRadius: 8,
+                        borderColor: '#979797',
+                        marginBottom: 16,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        minHeight: 85,
+                        paddingVertical: 8,
+                        backgroundColor: '#FEFCFC'
+                      }}
+                    >
+                      {/* Skeleton placeholder layout */}
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ width: 60, height: 60, borderRadius: 50, marginRight: 20 }} />
+                        <View>
+                          <View style={{ width: 120, height: 20, marginBottom: 6 }} />
+                          <View style={{ width: 150, height: 14 }} />
+                        </View>
+                      </View>
+                    </View>
+                  </SkeletonPlaceholder>
+                ))
+              ) : (
               clinicsData.map((item) => (
                 <TouchableOpacity
                   key={item.id}
@@ -621,7 +737,7 @@ const json = await response.json();
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    //height: 80,
+                    minHeight: 85,
                     paddingVertical: 8,
                     backgroundColor: '#FEFCFC'
                   }}
@@ -696,19 +812,23 @@ const json = await response.json();
                         {item.service}
                       </Text>
                       {/* Render location */}
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                          {/* <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]} numberOfLines={1}>
-                            {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
-                          </Text> */}
+                      {item.locality !== null && item.pincode !== null && item.locality !== '' && item.pincode !== '' && (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12, marginRight: 8 }} />
+                            <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                              {item.locality}, {item.pincode}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
+                      )}
+
                       {/* Add more texts or components if needed */}
                     </View>
                   </View>
                 </TouchableOpacity>
               ))
+              )
             )}
           </ScrollView>
         );
@@ -730,7 +850,7 @@ const json = await response.json();
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    //height: 80,
+                    minHeight: 85,
                     paddingVertical: 8,
                     backgroundColor: '#FEFCFC'
                   }}
@@ -802,23 +922,57 @@ const json = await response.json();
                       </View>
                       {/* Render specialty */}
                       <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
-                        {item.speciality}
+                        {item.service}
                       </Text>
                       {/* Render location */}
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                          {/* <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
-                            {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
-                          </Text> */}
+                      {item.locality !== null && item.pincode !== null && item.locality !== '' && item.pincode !== '' && (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12, marginRight: 8 }} />
+                            <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                              {item.locality}, {item.pincode}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
+                      )}
+
                       {/* Add more texts or components if needed */}
                     </View>
                   </View>
                 </TouchableOpacity>
               ))
             ) : (
+              officesLoading ? (
+                // Generate 10 SkeletonPlaceholder components
+                Array.from({ length: 10 }).map((_, index) => (
+                  <SkeletonPlaceholder key={index}>
+                    <View
+                      style={{
+                        paddingHorizontal: 9,
+                        borderWidth: 0.5,
+                        borderRadius: 8,
+                        borderColor: '#979797',
+                        marginBottom: 16,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        minHeight: 85,
+                        paddingVertical: 8,
+                        backgroundColor: '#FEFCFC'
+                      }}
+                    >
+                      {/* Skeleton placeholder layout */}
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ width: 60, height: 60, borderRadius: 50, marginRight: 20 }} />
+                        <View>
+                          <View style={{ width: 120, height: 20, marginBottom: 6 }} />
+                          <View style={{ width: 150, height: 14 }} />
+                        </View>
+                      </View>
+                    </View>
+                  </SkeletonPlaceholder>
+                ))
+              ) : (
               officeData.map((item) => (
                 <TouchableOpacity
                   key={item.id}
@@ -831,7 +985,7 @@ const json = await response.json();
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    //height: 80,
+                    minHeight: 85,
                     paddingVertical: 8,
                     backgroundColor: '#FEFCFC'
                   }}
@@ -903,22 +1057,26 @@ const json = await response.json();
                       </View>
                       {/* Render specialty */}
                       <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
-                        {item.speciality}
+                        {item.service}
                       </Text>
                       {/* Render location */}
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                          {/* <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]} numberOfLines={1}>
-                            {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
-                          </Text> */}
+                      {item.locality !== null && item.pincode !== null && item.locality !== '' && item.pincode !== '' && (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12, marginRight: 8 }} />
+                            <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                              {item.locality}, {item.pincode}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
+                      )}
+
                       {/* Add more texts or components if needed */}
                     </View>
                   </View>
                 </TouchableOpacity>
               ))
+              )
             )}
           </ScrollView>
         );
@@ -940,7 +1098,7 @@ const json = await response.json();
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    //height: 80,
+                    minHeight: 85,
                     paddingVertical: 8,
                     backgroundColor: '#FEFCFC'
                   }}
@@ -1015,18 +1173,54 @@ const json = await response.json();
                         {item.speciality}
                       </Text>
                       {/* Render location */}
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                        
+                      {item.locality !== null && item.pincode !== null && item.locality !== '' && item.pincode !== '' && (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12, marginRight: 8 }} />
+                            <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                              {item.locality}, {item.pincode}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
+                      )}
+
                       {/* Add more texts or components if needed */}
                     </View>
                   </View>
                 </TouchableOpacity>
               ))
             ) : (
+              othersLoading ? (
+                // Generate 10 SkeletonPlaceholder components
+                Array.from({ length: 10 }).map((_, index) => (
+                  <SkeletonPlaceholder key={index}>
+                    <View
+                      style={{
+                        paddingHorizontal: 9,
+                        borderWidth: 0.5,
+                        borderRadius: 8,
+                        borderColor: '#979797',
+                        marginBottom: 16,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        minHeight: 85,
+                        paddingVertical: 8,
+                        backgroundColor: '#FEFCFC'
+                      }}
+                    >
+                      {/* Skeleton placeholder layout */}
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ width: 60, height: 60, borderRadius: 50, marginRight: 20 }} />
+                        <View>
+                          <View style={{ width: 120, height: 20, marginBottom: 6 }} />
+                          <View style={{ width: 150, height: 14 }} />
+                        </View>
+                      </View>
+                    </View>
+                  </SkeletonPlaceholder>
+                ))
+              ) : (
               othersData.map((item) => (
                 <TouchableOpacity
                   key={item.id}
@@ -1039,7 +1233,7 @@ const json = await response.json();
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    //height: 80,
+                    minHeight: 85,
                     paddingVertical: 8,
                     backgroundColor: '#FEFCFC'
                   }}
@@ -1114,19 +1308,23 @@ const json = await response.json();
                         {item.speciality}
                       </Text>
                       {/* Render location */}
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12 }} />
-                          {/* <Text style={[commonStyles.headerText5BL, { marginLeft: 4, lineHeight: 22 }]}>
-                            {item.locList.length > 0 ? `${item.locList[0].landmark}, ${item.locList[0].state}` : 'Location not available'}
-                          </Text> */}
+                      {item.locality !== null && item.pincode !== null && item.locality !== '' && item.pincode !== '' && (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={require('../../../assets/img/Location.png')} style={{ width: 10, height: 12, marginRight: 8 }} />
+                            <Text style={[commonStyles.headerText5G, { lineHeight: 22, marginRight: 50 }]}>
+                              {item.locality}, {item.pincode}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
+                      )}
+
                       {/* Add more texts or components if needed */}
                     </View>
                   </View>
                 </TouchableOpacity>
               ))
+              )
             )}
           </ScrollView>
         );
@@ -1271,10 +1469,7 @@ const json = await response.json();
   return (
     <SafeAreaView style={styles.container}>
 
-      {isLoading ? (
-        <Animation />
-      ) : (
-        <View>
+           <View>
           {/* Header */}
           <View>
             <View style={commonStyles.wrapT}>
@@ -1351,7 +1546,16 @@ const json = await response.json();
           </View>
 
           {/* Tabs */}
-          <ScrollView style={styles.tabContainer} horizontal showsHorizontalScrollIndicator={false}>
+        <ScrollView
+          ref={scrollViewRef}
+          style={styles.tabContainer}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          onLayout={(event) => {
+            const { width } = event.nativeEvent.layout;
+            setScrollViewWidth(width);
+          }}
+        >
             {/* Tab buttons */}
             {[0, 1, 2, 3, 4].map((index) => (
               <TouchableOpacity
@@ -1360,6 +1564,7 @@ const json = await response.json();
                 //onPress={() => setSelectedTab(index)}
                 onPress={() => handleTabChange(index)}
                 activeOpacity={0.8}
+                ref={(ref) => (tabRefs.current[index] = ref)}
               >
                 {/* Tab icon */}
                 {/* Your tab icon component here */}
@@ -1378,8 +1583,6 @@ const json = await response.json();
           {/* Render selected tab content */}
           {renderTabContent()}
         </View>
-      )}
-
     </SafeAreaView>
   );
 };
